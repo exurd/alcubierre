@@ -49,6 +49,11 @@ def openRobloxPlace(rootPlaceId, bloxstrap=True, name=None):
         final_url = "roblox://placeId=" + str(rootPlaceId)
         webbrowser.open(final_url)
 
+def openPlaceInBrowser(placeId):
+    url = "https://www.roblox.com/games/" + str(placeId)
+    vPrint(f"Opening {url}")
+    webbrowser.open(url)
+
 def waitForProcessOrBadgeCollect(an_rbxInstance:rbxInstance,user_Id=0,secs_reincarnation=-1,singleBadge=True) -> rbxReason:
     """
     Wait for Roblox process to close or badge to be collected.

@@ -11,7 +11,7 @@ from . import apiReqs, dataSave, processHandle
 from .rbxTypes import rbxInstance, rbxType, rbxReason
 from .verbosePrint import vPrint
 
-def dealWithBadge(badge_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1) -> rbxReason:
+def dealWithBadge(badge_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1,open_place_in_browser=False) -> rbxReason:
     badge_info = badge_rbxInstance.info
     rootPlaceId = badge_info["awardingUniverse"]["rootPlaceId"]
     badgeName = badge_info["name"]
@@ -53,10 +53,13 @@ def dealWithBadge(badge_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1
             print("Not playable, skipping!")
             return rbxReason.notPlayable
 
+    if open_place_in_browser:
+        processHandle.openPlaceInBrowser(rootPlaceId)
+
     processHandle.openRobloxPlace(rootPlaceId,name=badge_info["awardingUniverse"]["name"])
     return rbxReason.processOpened
 
-def dealWithPlace(place_rbxInstance:rbxInstance,checkIfBadgesOnUniverse=True) -> rbxReason:
+def dealWithPlace(place_rbxInstance:rbxInstance,checkIfBadgesOnUniverse=True,open_place_in_browser=False) -> rbxReason:
     place_Info = place_rbxInstance.info
 
     if checkIfBadgesOnUniverse:
@@ -69,10 +72,13 @@ def dealWithPlace(place_rbxInstance:rbxInstance,checkIfBadgesOnUniverse=True) ->
         else: # no universe means that it"s most likely *not* a place...
             return rbxReason.noUniverse
     
+    if open_place_in_browser:   
+        processHandle.openPlaceInBrowser(place_rbxInstance.id)
+
     processHandle.openRobloxPlace(place_rbxInstance.id,name=place_Info["name"])
     return rbxReason.processOpened
 
-def dealWithUniverse(universe_rbxInstance:rbxInstance,checkIfBadgesOnUniverse=True) -> rbxReason:
+def dealWithUniverse(universe_rbxInstance:rbxInstance,checkIfBadgesOnUniverse=True,open_place_in_browser=False) -> rbxReason:
     universe_info = universe_rbxInstance.info
     rootPlaceId = universe_info["rootPlaceId"]
 
@@ -88,26 +94,49 @@ def dealWithUniverse(universe_rbxInstance:rbxInstance,checkIfBadgesOnUniverse=Tr
             print("Not playable, skipping!")
             return rbxReason.notPlayable
 
+    if open_place_in_browser:
+        processHandle.openPlaceInBrowser(rootPlaceId)
+
     processHandle.openRobloxPlace(rootPlaceId,name=universe_info["name"])
     return rbxReason.processOpened
 
-def dealWithInstance(an_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1,checkIfBadgesOnUniverse=True,nested=False) -> rbxReason:
+def dealWithInstance(an_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1,checkIfBadgesOnUniverse=True,open_place_in_browser=False,nested=False) -> rbxReason:
     """
     Deals with rbxInstance; should either return a new process or rbxReason
     """
+    print(open_place_in_browser)
     if an_rbxInstance.type == rbxType.BADGE:
-        result = dealWithBadge(an_rbxInstance,user_id,awardedThreshold)
+        result = dealWithBadge(
+            badge_rbxInstance=an_rbxInstance,
+            user_id=user_id,
+            awardedThreshold=awardedThreshold,
+            open_place_in_browser=open_place_in_browser
+            )
     if an_rbxInstance.type == rbxType.PLACE:
-        result = dealWithPlace(an_rbxInstance)
+        result = dealWithPlace(
+            place_rbxInstance=an_rbxInstance,
+            open_place_in_browser=open_place_in_browser
+            )
         if result == rbxReason.noUniverse:
             if nested == True: # already tried this; stop
                 return False
             an_rbxInstance.detectTypeFromId()
             # and then go back again...
             vPrint("Time to do an inception on this instance...")
-            return dealWithInstance(an_rbxInstance,user_id,awardedThreshold,checkIfBadgesOnUniverse,nested=True)
+            return dealWithInstance(
+                an_rbxInstance=an_rbxInstance,
+                user_id=user_id,
+                awardedThreshold=awardedThreshold,
+                checkIfBadgesOnUniverse=checkIfBadgesOnUniverse,
+                open_place_in_browser=open_place_in_browser,
+                nested=True
+                )
     if an_rbxInstance.type == rbxType.UNIVERSE:
-        result = dealWithUniverse(an_rbxInstance,checkIfBadgesOnUniverse)
+        result = dealWithUniverse(
+            universe_rbxInstance=an_rbxInstance,
+            checkIfBadgesOnUniverse=checkIfBadgesOnUniverse,
+            open_place_in_browser=open_place_in_browser
+            )
     return result
 
 def isUniverseOneBadge(an_rbxInstance:rbxInstance) -> bool:
@@ -164,7 +193,13 @@ def start(lines,user_id=None,awardedThreshold=-1,secs_reincarnation=-1,open_plac
         line_rbxInstance.getInfoFromType()
         #print(line_rbxInstance.type)
         
-        line_rbxReason = dealWithInstance(line_rbxInstance,user_id,awardedThreshold,checkIfBadgesOnUniverse)
+        line_rbxReason = dealWithInstance(
+            an_rbxInstance=line_rbxInstance,
+            user_id=user_id,
+            awardedThreshold=awardedThreshold,
+            checkIfBadgesOnUniverse=checkIfBadgesOnUniverse,
+            open_place_in_browser=open_place_in_browser
+            )
 
         if line_rbxReason == rbxReason.processOpened:
             singleBadge = False
