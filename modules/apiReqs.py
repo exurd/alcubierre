@@ -5,7 +5,7 @@ from modules.verbosePrint import vPrint
 
 # temporary response cache
 # TODO: create optional argument permCache as a file (and allow disabling caches)
-tempRespCache = {"economy":{},"badges":{},"places":{},"universes":{}}
+tempRespCache = {"badges":{},"places":{},"universes":{},"economy":{},"universeBadges":{},"universeIds":{}}
 
 requestSession = requests.Session()
 adapter = requests.adapters.HTTPAdapter(max_retries=5)
@@ -81,8 +81,6 @@ def validate_CSRF() -> str:
 
 # {"TargetId":0,"ProductType":null,"AssetId":123456,"ProductId":0,"Name":"blackcatgoth"s Place","Description":"","AssetTypeId":9,"Creator":{"Id":52988,"Name":"blackcatgoth","CreatorType":"User","CreatorTargetId":52988,"HasVerifiedBadge":false},"IconImageAssetId":752403374,"Created":"2007-08-27T17:40:45.12Z","Updated":"2007-08-27T17:40:45.12Z","PriceInRobux":null,"PriceInTickets":null,"Sales":0,"IsNew":false,"IsForSale":false,"IsPublicDomain":false,"IsLimited":false,"IsLimitedUnique":false,"Remaining":null,"MinimumMembershipLevel":0,"ContentRatingTypeId":0,"SaleAvailabilityLocations":null,"SaleLocation":null,"CollectibleItemId":null,"CollectibleProductId":null,"CollectiblesItemDetails":null}
 def getEconomyInfo(assetId,actLikePlaceDetailsAPI=False) -> dict:
-    economy_json = None
-
     if assetId in tempRespCache["economy"]:
         economy_json = tempRespCache["economy"][assetId]
         if actLikePlaceDetailsAPI:
@@ -106,11 +104,8 @@ def getEconomyInfo(assetId,actLikePlaceDetailsAPI=False) -> dict:
 # {"placeId": 20876709, "name": "[ Content Deleted ]", "description": "[ Content Deleted ]", "sourceName": "[ Content Deleted ]", "sourceDescription": "[ Content Deleted ]", "url": "https://www.roblox.com/games/20876709/Content-Deleted", "builder": "Chevsterr", "builderId": 6128452, "hasVerifiedBadge": False, "isPlayable": False, "reasonProhibited": "AssetUnapproved", "universeId": 19043203, "universeRootPlaceId": 20876709, "price": 0, "imageToken": "T_20876709_5455"}
 def getPlaceInfo(placeId,noAlternative=False) -> dict:
     if isTokenCookieThere():
-        place_json = None
-
         if placeId in tempRespCache["places"]:
-            place_json = tempRespCache["places"][placeId]
-            return place_check
+            return tempRespCache["places"][placeId]
 
         place_check = getRequestURL(f"https://games.roblox.com/v1/games/multiget-place-details?placeIds={str(placeId)}")
         if place_check.ok:
@@ -147,8 +142,6 @@ def getBadgeInfo(badgeId) -> dict:
     # example of badge_api error
     # {"errors": [{"code": 1, "message": "Badge is invalid or does not exist.", "userFacingMessage": "Something went wrong"}]}
     badge_check = getRequestURL(f"https://badges.roblox.com/v1/badges/{str(badgeId)}")
-
-    #print(badge_check.text)
     if badge_check.ok:
         badge_json = badge_check.json()
         if "errors" in badge_json:
@@ -163,13 +156,10 @@ def getBadgeInfo(badgeId) -> dict:
 
 # {"data":[{"id":13058,"rootPlaceId":1818,"name":"Classic: Crossroads","description":"The classic ROBLOX level is back!","sourceName":"Classic: Crossroads","sourceDescription":"The classic ROBLOX level is back!","creator":{"id":1,"name":"Roblox","type":"User","isRNVAccount":false,"hasVerifiedBadge":true},"price":null,"allowedGearGenres":["Ninja"],"allowedGearCategories":[],"isGenreEnforced":true,"copyingAllowed":true,"playing":21,"visits":10809119,"maxPlayers":8,"created":"2007-05-01T01:07:04.78Z","updated":"2024-01-29T22:05:10.417Z","studioAccessToApisAllowed":false,"createVipServersAllowed":false,"universeAvatarType":"MorphToR6","genre":"Fighting","genre_l1":"Action","genre_l2":"Battlegrounds & Fighting","isAllGenre":false,"isFavoritedByUser":false,"favoritedCount":229776}]}
 def getUniverseInfo(universeId) -> dict:
-    # ah, i forgot about the whole "id overlap" thing...
     if universeId in tempRespCache["universes"]:
         return tempRespCache["universes"][universeId]
     
     universe_check = getRequestURL(f"https://games.roblox.com/v1/games?universeIds={str(universeId)}")
-
-    #print(badge_check.text)
     if universe_check.ok:
         universe_json = universe_check.json()
         if "errors" in universe_json:
@@ -185,9 +175,8 @@ def getUniverseInfo(universeId) -> dict:
 def checkUserInvForAsset(userId=0, assetId=0) -> bool:
     # check if user has badge
     if not userId == 0 and not assetId == 0:
-        # inventory_api should only output "true" or "false"; all lowercase
+        # inventory_api outputs just "true" or "false" in lowercase
         user_check = getRequestURL(f"https://inventory.roblox.com/v1/users/{str(userId)}/items/2/{str(assetId)}/is-owned")
-
         if user_check.text == "true":
             return True
         elif user_check.text == "false":
@@ -198,24 +187,32 @@ def checkUserInvForAsset(userId=0, assetId=0) -> bool:
         return None
 
 def checkUniverseForAnyBadges(universeId) -> dict:
+    if universeId in tempRespCache["universeBadges"]:
+        return tempRespCache["universeBadges"][universeId]
+    
     universeBadgesCheck = getRequestURL(f"https://badges.roblox.com/v1/universes/{str(universeId)}/badges")#?limit=10&sortOrder=Asc")
-    #(badge_api + "universes/" + str(universeId) + "/badges?limit=10&sortOrder=Asc")
     if universeBadgesCheck.ok:
         universeBadges_json = universeBadgesCheck.json()
         vPrint(f"universeBadges_json: [{universeBadges_json}]")
         if universeBadges_json["data"] == []: # no badges
+            tempRespCache["universeBadges"][universeId] = False
             return False
         else:
+            tempRespCache["universeBadges"][universeId] = universeBadges_json["data"]
             return universeBadges_json["data"]
 
 # {"universeId":13058}
 def getUniverseFromPlaceId(placeId) -> dict:
+    if placeId in tempRespCache["universeIds"]:
+        return tempRespCache["universeIds"][placeId]
+    
     universeIdCheck = getRequestURL(f"https://apis.roblox.com/universes/v1/places/{str(placeId)}/universe")
     if universeIdCheck.ok:
         universeId_json = universeIdCheck.json()
         vPrint(f"universeId_json: [{universeId_json}]")
-        #print(universe_json)
+        tempRespCache["universeIds"][placeId] = universeId_json["universeId"]
         return universeId_json["universeId"]
+    
     return None
 
 def getUserFromToken() -> dict:
