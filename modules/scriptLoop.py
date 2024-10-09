@@ -129,7 +129,7 @@ def isUniverseOneBadge(an_rbxInstance:rbxInstance) -> bool:
 
 dataSave.init()
 
-def start(lines,user_id=None,awardedThreshold=-1,secs_reincarnation=-1,open_place_in_browser=False,use_bloxstrap=True,checkIfBadgesOnUniverse=True):
+def start(lines,user_id=None,awardedThreshold=-1,secs_reincarnation=-1,open_place_in_browser=False,use_bloxstrap=True,checkIfBadgesOnUniverse=True,detectOneBadgeUniverses=True):
     # check if variables are correctly set
     if not type(awardedThreshold) == int:
         awardedThreshold = -1
@@ -160,7 +160,7 @@ def start(lines,user_id=None,awardedThreshold=-1,secs_reincarnation=-1,open_plac
         if line_rbxInstance.type == None:
             continue
 
-        #print(line_rbxInstance)
+        print(f"line_rbxInstance; {line_rbxInstance}")
         line_rbxInstance.getInfoFromType()
         #print(line_rbxInstance.type)
         
@@ -168,9 +168,10 @@ def start(lines,user_id=None,awardedThreshold=-1,secs_reincarnation=-1,open_plac
 
         if line_rbxReason == rbxReason.processOpened:
             singleBadge = False
-            if isUniverseOneBadge(line_rbxInstance):
-                print("[SOLO BADGE! ONLY 1 TO COLLECT FOR THIS GAME!]")
-                singleBadge = True
+            if detectOneBadgeUniverses == True:
+                if isUniverseOneBadge(line_rbxInstance):
+                    print("[SOLO BADGE! ONLY 1 TO COLLECT FOR THIS GAME!]")
+                    singleBadge = True
 
             time.sleep(15)
 

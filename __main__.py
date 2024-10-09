@@ -61,6 +61,9 @@ def get_parser() -> argparse.ArgumentParser:
     # parser.add_argument("--do-not-skip", "-dns", action="store_false",
     #                 help="")
 
+    parser.add_argument("--detect-one-badge-games", "-dobg", action="store_false",
+                    help="Detects one badge games and automatically closes Roblox when the badge is collected.")
+
     parser.add_argument("--cache-directory", "-cd", default=os.path.join(os.path.dirname(__file__), "alcubierre_cache"),
                         help="The directory where caches/saved data is kept.")
 
@@ -69,7 +72,6 @@ def get_parser() -> argparse.ArgumentParser:
 
     return parser
 
-# --detect-one-badge-games -dobg DEFAULT:True
 # --play-sound FILE (optional)
 
 def main(args=None):
@@ -128,15 +130,17 @@ def main(args=None):
     args.file_path.close()
     # print(lines)
 
-    # variables for loop.py
-    secs_reincarnation = args.seconds
-    awardedThreshold = args.awarded_threshold
-    open_place_in_browser = args.open_in_browser
-    use_bloxstrap = args.no_bloxstrap
-
     vPrint("Starting scriptLoop...")
     from modules import scriptLoop
-    scriptLoop.start(lines,user_id,awardedThreshold,secs_reincarnation,open_place_in_browser,use_bloxstrap)
+    scriptLoop.start(
+        lines,
+        user_id=user_id,
+        awardedThreshold=args.awarded_threshold,
+        secs_reincarnation=args.seconds,
+        open_place_in_browser=args.open_in_browser,
+        use_bloxstrap=args.no_bloxstrap,
+        detectOneBadgeUniverses=args.detect_one_badge_games
+        )
 
 if __name__ == "__main__":
     main()
