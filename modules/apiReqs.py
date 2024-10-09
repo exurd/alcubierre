@@ -21,7 +21,6 @@ def init(user_agent=None,rbx_token=None):
         print("Warning: Ecomony API is limited to 1 request per minute!")
         print("Warning! Place playability info is unavailable!")
         print("Adding your Roblox token is highly recommended!")
-    #requestSession.headers["Referer"] = "https://www.roblox.com"
 
 def isTokenCookieThere() -> bool:
     return ".ROBLOSECURITY" in requestSession.cookies
@@ -33,7 +32,6 @@ def getRequestURL(url, retryAmount=8, acceptForbidden=False, initialWaitTime=Non
         tries += 1
         try:
             response = requestSession.get(url)
-            vPrint(response)
             if response.status_code == 200:
                 return response
             if response.status_code == 302: # Found
@@ -41,7 +39,7 @@ def getRequestURL(url, retryAmount=8, acceptForbidden=False, initialWaitTime=Non
             if acceptForbidden:
                 if response.status_code == 403: # Forbidden
                     return response
-            vPrint(response.status_code)
+            #vPrint(response.status_code)
             response.raise_for_status()
         except requests.exceptions.Timeout:
             vPrint("Timed out!")
@@ -85,9 +83,12 @@ def validate_CSRF() -> str:
 def getEconomyInfo(assetId,actLikePlaceDetailsAPI=False) -> dict:
     economy_json = None
 
-    if assetId in tempRespCache["places"]:
-        economy_json = tempRespCache["places"][assetId]
-        return economy_json
+    if assetId in tempRespCache["economy"]:
+        economy_json = tempRespCache["economy"][assetId]
+        if actLikePlaceDetailsAPI:
+            return {k.lower(): v for k, v in economy_json.items()}
+        else:
+            return economy_json
 
     economy_check = getRequestURL(f"https://economy.roblox.com/v2/assets/{str(assetId)}/details",initialWaitTime=60)
     if economy_check.ok:
@@ -118,7 +119,7 @@ def getPlaceInfo(placeId,noAlternative=False) -> dict:
                 vPrint(f"Error in place_json! [{place_json}]")
                 return False
             else:
-                #vPrint(f"place_json: [{place_json}]")
+                vPrint(f"place_json: [{place_json}]")
                 tempRespCache["places"][placeId] = place_json[0]
                 return place_json[0]
 
@@ -154,7 +155,7 @@ def getBadgeInfo(badgeId) -> dict:
             vPrint(f"Error in badge_json! [{badge_json}]")
             return False
         else:
-            #vPrint(f"badge_json: [{badge_json}]")
+            vPrint(f"badge_json: [{badge_json}]")
             tempRespCache["badges"][badgeId] = badge_json
             return badge_json
     else:
@@ -175,7 +176,7 @@ def getUniverseInfo(universeId) -> dict:
             vPrint(f"Error in universe_json! [{universe_json}]")
             return False
         else:
-            #vPrint(f"universe_json: [{universe_json}]")
+            vPrint(f"universe_json: [{universe_json}]")
             tempRespCache["universes"][universeId] = universe_json
             return universe_json
     else:
@@ -211,10 +212,10 @@ def checkUniverseForAnyBadges(universeId) -> dict:
 def getUniverseFromPlaceId(placeId) -> dict:
     universeIdCheck = getRequestURL(f"https://apis.roblox.com/universes/v1/places/{str(placeId)}/universe")
     if universeIdCheck.ok:
-        universe_json = universeIdCheck.json()
-        vPrint(f"universe_json: [{universe_json}]")
+        universeId_json = universeIdCheck.json()
+        vPrint(f"universeId_json: [{universeId_json}]")
         #print(universe_json)
-        return universe_json["universeId"]
+        return universeId_json["universeId"]
     return None
 
 def getUserFromToken() -> dict:

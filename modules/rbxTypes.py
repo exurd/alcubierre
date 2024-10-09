@@ -48,19 +48,16 @@ class rbxInstance:
         vPrint(f"Getting info for {self.id} with type {self.type}")
         if self.type == rbxType.BADGE:
             badgeInfo = apiReqs.getBadgeInfo(self.id)
-            vPrint(f"badgeInfo: {badgeInfo}")
             if badgeInfo != False:
                 self.info = badgeInfo
                 return badgeInfo
         if self.type == rbxType.PLACE:
             placeInfo = apiReqs.getPlaceInfo(self.id)
-            vPrint(f"placeInfo: {placeInfo}")
             if placeInfo != False:
                 self.info = placeInfo
                 return placeInfo
         if self.type == rbxType.UNIVERSE:
             universeInfo = apiReqs.getUniverseInfo(self.id)
-            vPrint(f"universeInfo: {universeInfo}")
             if universeInfo != False:
                 self.info = universeInfo
                 return universeInfo
@@ -112,7 +109,7 @@ class rbxInstance:
     
     def detectTypeFromId(self,ignore=[]) -> rbxType:
         id = self.id
-        vPrint(f"Attempt to detect type from {id}")
+        vPrint(f"Attempt to detect type from {id} (Previous type was: {self.type})")
 
         vPrint("Badge?")
         if not rbxType.BADGE in ignore:
@@ -126,7 +123,6 @@ class rbxInstance:
             economyInfo = apiReqs.getEconomyInfo(id)
             if economyInfo != False:
                 # economy api is broad; check if the asset type is 9 (place)
-                print(economyInfo)
                 if economyInfo["AssetTypeId"] == 9:
                     self.type = rbxType.PLACE
                     return rbxType.PLACE
