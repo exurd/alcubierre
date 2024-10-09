@@ -5,12 +5,12 @@ from . import apiReqs
 from .verbosePrint import vPrint
 
 place_patterns = [
-    r"roblox\.com/games/(\d+)",   # Match current place URLs
-    r"place\?id=(\d+)"            # Match old place URLs
+    r"roblox\.com/games/(\d+)",
+    r"place\?id=(\d+)"
 ]
 badge_patterns = [
-    r"roblox\.com/badges/(\d+)",  # Match current badge URLs
-    r"item\?id=(\d+)"             # Match old badge URLs
+    r"roblox\.com/badges/(\d+)",
+    r"item\?id=(\d+)"
 ]
 
 class rbxType(Enum):
@@ -65,7 +65,7 @@ class rbxInstance:
                 self.info = universeInfo
                 return universeInfo
     
-    def stringIdThingy(self,string):
+    def stringIdThingy(self,string:str):
         vPrint("Detecting type from string...")
         id = None
         idType = None
@@ -73,18 +73,13 @@ class rbxInstance:
             #print(string)
             id = string.replace("badge::","")
             idType = rbxType.BADGE
-            #return rbxType.BADGE, badgeId
-            #print(apiReqs.getBadgeInfo(badgeId))
         if "place::" in string:
             #print(string)
             id = string.replace("place::","")
             idType = rbxType.PLACE
-            #print(apiReqs.getPlaceInfo(placeId))
         if "universe::" in string:
-            #print(string)
             id = string.replace("universe::","")
             idType = rbxType.UNIVERSE
-            #print(apiReqs.getUniverseInfo(universeId))
         
         for pattern in place_patterns:
             if id != None and idType != None:   break
@@ -92,7 +87,6 @@ class rbxInstance:
             if match:
                 id = match.group(1)
                 idType = rbxType.PLACE
-                #return {"id": match.group(1), "type": rbxType.PLACE}
         
         for pattern in badge_patterns:
             if id != None and idType != None:   break
@@ -100,7 +94,6 @@ class rbxInstance:
             if match:
                 id = match.group(1)
                 idType = rbxType.BADGE
-                #return {"id": match.group(1), "type": rbxType.BADGE}
         
         # check if string is a number (id)
         if id == None and idType == None:
@@ -111,13 +104,13 @@ class rbxInstance:
                 id = string
                 idType = rbxType.UNKNOWN
             except ValueError:
-                vPrint("...I don't know what I expected")
+                vPrint("...welp, it's not an integer.")
 
         self.id = id
         self.type = idType
         vPrint(self)
     
-    def detectTypeFromId(self,ignore=[]):
+    def detectTypeFromId(self,ignore=[]) -> rbxType:
         id = self.id
         vPrint(f"Attempt to detect type from {id}")
 
