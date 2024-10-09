@@ -49,7 +49,7 @@ def get_parser():
     # If you want more time, say, to look around in the game, try 5-10 minutes (300-600 seconds)
 
     parser.add_argument("--no-bloxstrap", "-nbs", action="store_false",
-                    help="Don't use Bloxstrap to open Roblox (not recommended). When this option is not in use, the script automagicly detects if Bloxstrap is installed and uses it if so. Windows only! Bloxstrap website: https://bloxstraplabs.com")
+                    help="Don't use Bloxstrap to open Roblox (not recommended). When this option is not in use, the script automagically detects if Bloxstrap is installed and uses it if so. Windows only! Bloxstrap website: https://bloxstraplabs.com")
     
     parser.add_argument("--open-in-browser", "-ob", action="store_true",
                     help="Opens the Roblox place in default browser. Highly recommended, but set False as default.")
