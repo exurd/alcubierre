@@ -18,7 +18,7 @@ def createEnvTemplate(parser: argparse.ArgumentParser, env_file):
                 f.write(f"# {action.help}\n")
                 f.write(f"{env_var_name}={default_value}\n\n")
 
-def loadEnvFile(envFile):
+def loadEnvFile(envFile) -> dict[str,str]:
     # env_loaded = False
     if os.path.isfile(envFile):
         load_dotenv(envFile)

@@ -11,7 +11,8 @@ DETACHED_PROCESS = 0x00000008
 # TODO: figure out system differences (this means that the script is windows only for now)
 system = platform.system()
 
-def process_exists(process_name):
+# https://stackoverflow.com/a/29275361
+def win_process_exists(process_name) -> bool:
     call = "TASKLIST", "/FI", "imagename eq %s" % process_name
     # use buildin check_output right away
     output = subprocess.check_output(call).decode()
@@ -48,7 +49,7 @@ def openRobloxPlace(rootPlaceId, bloxstrap=True, name=None):
         final_url = "roblox://placeId=" + str(rootPlaceId)
         webbrowser.open(final_url)
 
-def waitForProcessOrBadgeCollect(an_rbxInstance:rbxInstance,user_Id=0,secs_reincarnation=-1,singleBadge=True):
+def waitForProcessOrBadgeCollect(an_rbxInstance:rbxInstance,user_Id=0,secs_reincarnation=-1,singleBadge=True) -> rbxReason:
     """
     Wait for Roblox process to close or badge to be collected.
     """
@@ -56,8 +57,9 @@ def waitForProcessOrBadgeCollect(an_rbxInstance:rbxInstance,user_Id=0,secs_reinc
         print("Exit the game when you have finished.")
         while True:
             time.sleep(3)
-            if not process_exists("RobloxPlayerBeta.exe"):
-                return rbxReason.processClosed
+            if system == "Windows":
+                if not win_process_exists("RobloxPlayerBeta.exe"):
+                    return rbxReason.processClosed
             if an_rbxInstance.type == rbxType.BADGE and user_Id != 0:
                 if singleBadge == True:
                     userBadge_check = apiReqs.checkUserInvForAsset(user_Id,an_rbxInstance.id)

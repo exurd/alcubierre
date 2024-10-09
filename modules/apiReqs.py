@@ -23,16 +23,16 @@ def init(user_agent=None,rbx_token=None):
         print("Adding your Roblox token is highly recommended!")
     #requestSession.headers["Referer"] = "https://www.roblox.com"
 
-def isTokenCookieThere():
+def isTokenCookieThere() -> bool:
     return ".ROBLOSECURITY" in requestSession.cookies
 
-def getRequestURL(url, retryAmount=8, acceptForbidden=False, initialWaitTime=None):
+def getRequestURL(url, retryAmount=8, acceptForbidden=False, initialWaitTime=None) -> requests.Response:
     tries = 0
     vPrint(f"Requesting {url}...")
     for _ in range(retryAmount):
         tries += 1
         try:
-            response: requests.Response = requestSession.get(url)
+            response = requestSession.get(url)
             vPrint(response)
             if response.status_code == 200:
                 return response
@@ -74,7 +74,7 @@ def getRequestURL(url, retryAmount=8, acceptForbidden=False, initialWaitTime=Non
             time.sleep(sleep_time)
     return False
 
-def validate_CSRF():
+def validate_CSRF() -> str:
     """
     Takes X-CSRF-Token from logout auth URL.
     """
@@ -82,7 +82,7 @@ def validate_CSRF():
     return req.headers["X-CSRF-Token"]
 
 # {"TargetId":0,"ProductType":null,"AssetId":123456,"ProductId":0,"Name":"blackcatgoth"s Place","Description":"","AssetTypeId":9,"Creator":{"Id":52988,"Name":"blackcatgoth","CreatorType":"User","CreatorTargetId":52988,"HasVerifiedBadge":false},"IconImageAssetId":752403374,"Created":"2007-08-27T17:40:45.12Z","Updated":"2007-08-27T17:40:45.12Z","PriceInRobux":null,"PriceInTickets":null,"Sales":0,"IsNew":false,"IsForSale":false,"IsPublicDomain":false,"IsLimited":false,"IsLimitedUnique":false,"Remaining":null,"MinimumMembershipLevel":0,"ContentRatingTypeId":0,"SaleAvailabilityLocations":null,"SaleLocation":null,"CollectibleItemId":null,"CollectibleProductId":null,"CollectiblesItemDetails":null}
-def getEconomyInfo(assetId,actLikePlaceDetailsAPI=False):
+def getEconomyInfo(assetId,actLikePlaceDetailsAPI=False) -> dict:
     economy_json = None
 
     if assetId in tempRespCache["places"]:
@@ -103,7 +103,7 @@ def getEconomyInfo(assetId,actLikePlaceDetailsAPI=False):
             return economy_json
 
 # {"placeId": 20876709, "name": "[ Content Deleted ]", "description": "[ Content Deleted ]", "sourceName": "[ Content Deleted ]", "sourceDescription": "[ Content Deleted ]", "url": "https://www.roblox.com/games/20876709/Content-Deleted", "builder": "Chevsterr", "builderId": 6128452, "hasVerifiedBadge": False, "isPlayable": False, "reasonProhibited": "AssetUnapproved", "universeId": 19043203, "universeRootPlaceId": 20876709, "price": 0, "imageToken": "T_20876709_5455"}
-def getPlaceInfo(placeId,noAlternative=False):
+def getPlaceInfo(placeId,noAlternative=False) -> dict:
     if isTokenCookieThere():
         place_json = None
 
@@ -137,7 +137,7 @@ def getPlaceInfo(placeId,noAlternative=False):
         vPrint("multiget-place-details is unusable; cannot use economy api for this. Returning false.")
         return False
 
-def getBadgeInfo(badgeId):
+def getBadgeInfo(badgeId) -> dict:
     if badgeId in tempRespCache["badges"]:
         return tempRespCache["badges"][badgeId]
 
@@ -161,7 +161,7 @@ def getBadgeInfo(badgeId):
         return False
 
 # {"data":[{"id":13058,"rootPlaceId":1818,"name":"Classic: Crossroads","description":"The classic ROBLOX level is back!","sourceName":"Classic: Crossroads","sourceDescription":"The classic ROBLOX level is back!","creator":{"id":1,"name":"Roblox","type":"User","isRNVAccount":false,"hasVerifiedBadge":true},"price":null,"allowedGearGenres":["Ninja"],"allowedGearCategories":[],"isGenreEnforced":true,"copyingAllowed":true,"playing":21,"visits":10809119,"maxPlayers":8,"created":"2007-05-01T01:07:04.78Z","updated":"2024-01-29T22:05:10.417Z","studioAccessToApisAllowed":false,"createVipServersAllowed":false,"universeAvatarType":"MorphToR6","genre":"Fighting","genre_l1":"Action","genre_l2":"Battlegrounds & Fighting","isAllGenre":false,"isFavoritedByUser":false,"favoritedCount":229776}]}
-def getUniverseInfo(universeId):
+def getUniverseInfo(universeId) -> dict:
     # ah, i forgot about the whole "id overlap" thing...
     if universeId in tempRespCache["universes"]:
         return tempRespCache["universes"][universeId]
@@ -181,7 +181,7 @@ def getUniverseInfo(universeId):
     else:
         return False
 
-def checkUserInvForAsset(userId=0, assetId=0):
+def checkUserInvForAsset(userId=0, assetId=0) -> bool:
     # check if user has badge
     if not userId == 0 and not assetId == 0:
         # inventory_api should only output "true" or "false"; all lowercase
@@ -196,7 +196,7 @@ def checkUserInvForAsset(userId=0, assetId=0):
     else:
         return None
 
-def checkUniverseForAnyBadges(universeId):
+def checkUniverseForAnyBadges(universeId) -> dict:
     universeBadgesCheck = getRequestURL(f"https://badges.roblox.com/v1/universes/{str(universeId)}/badges")#?limit=10&sortOrder=Asc")
     #(badge_api + "universes/" + str(universeId) + "/badges?limit=10&sortOrder=Asc")
     if universeBadgesCheck.ok:
@@ -208,7 +208,7 @@ def checkUniverseForAnyBadges(universeId):
             return universeBadges_json["data"]
 
 # {"universeId":13058}
-def getUniverseFromPlaceId(placeId):
+def getUniverseFromPlaceId(placeId) -> dict:
     universeIdCheck = getRequestURL(f"https://apis.roblox.com/universes/v1/places/{str(placeId)}/universe")
     if universeIdCheck.ok:
         universe_json = universeIdCheck.json()
@@ -217,7 +217,7 @@ def getUniverseFromPlaceId(placeId):
         return universe_json["universeId"]
     return None
 
-def getUserFromToken():
+def getUserFromToken() -> dict:
     userCheck = getRequestURL("https://users.roblox.com/v1/users/authenticated")
     if userCheck.ok:
         return userCheck.json()

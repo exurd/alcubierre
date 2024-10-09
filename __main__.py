@@ -6,7 +6,7 @@ __desc__ = "Teleports to every place on a file."
 __version__ = "(git master branch)"
 __author__ = "exurd"
 
-def get_parser():
+def get_parser() -> argparse.ArgumentParser:
     """
     Creates a new argument parser.
     """
@@ -31,7 +31,7 @@ def get_parser():
     parser.add_argument("--rbx-token", "-t", default=None,
                     help=".ROBLOSECURITY token. By using this option, you agree that this is your unique token and not anyone else's. DO NOT SHARE YOUR ROBLOX TOKEN WITH ANYONE! More info can be found here: https://ro.py.jmk.gg/dev/tutorials/roblosecurity/")
     
-    parser.add_argument("--user-id", "-u", default=None,
+    parser.add_argument("--user-id", "-u", type=int, default=None,
                     help="Specifys a Roblox User ID to check inventory for badges. Not required if you're already using --rbx-token, but the User ID does take priority when in used.")
     # Your Roblox User ID. It can be found your profile. If set to 0 it will not use any features that need your User ID, like badge checking.
     # Example: mrflimflam --> https://www.roblox.com/users/339310190/profile --> 339310190

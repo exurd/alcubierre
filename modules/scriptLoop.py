@@ -11,7 +11,7 @@ from . import apiReqs, dataSave, processHandle
 from .rbxTypes import rbxInstance, rbxType, rbxReason
 from .verbosePrint import vPrint
 
-def dealWithBadge(badge_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1):
+def dealWithBadge(badge_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1) -> rbxReason:
     badge_info = badge_rbxInstance.info
     rootPlaceId = badge_info["awardingUniverse"]["rootPlaceId"]
     badgeName = badge_info["name"]
@@ -56,7 +56,7 @@ def dealWithBadge(badge_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1
     processHandle.openRobloxPlace(rootPlaceId,name=badge_info["awardingUniverse"]["name"])
     return rbxReason.processOpened
 
-def dealWithPlace(place_rbxInstance:rbxInstance,checkIfBadgesOnUniverse=True):
+def dealWithPlace(place_rbxInstance:rbxInstance,checkIfBadgesOnUniverse=True) -> rbxReason:
     place_Info = place_rbxInstance.info
 
     if checkIfBadgesOnUniverse:
@@ -72,7 +72,7 @@ def dealWithPlace(place_rbxInstance:rbxInstance,checkIfBadgesOnUniverse=True):
     processHandle.openRobloxPlace(place_rbxInstance.id,name=place_Info["name"])
     return rbxReason.processOpened
 
-def dealWithUniverse(universe_rbxInstance:rbxInstance,checkIfBadgesOnUniverse=True):
+def dealWithUniverse(universe_rbxInstance:rbxInstance,checkIfBadgesOnUniverse=True) -> rbxReason:
     universe_info = universe_rbxInstance.info
     rootPlaceId = universe_info["rootPlaceId"]
 
@@ -91,7 +91,7 @@ def dealWithUniverse(universe_rbxInstance:rbxInstance,checkIfBadgesOnUniverse=Tr
     processHandle.openRobloxPlace(rootPlaceId,name=universe_info["name"])
     return rbxReason.processOpened
 
-def dealWithInstance(an_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1,checkIfBadgesOnUniverse=True,nested=False):
+def dealWithInstance(an_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1,checkIfBadgesOnUniverse=True,nested=False) -> rbxReason:
     """
     Deals with rbxInstance; should either return a new process or rbxReason
     """
@@ -110,7 +110,7 @@ def dealWithInstance(an_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1
         result = dealWithUniverse(an_rbxInstance,checkIfBadgesOnUniverse)
     return result
 
-def isUniverseOneBadge(an_rbxInstance:rbxInstance):
+def isUniverseOneBadge(an_rbxInstance:rbxInstance) -> bool:
     """
     This should be for *after* dealWithInstance(), not before. This is so the tempRespCache from apiReqs get used.
     """
@@ -121,6 +121,7 @@ def isUniverseOneBadge(an_rbxInstance:rbxInstance):
         check_universe_badges = apiReqs.checkUniverseForAnyBadges(universeId)
     if an_rbxInstance.type == rbxType.UNIVERSE:
         check_universe_badges = apiReqs.checkUniverseForAnyBadges(an_rbxInstance.id)
+
     if len(check_universe_badges) == 1:
         return True
     else:
