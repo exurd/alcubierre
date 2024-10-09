@@ -61,7 +61,7 @@ def get_parser() -> argparse.ArgumentParser:
     # parser.add_argument("--do-not-skip", "-dns", action="store_false",
     #                 help="")
 
-    parser.add_argument("--cache-directory", "-cd", default=os.path.dirname(__file__),
+    parser.add_argument("--cache-directory", "-cd", default=os.path.join(os.path.dirname(__file__), "alcubierre_cache"),
                         help="The directory where caches/saved data is kept.")
 
     parser.add_argument("--user-agent", "-ua", default=f"{parser.prog} - badge-to-badge teleporter {__version__}",
@@ -106,8 +106,21 @@ def main(args=None):
                 user_agent = data["user_agent"]
 
     from modules import apiReqs, dataSave
-    dataSave.get_data_file_path(args.cache_directory)
     apiReqs.init(user_agent, rbx_token)
+
+    user_id = args.user_id
+    if user_id == parser.get_default("user_id") and apiReqs.isTokenCookieThere():
+        userInfo = apiReqs.getUserFromToken()
+        vPrint(f"userInfo: [{userInfo}]")
+        user_id = userInfo["id"]
+        #print(userInfo)
+
+    data_folder = dataSave.get_data_file_path(args.cache_directory)
+    if user_id != parser.get_default("user_id"):
+        data_folder = os.path.join(data_folder,str(user_id))
+    else:
+        data_folder = os.path.join(data_folder,"guest")
+    data_folder = dataSave.get_data_file_path(data_folder)
 
     if args.file_path == None:
         parser.error("the following arguments are required to continue: file_path")
@@ -118,14 +131,6 @@ def main(args=None):
     # variables for loop.py
     secs_reincarnation = args.seconds
     awardedThreshold = args.awarded_threshold
-
-    user_id = args.user_id
-    if user_id == None and apiReqs.isTokenCookieThere():
-        userInfo = apiReqs.getUserFromToken()
-        vPrint(f"userInfo: [{userInfo}]")
-        user_id = userInfo["id"]
-        #print(userInfo)
-
     open_place_in_browser = args.open_in_browser
     use_bloxstrap = args.no_bloxstrap
 

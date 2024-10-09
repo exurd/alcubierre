@@ -11,7 +11,7 @@ played_places = None
 
 def get_data_file_path(rootFold):
     global data_folder
-    data_folder = os.path.join(rootFold, "alcubierre_cache")
+    data_folder = os.path.join(rootFold)
     os.makedirs(data_folder, exist_ok=True)
     vPrint(f"data_folder: [{data_folder}]")
     return data_folder
