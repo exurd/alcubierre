@@ -13,6 +13,16 @@ badge_patterns = [
     r"item\?id=(\d+)"
 ]
 
+def checkIfStringIsInteger(string:str):
+    vPrint(f"Checking if string {string} is an integer...")
+    try:
+        checkInt = int(string)
+        vPrint("String is an integer.")
+        return checkInt
+    except ValueError:
+        vPrint("String is not an integer.")
+        return None
+
 class rbxType(Enum):
     UNKNOWN = 0
     BADGE = 1
@@ -92,16 +102,15 @@ class rbxInstance:
                 id = match.group(1)
                 idType = rbxType.BADGE
         
-        # check if string is a number (id)
         if id == None and idType == None:
-            vPrint("Last ditch effort, checking if string is just an integer...")
-            try:
-                checkInt = int(string)
-                vPrint("String is an id, setting type to rbxType.UNKNOWN")
-                id = string
-                idType = rbxType.UNKNOWN
-            except ValueError:
-                vPrint("...welp, it's not an integer.")
+            vPrint("Is the string just numbers?")
+            id = string
+        checkInt = checkIfStringIsInteger(id)
+        if checkInt == None:
+            vPrint("Setting type to rbxType.UNKNOWN")
+            idType = rbxType.UNKNOWN
+        else:
+            id = checkInt
 
         self.id = id
         self.type = idType
