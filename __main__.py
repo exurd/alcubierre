@@ -1,5 +1,5 @@
 import os, sys, argparse, time
-from modules.verbosePrint import toggleVerbosity, vPrint
+from modules.verbosePrint import toggleVerbosity
 
 __prog__ = "alcubierre" 
 __desc__ = "Teleports to every place on a file."
@@ -77,8 +77,9 @@ def main(args=None):
     args = parser.parse_args(args)
     #print(args)
 
-    if args.verbose == True:
+    if args.verbose:
         toggleVerbosity()
+    from modules.verbosePrint import vPrint
 
     vPrint("-------------------------")
     vPrint(f"Timestamp: {time.time()}")

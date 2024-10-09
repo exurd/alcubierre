@@ -129,7 +129,7 @@ def isUniverseOneBadge(an_rbxInstance:rbxInstance) -> bool:
 
 dataSave.init()
 
-def start(lines,user_id=None,awardedThreshold=-1,secs_reincarnation=-1,open_place_in_browser=False,use_bloxstrap=True,checkIfBadgesOnUniverse=True):    
+def start(lines,user_id=None,awardedThreshold=-1,secs_reincarnation=-1,open_place_in_browser=False,use_bloxstrap=True,checkIfBadgesOnUniverse=True):
     # check if variables are correctly set
     if not type(awardedThreshold) == int:
         awardedThreshold = -1
