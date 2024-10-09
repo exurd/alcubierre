@@ -1,4 +1,4 @@
-import os, argparse
+import os, argparse, typing
 from dotenv import load_dotenv
 
 def createEnvTemplate(parser: argparse.ArgumentParser, env_file):
@@ -18,7 +18,7 @@ def createEnvTemplate(parser: argparse.ArgumentParser, env_file):
                 f.write(f"# {action.help}\n")
                 f.write(f"{env_var_name}={default_value}\n\n")
 
-def loadEnvFile(envFile) -> dict[str,str]:
+def loadEnvFile(envFile) -> typing.Dict[str,str]: # dict[str,str]: # # __future__.annotations can only do so much for compatibility
     # env_loaded = False
     if os.path.isfile(envFile):
         load_dotenv(envFile)
