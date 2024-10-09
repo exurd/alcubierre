@@ -190,3 +190,6 @@ desktop.ini
 
 # Built Visual Studio Code Extensions
 *.vsix
+
+# ignore .conda
+.conda/
