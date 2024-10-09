@@ -31,7 +31,7 @@ def openRobloxPlace(rootPlaceId, bloxstrap=True, name=None):
     dataSave.save_data(dataSave.played_places,"played_places.json")
     #if bloxstrap exists and on windows, use it (unless ignored by args)
     if system == "Windows" and bloxstrap:
-        bs_path = f"{os.getenv("LOCALAPPDATA")}\\Bloxstrap"
+        bs_path = f"{os.getenv('LOCALAPPDATA')}\\Bloxstrap"
         if os.path.exists(bs_path):
             # https://stackoverflow.com/questions/14797236/python-howto-launch-a-full-process-not-a-child-process-and-retrieve-the-pid
             # otherwise, quitting script also closes roblox
