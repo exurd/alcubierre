@@ -149,6 +149,12 @@ def start(lines,user_id=None,awardedThreshold=-1,secs_reincarnation=-1,open_plac
         line_rbxInstance.stringIdThingy(stripped_line)
         if line_rbxInstance.id == None:
             continue
+        if line_rbxInstance.id in dataSave.gotten_badges:
+            print(f"Skipping {stripped_line}, already collected!")
+            continue
+        if line_rbxInstance.id in dataSave.played_places:
+            print(f"Skipping {stripped_line}, already played!")
+            continue
         if line_rbxInstance.type == rbxType.UNKNOWN:
             line_rbxInstance.detectTypeFromId()
         if line_rbxInstance.type == None:
