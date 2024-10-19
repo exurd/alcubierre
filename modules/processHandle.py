@@ -1,4 +1,4 @@
-import os, subprocess, platform, time, re
+import os, subprocess, platform, time, psutil
 import webbrowser
 
 from . import apiReqs, dataSave
@@ -11,7 +11,13 @@ DETACHED_PROCESS = 0x00000008
 FLATPAK_SOBER_OPTS = "run --branch=master --arch=x86_64 --command=sober --file-forwarding org.vinegarhq.Sober"
 
 # TODO: figure out system differences (this means that the script is windows and linux only for now)
-system = platform.system()
+SYSTEM = platform.system()
+vPrint(f"System: {SYSTEM}")
+
+if SYSTEM == "Windows":
+    robloxProcess_name = "RobloxPlayerBeta.exe"
+elif SYSTEM == "Linux":
+    robloxProcess_name = "sober"
 
 # https://stackoverflow.com/a/62823656
 def linux_process_exists(process_name):
@@ -31,6 +37,16 @@ def win_process_exists(process_name) -> bool:
     # because Fail message could be translated
     return last_line.lower().startswith(process_name.lower())
 
+def kill_process():
+    print("Closing Roblox in 5 seconds...")
+    time.sleep(5)
+    vPrint(f"Killing in the name of `{robloxProcess_name}`")
+    for proc in psutil.process_iter():
+        # check whether the process name matches
+        if proc.name() == robloxProcess_name:
+            proc.kill()
+            vPrint(f"Killed process with PID {proc.pid}")
+
 def openRobloxPlace(rootPlaceId, name=None, use_bloxstrap=True, use_sober=True, sober_opts=""):
     if name == None:
         print(f"Going to Roblox Place #{str(rootPlaceId)}")
@@ -40,7 +56,7 @@ def openRobloxPlace(rootPlaceId, name=None, use_bloxstrap=True, use_sober=True, 
     dataSave.played_places.append(rootPlaceId)
     dataSave.save_data(dataSave.played_places,"played_places.json")
     #if bloxstrap exists and on windows, use it (unless ignored by args)
-    if system == "Windows" and use_bloxstrap:
+    if SYSTEM == "Windows" and use_bloxstrap:
         bs_path = f"{os.getenv('LOCALAPPDATA')}\\Bloxstrap"
         if os.path.exists(bs_path):
             # https://stackoverflow.com/questions/14797236/python-howto-launch-a-full-process-not-a-child-process-and-retrieve-the-pid
@@ -48,7 +64,7 @@ def openRobloxPlace(rootPlaceId, name=None, use_bloxstrap=True, use_sober=True, 
             process = subprocess.Popen([f"{bs_path}\\Bloxstrap.exe", f"roblox://experiences/start?placeId={rootPlaceId}"], creationflags=DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP)
             vPrint(process)
             # return good or bad(...?)
-    elif system == "Linux" and use_sober:
+    elif SYSTEM == "Linux" and use_sober:
         sober_path = os.path.join(os.path.expanduser("~"), ".var/app/org.vinegarhq.Sober")
         if os.path.exists(sober_path):
             if sober_opts != "":
@@ -56,6 +72,7 @@ def openRobloxPlace(rootPlaceId, name=None, use_bloxstrap=True, use_sober=True, 
             else:
                 sober_command = ["flatpak"] + FLATPAK_SOBER_OPTS.split() + [f"roblox://experiences/start?placeId={rootPlaceId}"]
             process = subprocess.Popen(sober_command, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            vPrint(process)
     else: # fallback that might or might not work *shrug*
         # TODO: test if this part of the script works after all these years
 
@@ -80,10 +97,10 @@ def waitForProcessOrBadgeCollect(an_rbxInstance:rbxInstance,user_Id=0,secs_reinc
         print("Exit the game when you have finished.")
         while True:
             time.sleep(3)
-            if system == "Windows":
+            if SYSTEM == "Windows":
                 if not win_process_exists("RobloxPlayerBeta.exe"):
                     return rbxReason.processClosed
-            if system == "Linux":
+            if SYSTEM == "Linux":
                 if not linux_process_exists("sober"):
                     return rbxReason.processClosed
             if an_rbxInstance.type == rbxType.BADGE and user_Id != 0:
