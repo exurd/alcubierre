@@ -11,7 +11,7 @@ from . import apiReqs, dataSave, processHandle
 from .rbxTypes import rbxInstance, rbxType, rbxReason
 from .verbosePrint import vPrint
 
-def dealWithBadge(badge_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1,open_place_in_browser=False) -> rbxReason:
+def dealWithBadge(badge_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1,open_place_in_browser=False,use_bloxstrap=True,use_sober=True,sober_opts="") -> rbxReason:
     badge_info = badge_rbxInstance.info
     rootPlaceId = badge_info["awardingUniverse"]["rootPlaceId"]
     badgeName = badge_info["name"]
@@ -56,10 +56,15 @@ def dealWithBadge(badge_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1
     if open_place_in_browser:
         processHandle.openPlaceInBrowser(rootPlaceId)
 
-    processHandle.openRobloxPlace(rootPlaceId,name=badge_info["awardingUniverse"]["name"])
+    processHandle.openRobloxPlace(rootPlaceId,
+        name=badge_info["awardingUniverse"]["name"],
+        use_bloxstrap=use_bloxstrap,
+        use_sober=use_sober,
+        sober_opts=sober_opts
+        )
     return rbxReason.processOpened
 
-def dealWithPlace(place_rbxInstance:rbxInstance,checkIfBadgesOnUniverse=True,open_place_in_browser=False) -> rbxReason:
+def dealWithPlace(place_rbxInstance:rbxInstance,checkIfBadgesOnUniverse=True,open_place_in_browser=False,use_bloxstrap=True,use_sober=True,sober_opts="") -> rbxReason:
     place_Info = place_rbxInstance.info
 
     if checkIfBadgesOnUniverse:
@@ -75,10 +80,15 @@ def dealWithPlace(place_rbxInstance:rbxInstance,checkIfBadgesOnUniverse=True,ope
     if open_place_in_browser:   
         processHandle.openPlaceInBrowser(place_rbxInstance.id)
 
-    processHandle.openRobloxPlace(place_rbxInstance.id,name=place_Info["name"])
+    processHandle.openRobloxPlace(place_rbxInstance.id,
+        name=place_Info["name"],
+        use_bloxstrap=use_bloxstrap,
+        use_sober=use_sober,
+        sober_opts=sober_opts
+        )
     return rbxReason.processOpened
 
-def dealWithUniverse(universe_rbxInstance:rbxInstance,checkIfBadgesOnUniverse=True,open_place_in_browser=False) -> rbxReason:
+def dealWithUniverse(universe_rbxInstance:rbxInstance,checkIfBadgesOnUniverse=True,open_place_in_browser=False,use_bloxstrap=True,use_sober=True,sober_opts="") -> rbxReason:
     universe_info = universe_rbxInstance.info
     rootPlaceId = universe_info["rootPlaceId"]
 
@@ -97,25 +107,35 @@ def dealWithUniverse(universe_rbxInstance:rbxInstance,checkIfBadgesOnUniverse=Tr
     if open_place_in_browser:
         processHandle.openPlaceInBrowser(rootPlaceId)
 
-    processHandle.openRobloxPlace(rootPlaceId,name=universe_info["name"])
+    processHandle.openRobloxPlace(rootPlaceId,
+        name=universe_info["name"],
+        use_bloxstrap=use_bloxstrap,
+        use_sober=use_sober,
+        sober_opts=sober_opts
+        )
     return rbxReason.processOpened
 
-def dealWithInstance(an_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1,checkIfBadgesOnUniverse=True,open_place_in_browser=False,nested=False) -> rbxReason:
+def dealWithInstance(an_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1,checkIfBadgesOnUniverse=True,open_place_in_browser=False,use_bloxstrap=True,use_sober=True,sober_opts="",nested=False) -> rbxReason:
     """
     Deals with rbxInstance; should either return a new process or rbxReason
     """
-    print(open_place_in_browser)
     if an_rbxInstance.type == rbxType.BADGE:
         result = dealWithBadge(
             badge_rbxInstance=an_rbxInstance,
             user_id=user_id,
             awardedThreshold=awardedThreshold,
-            open_place_in_browser=open_place_in_browser
+            open_place_in_browser=open_place_in_browser,
+            use_bloxstrap=use_bloxstrap,
+            use_sober=use_sober,
+            sober_opts=sober_opts
             )
     if an_rbxInstance.type == rbxType.PLACE:
         result = dealWithPlace(
             place_rbxInstance=an_rbxInstance,
-            open_place_in_browser=open_place_in_browser
+            open_place_in_browser=open_place_in_browser,
+            use_bloxstrap=use_bloxstrap,
+            use_sober=use_sober,
+            sober_opts=sober_opts
             )
         if result == rbxReason.noUniverse:
             if nested == True: # already tried this; stop
@@ -129,13 +149,19 @@ def dealWithInstance(an_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1
                 awardedThreshold=awardedThreshold,
                 checkIfBadgesOnUniverse=checkIfBadgesOnUniverse,
                 open_place_in_browser=open_place_in_browser,
+                use_bloxstrap=use_bloxstrap,
+                use_sober=use_sober,
+                sober_opts=sober_opts,
                 nested=True
                 )
     if an_rbxInstance.type == rbxType.UNIVERSE:
         result = dealWithUniverse(
             universe_rbxInstance=an_rbxInstance,
             checkIfBadgesOnUniverse=checkIfBadgesOnUniverse,
-            open_place_in_browser=open_place_in_browser
+            open_place_in_browser=open_place_in_browser,
+            use_bloxstrap=use_bloxstrap,
+            use_sober=use_sober,
+            sober_opts=sober_opts
             )
     return result
 
@@ -158,7 +184,7 @@ def isUniverseOneBadge(an_rbxInstance:rbxInstance) -> bool:
 
 dataSave.init()
 
-def start(lines,user_id=None,awardedThreshold=-1,secs_reincarnation=-1,open_place_in_browser=False,use_bloxstrap=True,checkIfBadgesOnUniverse=True,detectOneBadgeUniverses=True):
+def start(lines,user_id=None,awardedThreshold=-1,secs_reincarnation=-1,open_place_in_browser=False,use_bloxstrap=True,use_sober=True,sober_opts="",checkIfBadgesOnUniverse=True,detectOneBadgeUniverses=True):
     # check if variables are correctly set
     if not type(awardedThreshold) == int:
         awardedThreshold = -1
@@ -189,7 +215,7 @@ def start(lines,user_id=None,awardedThreshold=-1,secs_reincarnation=-1,open_plac
         if line_rbxInstance.type == None:
             continue
 
-        print(f"line_rbxInstance; {line_rbxInstance}")
+        vPrint(f"line_rbxInstance; {line_rbxInstance}")
         line_rbxInstance.getInfoFromType()
         #print(line_rbxInstance.type)
         
@@ -198,7 +224,10 @@ def start(lines,user_id=None,awardedThreshold=-1,secs_reincarnation=-1,open_plac
             user_id=user_id,
             awardedThreshold=awardedThreshold,
             checkIfBadgesOnUniverse=checkIfBadgesOnUniverse,
-            open_place_in_browser=open_place_in_browser
+            open_place_in_browser=open_place_in_browser,
+            use_bloxstrap=use_bloxstrap,
+            use_sober=use_sober,
+            sober_opts=sober_opts
             )
 
         if line_rbxReason == rbxReason.processOpened:

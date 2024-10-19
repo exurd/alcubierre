@@ -3,7 +3,7 @@ vPrint = None
 def toggleVerbosity():
     global verbose
     verbose = not verbose
-    print(verbose)
+    #print(verbose)
     activateLambda()
 def activateLambda():
     global vPrint

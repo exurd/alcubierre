@@ -42,6 +42,7 @@ def get_parser() -> argparse.ArgumentParser:
     # How many players the badge has to reach before you get teleported to the game. Great for games that never had their badges implemented.
     # It can be set to any number. 10, 50, 100, 3000, 25000; whatever you think is the right amount of total users who won it validates the badge.
     # If you want all badges to go through, then set it to -1
+    
     parser.add_argument("--seconds", "-s", type=int, default=-1,
                     help="How many seconds before script kills Roblox process and goes to next line in file. Setting to -1 or 0 disables the timer.")
     # How long until you join the next game.
@@ -49,7 +50,13 @@ def get_parser() -> argparse.ArgumentParser:
     # If you want more time, say, to look around in the game, try 5-10 minutes (300-600 seconds)
 
     parser.add_argument("--no-bloxstrap", "-nbs", action="store_false",
-                    help="Don't use Bloxstrap to open Roblox (not recommended). When this option is not in use, the script automagically detects if Bloxstrap is installed and uses it if so. Windows only! Bloxstrap website: https://bloxstraplabs.com")
+                    help="Windows only! Don't use Bloxstrap to open Roblox (not recommended). When this option is not in use, the script automagically detects if Bloxstrap is installed and uses it if so. Bloxstrap website: https://bloxstraplabs.com")
+    
+    parser.add_argument("--no-sober", "-nsob", action="store_false",
+                    help="Linux only! Don't use Sober to open Roblox. When this option is not in use, the script automagically detects if Sober is installed and uses it if so. Sober website: https://sober.vinegarhq.org")
+    
+    parser.add_argument("--sober-opts", "-sopts", default="",
+                    help="Linux only! Commands to give Sober. Connect with an equal sign for it to work (`--sober-opts='--opengl'`) See --no-sober for more info on Sober.")
     
     parser.add_argument("--open-in-browser", "-ob", action="store_true",
                     help="Opens the Roblox place in default browser. Highly recommended, but set False as default.")
@@ -139,6 +146,8 @@ def main(args=None):
         secs_reincarnation=args.seconds,
         open_place_in_browser=args.open_in_browser,
         use_bloxstrap=args.no_bloxstrap,
+        use_sober=args.no_sober,
+        sober_opts=args.sober_opts,
         detectOneBadgeUniverses=args.detect_one_badge_games
         )
 

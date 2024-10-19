@@ -174,7 +174,7 @@ def getUniverseInfo(universeId) -> dict:
 
 def checkUserInvForAsset(userId=0, assetId=0) -> bool:
     # check if user has badge
-    if not userId == 0 and not assetId == 0:
+    if not userId == 0 and not userId == None and not assetId == 0:
         # inventory_api outputs just "true" or "false" in lowercase
         user_check = getRequestURL(f"https://inventory.roblox.com/v1/users/{str(userId)}/items/2/{str(assetId)}/is-owned")
         if user_check.text == "true":
