@@ -232,7 +232,7 @@ def start(lines,user_id=None,awardedThreshold=-1,secs_reincarnation=-1,open_plac
 
         if line_rbxReason == rbxReason.processOpened:
             singleBadge = False
-            if detectOneBadgeUniverses == True:
+            if line_rbxInstance.type == rbxType.BADGE and detectOneBadgeUniverses == True:
                 if isUniverseOneBadge(line_rbxInstance):
                     print("[SOLO BADGE! ONLY 1 TO COLLECT FOR THIS GAME!]")
                     singleBadge = True
