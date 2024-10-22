@@ -52,7 +52,7 @@ def openRobloxPlace(rootPlaceId, name=None, use_bloxstrap=True, use_sober=True, 
         if os.path.exists(bs_path):
             # https://stackoverflow.com/questions/14797236/python-howto-launch-a-full-process-not-a-child-process-and-retrieve-the-pid
             # otherwise, quitting script also closes roblox
-            process = subprocess.Popen([f"{bs_path}\\Bloxstrap.exe", roblox_uri], creationflags=DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP)
+            process = subprocess.Popen([f"{bs_path}\\Bloxstrap.exe", "-player", roblox_uri], creationflags=DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP)
             vPrint(process)
             # return good or bad(...?)
     elif SYSTEM == "Linux" and use_sober:
