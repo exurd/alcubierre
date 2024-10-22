@@ -68,8 +68,8 @@ def get_parser() -> argparse.ArgumentParser:
     # parser.add_argument("--do-not-skip", "-dns", action="store_false",
     #                 help="")
 
-    parser.add_argument("--detect-one-badge-games", "-dobg", action="store_false",
-                    help="Detects one badge games and automatically closes Roblox when the badge is collected.")
+    parser.add_argument("--no-detect-one-badge", "-ndob", action="store_false",
+                    help="Turns off one badge place detection, which automatically closes Roblox after the user has collected the solo badge on a place.")
 
     parser.add_argument("--cache-directory", "-cd", default=os.path.join(os.path.dirname(__file__), "alcubierre_cache"),
                         help="The directory where caches/saved data is kept.")
@@ -148,7 +148,7 @@ def main(args=None):
         use_bloxstrap=args.no_bloxstrap,
         use_sober=args.no_sober,
         sober_opts=args.sober_opts,
-        detectOneBadgeUniverses=args.detect_one_badge_games
+        detectOneBadgeUniverses=args.no_detect_one_badge
         )
 
 if __name__ == "__main__":
