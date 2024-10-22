@@ -244,4 +244,4 @@ def start(lines,user_id=None,awardedThreshold=-1,secs_reincarnation=-1,open_plac
                 print("Badge has been awarded!")
                 dataSave.gotten_badges.append(line_rbxInstance.id)
                 dataSave.save_data(dataSave.gotten_badges,"gotten_badges.json")
-                processHandle.kill_process()
+                processHandle.kill_roblox_process()
