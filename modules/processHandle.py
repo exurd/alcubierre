@@ -1,3 +1,7 @@
+# alcubierre
+# ./modules/processHandle.py
+# Licensed under the GNU General Public License v3.0
+
 import os, subprocess, platform, time, psutil
 import webbrowser
 

@@ -1,3 +1,7 @@
+# alcubierre
+# ./modules/loadEnv.py
+# Licensed under the GNU General Public License v3.0
+
 import os, argparse, typing
 from dotenv import load_dotenv
 

@@ -1,3 +1,7 @@
+# alcubierre
+# ./modules/scriptLoop.py
+# Licensed under the GNU General Public License v3.0
+
 import os
 from urllib.parse import unquote, urlparse
 import pathlib #import PurePosixPath

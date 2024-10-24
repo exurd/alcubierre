@@ -1,3 +1,7 @@
+# alcubierre
+# ./modules/dataSave.py
+# Licensed under the GNU General Public License v3.0
+
 import os
 import json
 

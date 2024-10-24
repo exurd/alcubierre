@@ -1,3 +1,7 @@
+# alcubierre
+# ./modules/verbosePrint.py
+# Licensed under the GNU General Public License v3.0
+
 verbose = False
 vPrint = None
 def toggleVerbosity():

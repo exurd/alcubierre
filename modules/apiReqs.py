@@ -1,3 +1,7 @@
+# alcubierre
+# ./modules/apiReqs.py
+# Licensed under the GNU General Public License v3.0
+
 import time, random, math, requests
 #from . import dataSave
 

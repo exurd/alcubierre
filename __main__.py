@@ -1,3 +1,7 @@
+# alcubierre
+# ./__main__.py
+# Licensed under the GNU General Public License v3.0
+
 import os, sys, argparse, time
 from modules.verbosePrint import toggleVerbosity
 
