@@ -1,6 +1,6 @@
-# alcubierre
+# alcubierre - Roblox Badge-to-Badge Place Teleporter
 # ./__main__.py
-# Licensed under the GNU General Public License v3.0
+# Licensed under the GNU General Public License Version 3.0 (see below for more details)
 
 import os, sys, argparse, time
 from modules.verbosePrint import toggleVerbosity
@@ -9,6 +9,25 @@ __prog__ = "alcubierre"
 __desc__ = "Teleports to every place on a file."
 __version__ = "(git master branch)"
 __author__ = "exurd"
+__copyright__ = "copyright (c) 2024, exurd"
+__credits__ = ["exurd"]
+__license__ = "GPL"
+__short_license__ = """This program comes with ABSOLUTELY NO WARRANTY.
+This is free software, and you are welcome to redistribute it
+under certain conditions; check help (`-h`) for details.
+"""
+__long_license__ = """This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>."""
 
 def get_parser() -> argparse.ArgumentParser:
     """
@@ -16,7 +35,9 @@ def get_parser() -> argparse.ArgumentParser:
     """
     parser = argparse.ArgumentParser(
         prog=__prog__,
-        description=__desc__
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=__desc__,
+        epilog=__long_license__
     )
     version = "%(prog)s " + __version__
     parser.add_argument("--version", action="version", version=version)
@@ -90,6 +111,8 @@ def main(args=None):
     args = parser.parse_args(args)
     #print(args)
 
+    print(f"{__prog__} {__version__}\n{__copyright__}\n\n{__short_license__}")
+
     if args.verbose:
         toggleVerbosity()
     from modules.verbosePrint import vPrint
@@ -118,6 +141,12 @@ def main(args=None):
             if user_agent == parser.get_default("user_agent"):
                 user_agent = data["user_agent"]
 
+    if args.file_path == None:
+        parser.error("the following arguments are required to continue: file_path")
+    lines = [l.strip() for l in args.file_path.readlines()]
+    args.file_path.close()
+    # print(lines)
+
     from modules import apiReqs, dataSave
     apiReqs.init(user_agent, rbx_token)
 
@@ -135,12 +164,6 @@ def main(args=None):
         data_folder = os.path.join(data_folder,"guest")
     data_folder = dataSave.get_data_file_path(data_folder)
 
-    if args.file_path == None:
-        parser.error("the following arguments are required to continue: file_path")
-    lines = [l.strip() for l in args.file_path.readlines()]
-    args.file_path.close()
-    # print(lines)
-
     vPrint("Starting scriptLoop...")
     from modules import scriptLoop
     scriptLoop.start(
@@ -157,3 +180,16 @@ def main(args=None):
 
 if __name__ == "__main__":
     main()
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
