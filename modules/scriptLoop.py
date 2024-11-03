@@ -11,7 +11,7 @@ import subprocess
 import json
 #import pygame
 
-from . import apiReqs, dataSave, processHandle
+from . import apiReqs, dataSave, processHandle, playSound
 from .rbxTypes import rbxInstance, rbxType, rbxReason
 from .verbosePrint import vPrint
 
@@ -239,6 +239,7 @@ def start(lines,user_id=None,awardedThreshold=-1,secs_reincarnation=-1,open_plac
             if line_rbxInstance.type == rbxType.BADGE and detectOneBadgeUniverses == True:
                 if isUniverseOneBadge(line_rbxInstance):
                     print("[SOLO BADGE! ONLY 1 TO COLLECT FOR THIS GAME!]")
+                    playSound.playSound("notify")
                     singleBadge = True
 
             time.sleep(15)
@@ -248,6 +249,7 @@ def start(lines,user_id=None,awardedThreshold=-1,secs_reincarnation=-1,open_plac
                 print("Badge has been awarded!")
                 dataSave.gotten_badges.append(line_rbxInstance.id)
                 dataSave.save_data(dataSave.gotten_badges,"gotten_badges.json")
+                playSound.playSound("success")
                 processHandle.kill_roblox_process()
 
 # This program is free software: you can redistribute it and/or modify

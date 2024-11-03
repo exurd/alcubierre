@@ -46,7 +46,7 @@ def get_parser() -> argparse.ArgumentParser:
                         help="Filename path of Badge IDs/URLs.")
     
     parser.add_argument("--env-file", "-e", default=None, #type=argparse.FileType("w"),
-                    help=f"An .env file allows you to specify settings (the below options) for {parser.prog} to follow without cluttering or risking leaking commands. If the file doesn't exist, the program will create a template in it's place. More infomation on .env files can be found in the README.")
+                    help=f"An .env file allows you to specify settings (the below options) for {parser.prog} to follow without cluttering the terminal or risking important tokens. If the file doesn't exist, the program will create a template in it's place. More infomation on .env files can be found in the README.")
     # The .env file will allow you to check if the place is playable or not.
     # Caution: To create an .env file, you will need your account's Roblox cookies, which can pose a risk if someone hacks into your computer.
     # It should have the following:
@@ -57,7 +57,7 @@ def get_parser() -> argparse.ArgumentParser:
                     help=".ROBLOSECURITY token. By using this option, you agree that this is your unique token and not anyone else's. DO NOT SHARE YOUR ROBLOX TOKEN WITH ANYONE! More info can be found here: https://ro.py.jmk.gg/dev/tutorials/roblosecurity/")
     
     parser.add_argument("--user-id", "-u", type=int, default=None,
-                    help="Specifys a Roblox User ID to check inventory for badges. Not required if you're already using --rbx-token, but the User ID does take priority when in used.")
+                    help="Specifys a Roblox User ID to check inventory for badges. Not required if you're already using --rbx-token. The User ID argument takes priority from --rbx-token.")
     # Your Roblox User ID. It can be found your profile. If set to 0 it will not use any features that need your User ID, like badge checking.
     # Example: mrflimflam --> https://www.roblox.com/users/339310190/profile --> 339310190
     #                                                     [---------]
@@ -84,7 +84,7 @@ def get_parser() -> argparse.ArgumentParser:
                     help="Linux only! Commands to give Sober. Connect with an equal sign for it to work (`--sober-opts='--opengl'`) See --no-sober for more info on Sober.")
     
     parser.add_argument("--open-in-browser", "-ob", action="store_true",
-                    help="Opens the Roblox place in default browser. Highly recommended, but set False as default.")
+                    help="Opens the Roblox place in default browser. Highly recommended, but set to False as default.")
     # Opens the URL to the place in your web browser as you join, so you can track the badges you need to collect. Simple as.
     
     parser.add_argument("--verbose", "-v", action="store_true",
@@ -97,11 +97,17 @@ def get_parser() -> argparse.ArgumentParser:
                     help="Turns off one badge place detection, which automatically closes Roblox after the user has collected the solo badge on a place.")
 
     parser.add_argument("--cache-directory", "-cd", default=os.path.join(os.path.dirname(__file__), "alcubierre_cache"),
-                        help="The directory where caches/saved data is kept.")
+                    help="The directory where caches/saved data is kept.")
 
     parser.add_argument("--user-agent", "-ua", default=f"{parser.prog} - badge-to-badge teleporter {__version__}",
                     help="Sets the user agent for requests made by the program.")
 
+    parser.add_argument("--play-sound", "-ps", action="store_true",
+                    help="Play sounds for important context.")
+    
+    parser.add_argument("--sound-pack", type=str, default="piano",
+                    help=f"Sound packs to choose from: {os.listdir(os.path.join(".","sounds"))}")
+    
     return parser
 
 # --play-sound FILE (optional)
@@ -116,6 +122,12 @@ def main(args=None):
     if args.verbose:
         toggleVerbosity()
     from modules.verbosePrint import vPrint
+
+    if args.play_sound:
+        from modules import playSound
+        playSound.toggleSoundWithSoundPack(args.sound_pack)
+        print(playSound.active_sndPack)
+        playSound.playSound("startup")
 
     vPrint("-------------------------")
     vPrint(f"Timestamp: {time.time()}")

@@ -1,0 +1,5 @@
+echo 'An error has occurred!' | piper --model /home/exurd/clean100.onnx --output_file error.wav
+echo 'Badge was collected, congratulations!' | piper --model /home/exurd/clean100.onnx --output_file success.wav
+echo 'Alert! Next place contains one badge.' | piper --model /home/exurd/clean100.onnx --output_file notify.wav
+echo 'Starting up alcubierre...' | piper --model /home/exurd/clean100.onnx --output_file startup.wav
+for filename in ./* do; oggenc -q 10 $filename

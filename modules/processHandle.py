@@ -26,8 +26,11 @@ if SYSTEM == "Darwin":
 
 def roblox_process_exists() -> psutil.Process:
     for proc in psutil.process_iter():
-        if proc.name() == robloxProcess_name:
-            return proc
+        try:
+            if proc.name() == robloxProcess_name:
+                return proc
+        except psutil.NoSuchProcess:
+            pass
     return None
 
 def kill_roblox_process():
