@@ -4,7 +4,10 @@
 
 import os
 import json
-import pickle
+try:
+    import pickle5 as pickle
+except ImportError:
+    import pickle
 
 from .verbosePrint import vPrint
 

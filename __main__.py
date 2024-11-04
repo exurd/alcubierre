@@ -109,7 +109,7 @@ def get_parser() -> argparse.ArgumentParser:
                     help="Play sounds for important context.")
     
     parser.add_argument("--sound-pack", type=str, default="piano",
-                    help=f"Sound packs to choose from: {os.listdir(os.path.join(".","sounds"))}")
+                    help=f"Sound packs to choose from: {os.listdir(os.path.join('.','sounds'))}")
     
     return parser
 
