@@ -19,7 +19,7 @@ def dealWithBadge(badge_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1
     badge_info = badge_rbxInstance.info
     rootPlaceId = badge_info["awardingUniverse"]["rootPlaceId"]
     badgeName = badge_info["name"]
-    #vPrint(f"Badge Name: {badgeName}")
+    print(f"Badge Name: {badgeName}")
 
     if badge_rbxInstance.id in dataSave.gotten_badges:
         print("Badge in 'gotten_badges.json' list, skipping!")
@@ -259,8 +259,8 @@ def start(lines,user_id=None,awardedThreshold=-1,secs_reincarnation=-1,open_plac
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# along with this program. If not, see <https://www.gnu.org/licenses/>.

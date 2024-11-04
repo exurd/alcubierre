@@ -101,6 +101,9 @@ def get_parser() -> argparse.ArgumentParser:
 
     parser.add_argument("--user-agent", "-ua", default=f"{parser.prog} - badge-to-badge teleporter {__version__}",
                     help="Sets the user agent for requests made by the program.")
+    
+    parser.add_argument("--save-response-cache", "-src", action="store_true",
+                    help="Save API responses from Roblox into a file. This can save bandwidth, at the cost of new infomation from already checked responses being ignored.")
 
     parser.add_argument("--play-sound", "-ps", action="store_true",
                     help="Play sounds for important context.")
@@ -109,8 +112,6 @@ def get_parser() -> argparse.ArgumentParser:
                     help=f"Sound packs to choose from: {os.listdir(os.path.join(".","sounds"))}")
     
     return parser
-
-# --play-sound FILE (optional)
 
 def main(args=None):
     parser = get_parser()
@@ -176,6 +177,8 @@ def main(args=None):
         data_folder = os.path.join(data_folder,"guest")
     data_folder = dataSave.get_data_file_path(data_folder)
 
+    if args.save_response_cache: apiReqs.getPermCache()
+
     vPrint("Starting scriptLoop...")
     from modules import scriptLoop
     scriptLoop.start(
@@ -200,8 +203,8 @@ if __name__ == "__main__":
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# along with this program. If not, see <https://www.gnu.org/licenses/>.

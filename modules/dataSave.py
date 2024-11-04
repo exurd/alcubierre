@@ -4,6 +4,7 @@
 
 import os
 import json
+import pickle
 
 from .verbosePrint import vPrint
 
@@ -20,25 +21,38 @@ def get_data_file_path(rootFold):
     vPrint(f"data_folder: [{data_folder}]")
     return data_folder
 
-def load_data(filename):
+def load_data(filename,asDict=False):
     vPrint(f"Loading data from [{filename}]...")
     global data_folder
     data_file_path = os.path.join(data_folder, filename)
     if os.path.exists(data_file_path) and os.path.getsize(data_file_path) > 0:
-        with open(data_file_path, "r") as f:
-            data = json.load(f)
-            f.close()
+        if asDict:
+            with open(data_file_path, "rb") as f:
+                data = pickle.load(f)
+                f.close()
+        else:
+            with open(data_file_path, "r") as f:
+                data = json.load(f)
+                f.close()
     else:
-        data = []
+        if asDict:
+            data = {}
+        else:
+            data = []
     return data
 
 def save_data(data, filename):
     vPrint(f"Saving data to [{filename}]...")
     global data_folder
     data_file_path = os.path.join(data_folder, filename)
-    with open(data_file_path, "w") as f:
-        json.dump(data, f, indent=4, sort_keys=True)
-        f.close()
+    if type(data) == dict:
+        with open(data_file_path, "wb") as f:
+            pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
+            f.close()
+    else:
+        with open(data_file_path, "w") as f:
+            json.dump(data, f, indent=4, sort_keys=True)
+            f.close()
 
 def init():
     global gotten_badges
@@ -53,8 +67,8 @@ def init():
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# along with this program. If not, see <https://www.gnu.org/licenses/>.

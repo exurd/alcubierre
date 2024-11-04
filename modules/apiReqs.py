@@ -3,13 +3,26 @@
 # Licensed under the GNU General Public License Version 3.0 (see below for more details)
 
 import time, random, math, requests
-#from . import dataSave
+from . import dataSave
 
 from modules.verbosePrint import vPrint
 
 # temporary response cache
-# TODO: create optional argument permCache as a file (and allow disabling caches)
 tempRespCache = {"badges":{},"places":{},"universes":{},"economy":{},"universeBadges":{},"universeIds":{}}
+
+usingPermCache = False
+def getPermCache():
+    global usingPermCache
+    global tempRespCache
+    usingPermCache = True
+
+    permRespCache = dataSave.load_data("permRespCache.pickle",asDict=True)
+    if permRespCache == {}: return
+    tempRespCache = permRespCache
+
+def saveToPermCache():
+    global tempRespCache
+    dataSave.save_data(tempRespCache,"permRespCache.pickle")
 
 requestSession = requests.Session()
 adapter = requests.adapters.HTTPAdapter(max_retries=5)
@@ -19,6 +32,7 @@ requestSession.mount("http://", adapter)
 def init(user_agent=None,rbx_token=None):
     if not user_agent == None:
         requestSession.headers["User-Agent"] = str(user_agent)
+
     if not rbx_token == None:
         requestSession.cookies[".ROBLOSECURITY"] = str(rbx_token)
     else:
@@ -101,6 +115,7 @@ def getEconomyInfo(assetId,actLikePlaceDetailsAPI=False) -> dict:
         else:
             vPrint(f"economy_json: [{economy_json}]")
             tempRespCache["economy"][assetId] = economy_json
+            if usingPermCache: saveToPermCache()
             if actLikePlaceDetailsAPI:
                 return {k.lower(): v for k, v in economy_json.items()}
             return economy_json
@@ -120,6 +135,7 @@ def getPlaceInfo(placeId,noAlternative=False) -> dict:
             else:
                 vPrint(f"place_json: [{place_json}]")
                 tempRespCache["places"][placeId] = place_json[0]
+                if usingPermCache: saveToPermCache()
                 return place_json[0]
 
         # except ConnectionError:
@@ -154,6 +170,7 @@ def getBadgeInfo(badgeId) -> dict:
         else:
             vPrint(f"badge_json: [{badge_json}]")
             tempRespCache["badges"][badgeId] = badge_json
+            if usingPermCache: saveToPermCache()
             return badge_json
     else:
         return False
@@ -172,6 +189,7 @@ def getUniverseInfo(universeId) -> dict:
         else:
             vPrint(f"universe_json: [{universe_json}]")
             tempRespCache["universes"][universeId] = universe_json
+            if usingPermCache: saveToPermCache()
             return universe_json
     else:
         return False
@@ -200,9 +218,11 @@ def checkUniverseForAnyBadges(universeId) -> dict:
         vPrint(f"universeBadges_json: [{universeBadges_json}]")
         if universeBadges_json["data"] == []: # no badges
             tempRespCache["universeBadges"][universeId] = False
+            if usingPermCache: saveToPermCache()
             return False
         else:
             tempRespCache["universeBadges"][universeId] = universeBadges_json["data"]
+            if usingPermCache: saveToPermCache()
             return universeBadges_json["data"]
 
 # {"universeId":13058}
@@ -215,6 +235,7 @@ def getUniverseFromPlaceId(placeId) -> dict:
         universeId_json = universeIdCheck.json()
         vPrint(f"universeId_json: [{universeId_json}]")
         tempRespCache["universeIds"][placeId] = universeId_json["universeId"]
+        if usingPermCache: saveToPermCache()
         return universeId_json["universeId"]
     
     return None
@@ -231,8 +252,8 @@ def getUserFromToken() -> dict:
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
