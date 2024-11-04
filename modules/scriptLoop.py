@@ -57,8 +57,7 @@ def dealWithBadge(badge_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1
             print("Not playable, skipping!")
             return rbxReason.notPlayable
 
-    if open_place_in_browser:
-        processHandle.openPlaceInBrowser(rootPlaceId)
+    if open_place_in_browser: processHandle.openPlaceInBrowser(rootPlaceId)
 
     processHandle.openRobloxPlace(rootPlaceId,
         name=badge_info["awardingUniverse"]["name"],
@@ -81,8 +80,7 @@ def dealWithPlace(place_rbxInstance:rbxInstance,checkIfBadgesOnUniverse=True,ope
         else: # no universe means that it"s most likely *not* a place...
             return rbxReason.noUniverse
     
-    if open_place_in_browser:   
-        processHandle.openPlaceInBrowser(place_rbxInstance.id)
+    if open_place_in_browser: processHandle.openPlaceInBrowser(place_rbxInstance.id)
 
     processHandle.openRobloxPlace(place_rbxInstance.id,
         name=place_Info["name"],
@@ -108,8 +106,7 @@ def dealWithUniverse(universe_rbxInstance:rbxInstance,checkIfBadgesOnUniverse=Tr
             print("Not playable, skipping!")
             return rbxReason.notPlayable
 
-    if open_place_in_browser:
-        processHandle.openPlaceInBrowser(rootPlaceId)
+    if open_place_in_browser: processHandle.openPlaceInBrowser(rootPlaceId)
 
     processHandle.openRobloxPlace(rootPlaceId,
         name=universe_info["name"],
@@ -142,8 +139,7 @@ def dealWithInstance(an_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1
             sober_opts=sober_opts
             )
         if result == rbxReason.noUniverse:
-            if nested == True: # already tried this; stop
-                return False
+            if nested == True: return False # already tried this; stop
             an_rbxInstance.detectTypeFromId()
             # and then go back again...
             vPrint("Time to do an inception on this instance...")
@@ -181,10 +177,8 @@ def isUniverseOneBadge(an_rbxInstance:rbxInstance) -> bool:
     if an_rbxInstance.type == rbxType.UNIVERSE:
         check_universe_badges = apiReqs.checkUniverseForAnyBadges(an_rbxInstance.id)
 
-    if len(check_universe_badges) == 1:
-        return True
-    else:
-        return False
+    if len(check_universe_badges) == 1: return True
+    return False
 
 dataSave.init()
 

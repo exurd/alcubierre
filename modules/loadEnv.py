@@ -13,8 +13,7 @@ def createEnvTemplate(parser: argparse.ArgumentParser, env_file):
     with open(env_file, "w") as f:
         for argument in parser._option_string_actions:
             action = parser._option_string_actions[argument]
-            if argument in ["--env-file", "--help", "--version"]:
-                continue
+            if argument in ["--env-file", "--help", "--version"]: continue
             #print(argument)
             if argument.startswith("--"):
                 env_var_name = argument[2:].replace("-", "_").upper()
@@ -26,8 +25,9 @@ def loadEnvFile(envFile) -> typing.Dict[str,str]: # dict[str,str]: # # __future_
     # env_loaded = False
     if os.path.isfile(envFile):
         load_dotenv(envFile)
-        envData = {"rbx_token": str(os.getenv("RBX_TOKEN")),
-         "user_agent": str(os.getenv("USER_AGENT"))
+        envData = {
+            "rbx_token": str(os.getenv("RBX_TOKEN")),
+            "user_agent": str(os.getenv("USER_AGENT"))
         }
         return envData
 
@@ -38,8 +38,8 @@ def loadEnvFile(envFile) -> typing.Dict[str,str]: # dict[str,str]: # # __future_
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# along with this program. If not, see <https://www.gnu.org/licenses/>.

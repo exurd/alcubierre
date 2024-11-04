@@ -55,8 +55,7 @@ class rbxInstance:
         self.type = type
         self.info = None # no info yet as it was just created
 
-    def __str__(self):
-        return f"rbxInstance [id: {self.id}, type: {self.type}]"
+    def __str__(self): return f"rbxInstance [id: {self.id}, type: {self.type}]"
     
     def getInfoFromType(self):
         vPrint(f"Getting info for {self.id} with type {self.type}")
@@ -163,8 +162,8 @@ class rbxInstance:
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# along with this program. If not, see <https://www.gnu.org/licenses/>.

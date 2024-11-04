@@ -34,8 +34,7 @@ class sndPack:
             self.sounds = {}
         active_sndPack = self
     
-    def __str__(self) -> str:
-        return f"sndPack [folder: `{self.folder}`, sounds: `{self.sounds}`]"
+    def __str__(self) -> str: return f"sndPack [folder: `{self.folder}`, sounds: `{self.sounds}`]"
 
 def playSound(soundName:str):
     global active_sndPack

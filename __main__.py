@@ -120,8 +120,7 @@ def main(args=None):
 
     print(f"{__prog__} {__version__}\n{__copyright__}\n\n{__short_license__}")
 
-    if args.verbose:
-        toggleVerbosity()
+    if args.verbose: toggleVerbosity()
     from modules.verbosePrint import vPrint
 
     if args.play_sound:
@@ -154,8 +153,7 @@ def main(args=None):
             if user_agent == parser.get_default("user_agent"):
                 user_agent = data["user_agent"]
 
-    if args.file_path == None:
-        parser.error("the following arguments are required to continue: file_path")
+    if args.file_path == None: parser.error("the following arguments are required to continue: file_path")
     lines = [l.strip() for l in args.file_path.readlines()]
     args.file_path.close()
     # print(lines)
@@ -193,8 +191,7 @@ def main(args=None):
         detectOneBadgeUniverses=args.no_detect_one_badge
         )
 
-if __name__ == "__main__":
-    main()
+if __name__ == "__main__": main()
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
