@@ -63,13 +63,16 @@ def get_parser() -> argparse.ArgumentParser:
     #                                                     [---------]
 
     parser.add_argument("--awarded-threshold", "-at", type=int, default=-1,
-                    help="Threshold of players with the badge. If lower than the number specified, it gets skipped. Setting to -1 disables the threshold.")
+                    help="Threshold of players with the badge. If the badge has a lower number than the threshold, it gets skipped. Setting to -1 (default) disables the threshold.")
     # How many players the badge has to reach before you get teleported to the game. Great for games that never had their badges implemented.
     # It can be set to any number. 10, 50, 100, 3000, 25000; whatever you think is the right amount of total users who won it validates the badge.
     # If you want all badges to go through, then set it to -1
+
+    parser.add_argument("--vote-threshold", "-vt", type=float, default=-1,
+                    help="The threshold ratio of likes and dislikes. If a game has a lower ratio than the threshold, it gets skipped. Setting to -1 (default) disables the threshold.")
     
     parser.add_argument("--seconds", "-s", type=int, default=-1,
-                    help="How many seconds before script kills Roblox process and goes to next line in file. Setting to -1 or 0 disables the timer.")
+                    help="How many seconds before script kills Roblox process and goes to next line in file. Setting to -1 (default) disables the timer.")
     # How long until you join the next game.
     # 45 seconds is long enough if you're only looking around for the welcome badge when joining the games.
     # If you want more time, say, to look around in the game, try 5-10 minutes (300-600 seconds)
@@ -183,6 +186,7 @@ def main(args=None):
         lines,
         user_id=user_id,
         awardedThreshold=args.awarded_threshold,
+        voteThreshold=args.vote_threshold,
         secs_reincarnation=args.seconds,
         open_place_in_browser=args.open_in_browser,
         use_bloxstrap=args.no_bloxstrap,

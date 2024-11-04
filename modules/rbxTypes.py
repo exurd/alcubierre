@@ -48,6 +48,7 @@ class rbxReason(Enum):
     notPlayable = -5
     notEnoughPlayersAwarded = -6
     noUniverse = -7
+    badVoteRatio = -8
 
 class rbxInstance:
     def __init__(self, id=None, type=None):

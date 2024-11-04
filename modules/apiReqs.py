@@ -8,7 +8,7 @@ from . import dataSave
 from modules.verbosePrint import vPrint
 
 # temporary response cache
-tempRespCache = {"badges":{},"places":{},"universes":{},"economy":{},"universeBadges":{},"universeIds":{}}
+tempRespCache = {"badges":{},"places":{},"universes":{},"economy":{},"universeBadges":{},"universeIds":{},"universeVotes":{}}
 
 usingPermCache = False
 def getPermCache():
@@ -180,6 +180,24 @@ def getUniverseInfo(universeId) -> dict:
             tempRespCache["universes"][universeId] = universe_json
             if usingPermCache: saveToPermCache()
             return universe_json
+    else:
+        return False
+
+# {"data":[{"id":5988568657,"upVotes":8922,"downVotes":670}]}
+def getUniverseVotes(universeId) -> dict:
+    if universeId in tempRespCache["universeVotes"]: return tempRespCache["universeVotes"][universeId]
+    
+    universeVotes_check = getRequestURL(f"https://games.roblox.com/v1/games/votes?universeIds={str(universeId)}")
+    if universeVotes_check.ok:
+        universeVotes_json = universeVotes_check.json()
+        if "errors" in universeVotes_json:
+            vPrint(f"Error in universeVotes_json! [{universeVotes_json}]")
+            return False
+        else:
+            vPrint(f"universe_json: [{universeVotes_json}]")
+            tempRespCache["universeVotes"][universeId] = universeVotes_json["data"][0]
+            if usingPermCache: saveToPermCache()
+            return universeVotes_json["data"][0]
     else:
         return False
 
