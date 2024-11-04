@@ -177,9 +177,9 @@ def getUniverseInfo(universeId) -> dict:
             return False
         else:
             vPrint(f"universe_json: [{universe_json}]")
-            tempRespCache["universes"][universeId] = universe_json
+            tempRespCache["universes"][universeId] = universe_json["data"][0]
             if usingPermCache: saveToPermCache()
-            return universe_json
+            return universe_json["data"][0]
     else:
         return False
 

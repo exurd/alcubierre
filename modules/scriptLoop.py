@@ -108,7 +108,7 @@ def dealWithPlace(place_rbxInstance:rbxInstance,voteThreshold=-1.0,checkIfBadges
         )
     return rbxReason.processOpened
 
-def dealWithUniverse(universe_rbxInstance:rbxInstance,checkIfBadgesOnUniverse=True,open_place_in_browser=False,use_bloxstrap=True,use_sober=True,sober_opts="") -> rbxReason:
+def dealWithUniverse(universe_rbxInstance:rbxInstance,voteThreshold=-1.0,checkIfBadgesOnUniverse=True,open_place_in_browser=False,use_bloxstrap=True,use_sober=True,sober_opts="") -> rbxReason:
     universe_info = universe_rbxInstance.info
     rootPlaceId = universe_info["rootPlaceId"]
 
@@ -117,6 +117,15 @@ def dealWithUniverse(universe_rbxInstance:rbxInstance,checkIfBadgesOnUniverse=Tr
         if check_universe_badges == False:
             print("No badges found in the universe/place, skipping...")
             return rbxReason.noBadgesInUniverse
+        
+    if voteThreshold != -1:
+        universeVotes = apiReqs.getUniverseVotes(universe_rbxInstance.id)
+        vPrint(f"universeVotes: {universeVotes}")
+        uvRatio = int(universeVotes["upVotes"]) / int(universeVotes["downVotes"])
+        vPrint(f"uvRatio: {uvRatio}")
+        if uvRatio <= voteThreshold:
+            print("Universe has a bad like-to-dislike ratio, skipping...")
+            return rbxReason.badVoteRatio
     
     placeDetails = apiReqs.getPlaceInfo(rootPlaceId,noAlternative=True) # need the auth-only place api for playability stats
     if placeDetails != False:
@@ -167,6 +176,7 @@ def dealWithInstance(an_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1
                 an_rbxInstance=an_rbxInstance,
                 user_id=user_id,
                 awardedThreshold=awardedThreshold,
+                voteThreshold=voteThreshold,
                 checkIfBadgesOnUniverse=checkIfBadgesOnUniverse,
                 open_place_in_browser=open_place_in_browser,
                 use_bloxstrap=use_bloxstrap,
@@ -177,6 +187,7 @@ def dealWithInstance(an_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1
     if an_rbxInstance.type == rbxType.UNIVERSE:
         result = dealWithUniverse(
             universe_rbxInstance=an_rbxInstance,
+            voteThreshold=voteThreshold,
             checkIfBadgesOnUniverse=checkIfBadgesOnUniverse,
             open_place_in_browser=open_place_in_browser,
             use_bloxstrap=use_bloxstrap,
