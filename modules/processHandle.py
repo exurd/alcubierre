@@ -63,10 +63,12 @@ def openRobloxPlace(rootPlaceId, name=None, use_bloxstrap=True, use_sober=True, 
     elif SYSTEM == "Linux" and use_sober:
         sober_path = os.path.join(os.path.expanduser("~"), ".var/app/org.vinegarhq.Sober")
         if os.path.exists(sober_path):
+            sober_command = ["flatpak"] + FLATPAK_SOBER_OPTS.split()
             if sober_opts != "":
-                sober_command = ["flatpak"] + FLATPAK_SOBER_OPTS.split() + sober_opts.split() + [roblox_uri]
+                sober_command += sober_opts.split() + [roblox_uri]
             else:
-                sober_command = ["flatpak"] + FLATPAK_SOBER_OPTS.split() + [roblox_uri]
+                sober_command += [roblox_uri]
+            vPrint(f"sober_command: [{sober_command}]")
             process = subprocess.Popen(sober_command, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
             vPrint(process)
     else: # fallback that might or might not work *shrug*
