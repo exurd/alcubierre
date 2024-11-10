@@ -98,9 +98,10 @@ def waitForProcessOrBadgeCollect(an_rbxInstance:rbxInstance,user_Id=0,secs_reinc
                 return rbxReason.processClosed
             if an_rbxInstance.type == rbxType.BADGE and user_Id != 0:
                 if singleBadge == True:
-                    userBadge_check = apiReqs.checkUserInvForAsset(user_Id,an_rbxInstance.id)
+                    userBadge_check = apiReqs.checkUserInvForBadge(user_Id,an_rbxInstance.id)
                     if userBadge_check:
                         return rbxReason.badgeCollected
+                    time.sleep(7) # 10 secs to avoid rate limiting
     else:
         print("You got " + str(secs_reincarnation) + " seconds")
         time.sleep(secs_reincarnation)

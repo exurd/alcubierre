@@ -178,7 +178,7 @@ def main(args=None):
         data_folder = os.path.join(data_folder,"guest")
     data_folder = dataSave.get_data_file_path(data_folder)
 
-    if args.save_response_cache: apiReqs.getPermCache()
+    if args.save_response_cache: apiReqs._getPermCache()
 
     vPrint("Starting scriptLoop...")
     from modules import scriptLoop
