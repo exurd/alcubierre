@@ -94,10 +94,10 @@ def get_parser() -> argparse.ArgumentParser:
     # If you want more time, say, to look around in the game, try 5-10 minutes (300-600 seconds)
 
     parser.add_argument("--no-bloxstrap", "-nbs", action="store_false",
-                    help="Windows only! Don't use Bloxstrap to open Roblox (not recommended). When this option is not in use, the script automagically detects if Bloxstrap is installed and uses it if so. Bloxstrap website: https://bloxstraplabs.com")
+                    help="Windows only! Don't use Bloxstrap to open Roblox (not recommended). When this option is not in use, the program automagically detects if Bloxstrap is installed and uses it if so. Bloxstrap website: https://bloxstraplabs.com")
     
     parser.add_argument("--no-sober", "-nsob", action="store_false",
-                    help="Linux only! Don't use Sober to open Roblox. When this option is not in use, the script automagically detects if Sober is installed and uses it if so. Sober website: https://sober.vinegarhq.org")
+                    help="Linux only! Don't use Sober to open Roblox. When this option is not in use, the program automagically detects if Sober is installed and uses it if so. Sober website: https://sober.vinegarhq.org")
     
     parser.add_argument("--sober-opts", "-sopts", default="",
                     help="Linux only! Commands to give Sober. Connect with an equal sign for it to work (`--sober-opts='--opengl'`) See --no-sober for more info on Sober.")
@@ -173,9 +173,9 @@ def main(args=None):
         else:
             vPrint(f"Loading .env file [{args.env_file}]...")
             data = loadEnv.loadEnvFile(env_file)
-            if rbx_token == parser.get_default("RBX_TOKEN") and "RBX_TOKEN" in data:
+            if rbx_token == parser.get_default("RBX_TOKEN") and "RBX_TOKEN" in data and data["USER_AGENT"] != "":
                 rbx_token = data["RBX_TOKEN"]
-            if user_agent == parser.get_default("USER_AGENT") and "USER_AGENT" in data:
+            if user_agent == parser.get_default("USER_AGENT") and "USER_AGENT" in data and data["USER_AGENT"] != "":
                 user_agent = data["USER_AGENT"]
 
     from modules import apiReqs, dataSave
