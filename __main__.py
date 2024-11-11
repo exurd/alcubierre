@@ -151,10 +151,10 @@ def main(args=None):
         else:
             vPrint(f"Loading .env file [{args.env_file}]...")
             data = loadEnv.loadEnvFile(env_file)
-            if rbx_token == None:
-                rbx_token = data["rbx_token"]
-            if user_agent == parser.get_default("user_agent"):
-                user_agent = data["user_agent"]
+            if rbx_token == parser.get_default("RBX_TOKEN") and "RBX_TOKEN" in data:
+                rbx_token = data["RBX_TOKEN"]
+            if user_agent == parser.get_default("USER_AGENT") and "USER_AGENT" in data:
+                user_agent = data["USER_AGENT"]
 
     if args.file_path == None: parser.error("the following arguments are required to continue: file_path")
     lines = [l.strip() for l in args.file_path.readlines()]

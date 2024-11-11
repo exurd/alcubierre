@@ -21,14 +21,15 @@ def createEnvTemplate(parser: argparse.ArgumentParser, env_file):
                 f.write(f"# {action.help}\n")
                 f.write(f"{env_var_name}={default_value}\n\n")
 
-def loadEnvFile(envFile) -> typing.Dict[str,str]: # dict[str,str]: # # __future__.annotations can only do so much for compatibility
+def loadEnvFile(envFile) -> dict:
     # env_loaded = False
     if os.path.isfile(envFile):
         load_dotenv(envFile)
-        envData = {
-            "rbx_token": str(os.getenv("RBX_TOKEN")),
-            "user_agent": str(os.getenv("USER_AGENT"))
-        }
+        envData = {}
+        if os.getenv("RBX_TOKEN"):
+            envData["RBX_TOKEN"] = str(os.getenv("RBX_TOKEN"))
+        if os.getenv("USER_AGENT"):
+            envData["USER_AGENT"] = str(os.getenv("USER_AGENT"))
         return envData
 
 # This program is free software: you can redistribute it and/or modify
