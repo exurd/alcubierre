@@ -62,13 +62,13 @@ def get_parser() -> argparse.ArgumentParser:
     # Example: mrflimflam --> https://www.roblox.com/users/339310190/profile --> 339310190
     #                                                     [---------]
 
-    parser.add_argument("--awarded-threshold", "-at", type=int, default=-1,
+    parser.add_argument("--awarded-threshold", "-at", type=int, default=-1, metavar="NUMBER",
                     help="Threshold of players with the badge. If the badge has a lower number than the threshold, it gets skipped. Setting to -1 (default) disables the threshold.")
     # How many players the badge has to reach before you get teleported to the game. Great for games that never had their badges implemented.
     # It can be set to any number. 10, 50, 100, 3000, 25000; whatever you think is the right amount of total users who won it validates the badge.
     # If you want all badges to go through, then set it to -1
 
-    parser.add_argument("--vote-threshold", "-vt", type=float, default=-1,
+    parser.add_argument("--vote-threshold", "-vt", type=float, default=-1, metavar="RATIO",
                     help="The threshold ratio of likes and dislikes. If a game has a lower ratio than the threshold, it gets skipped. Setting to -1 (default) disables the threshold.")
     
     parser.add_argument("--seconds", "-s", type=int, default=-1,
