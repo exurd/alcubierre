@@ -292,16 +292,16 @@ def handleLine(line,user_id=None,awardedThreshold=-1,voteThreshold=-1.0,secs_rei
 
 def start(lines,user_id=None,awardedThreshold=-1,voteThreshold=-1.0,secs_reincarnation=-1,open_place_in_browser=False,use_bloxstrap=True,use_sober=True,sober_opts="",checkIfBadgesOnUniverse=True,detectOneBadgeUniverses=True):
     # check if variables are correctly set
-    if not type(user_id) == int: user_id = None
-    if not type(awardedThreshold) == int: awardedThreshold = -1
-    if not type(voteThreshold) == float: voteThreshold = -1.0
-    if not type(secs_reincarnation) == int: secs_reincarnation = -1
-    if not type(open_place_in_browser) == bool: open_place_in_browser = False
-    if not type(use_bloxstrap) == bool: use_bloxstrap = True
-    if not type(use_sober) == bool: use_sober = True
-    if not type(open_place_in_browser) == bool: open_place_in_browser = False
-    if not type(checkIfBadgesOnUniverse) == bool: checkIfBadgesOnUniverse = True
-    if not type(detectOneBadgeUniverses) == bool: detectOneBadgeUniverses = True
+    if not isinstance(user_id,int): user_id = None
+    if not isinstance(awardedThreshold,int): awardedThreshold = -1
+    if not isinstance(voteThreshold,float): voteThreshold = -1.0
+    if not isinstance(secs_reincarnation,int): secs_reincarnation = -1
+    if not isinstance(open_place_in_browser,bool): open_place_in_browser = False
+    if not isinstance(use_bloxstrap,bool): use_bloxstrap = True
+    if not isinstance(use_sober,bool): use_sober = True
+    if not isinstance(open_place_in_browser,bool): open_place_in_browser = False
+    if not isinstance(checkIfBadgesOnUniverse,bool): checkIfBadgesOnUniverse = True
+    if not isinstance(detectOneBadgeUniverses,bool): detectOneBadgeUniverses = True
     
     for line_number, line in enumerate(lines,start=1):
         #print(line)
