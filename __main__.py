@@ -3,7 +3,7 @@
 # Licensed under the GNU General Public License Version 3.0 (see below for more details)
 
 import os, re, sys, argparse, time
-from modules.verbosePrint import toggleVerbosity
+from modules.verbosePrint import toggleVerbosePrint, toggleVeryVerbosePrint
 
 __prog__ = "alcubierre" 
 __desc__ = "Teleports to every place on a file."
@@ -107,7 +107,10 @@ def get_parser() -> argparse.ArgumentParser:
     # Opens the URL to the place in your web browser as you join, so you can track the badges you need to collect. Simple as.
     
     parser.add_argument("--verbose", "-v", action="store_true",
-                    help="Verbose mode. Print out as many things that can help with debugging.")
+                    help="Verbose mode. Prints out things to help with debugging.")
+    
+    parser.add_argument("--very-verbose", "-vv", action="store_true",
+                    help="Very verbose mode. Print out as many things as it can to help with debugging. Not recommended as it can slow down the program.")
 
     # parser.add_argument("--do-not-skip", "-dns", action="store_false",
     #                 help="")
@@ -139,13 +142,16 @@ def main(args=None):
 
     print(f"{__prog__} {__version__}\n{__copyright__}\n\n{__short_license__}")
 
-    if args.verbose: toggleVerbosity()
-    from modules.verbosePrint import vPrint
+    if args.verbose or args.very_verbose: toggleVerbosePrint()
+    if args.very_verbose: toggleVeryVerbosePrint()
+    from modules.verbosePrint import vPrint, vvPrint
+    vPrint("Verbose mode is now enabled, else you wouldn't be seeing this...")
+    vvPrint("Very verbose mode is also enabled... Have fun!")
 
     if args.play_sound:
         from modules import playSound
         playSound.toggleSoundWithSoundPack(args.sound_pack)
-        print(playSound.active_sndPack)
+        vvPrint(playSound.active_sndPack)
         playSound.playSound("startup")
 
     vPrint("-------------------------")

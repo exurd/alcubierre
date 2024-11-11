@@ -25,7 +25,7 @@ def dealWithBadge(badge_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1
 
     awardedCount = badge_info["statistics"]["awardedCount"]
     if not awardedCount >= awardedThreshold:
-        print(str(awardedCount) + " people with this badge is too little of a number, skipping...")
+        print(str(awardedCount) + " people with this badge is not enough for set threshold, skipping...")
         return rbxReason.notEnoughPlayersAwarded
 
     if badge_info["enabled"] == False:
@@ -268,7 +268,7 @@ def handleLine(line,user_id=None,awardedThreshold=-1,voteThreshold=-1.0,secs_rei
         use_sober=use_sober,
         sober_opts=sober_opts
         )
-    print(f"line_rbxReason: {line_rbxReason}")
+    vPrint(f"line_rbxReason: {line_rbxReason}")
 
     if line_rbxReason == rbxReason.processOpened:
         singleBadge = False

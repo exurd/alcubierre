@@ -5,7 +5,7 @@
 import time, random, math, requests
 from . import dataSave
 
-from modules.verbosePrint import vPrint
+from modules.verbosePrint import vPrint, vvPrint
 
 # temporary response cache
 respCache = {}
@@ -102,7 +102,7 @@ def getEconomyInfo(assetId,actLikePlaceDetailsAPI=False) -> dict:
         if "errors" in economy_json:
             vPrint(f"Error in economy_json! [{economy_json}]")
             return False
-        vPrint(f"economy_json: [{economy_json}]")
+        vvPrint(f"economy_json: [{economy_json}]")
         if actLikePlaceDetailsAPI: return {k.lower(): v for k, v in economy_json.items()}
         return economy_json
     return False
@@ -116,7 +116,7 @@ def getPlaceInfo(placeId,noAlternative=False) -> dict:
             if "errors" in place_json:
                 vPrint(f"Error in place_json! [{place_json}]")
                 return False
-            vPrint(f"place_json: [{place_json}]")
+            vvPrint(f"place_json: [{place_json}]")
             return place_json[0]
         return False
     elif noAlternative == False:
@@ -139,7 +139,7 @@ def getBadgeInfo(badgeId) -> dict:
             vPrint(f"Error in badge_json! [{badge_json}]")
             return False
         else:
-            vPrint(f"badge_json: [{badge_json}]")
+            vvPrint(f"badge_json: [{badge_json}]")
             return badge_json
     return False
 
@@ -152,7 +152,7 @@ def getUniverseInfo(universeId) -> dict:
             vPrint(f"Error in universe_json! [{universe_json}]")
             return False
         else:
-            vPrint(f"universe_json: [{universe_json}]")
+            vvPrint(f"universe_json: [{universe_json}]")
             return universe_json["data"][0]
     return False
 
@@ -164,7 +164,7 @@ def getGroupInfo(groupId) -> dict:
             vPrint(f"Error in groupInfo_json! [{groupInfo_json}]")
             return False
         else:
-            vPrint(f"groupInfo_json: [{groupInfo_json}]")
+            vvPrint(f"groupInfo_json: [{groupInfo_json}]")
             return groupInfo_json["data"][0]
     return False
 
@@ -180,7 +180,7 @@ def findGroupPlaces(groupId) -> list:
                 vPrint(f"Error in groupPlaces_json! [{groupPlaces_json}]")
                 return groupPlaces
             else:
-                vPrint(f"groupPlaces_json: [{groupPlaces_json}]")
+                vvPrint(f"groupPlaces_json: [{groupPlaces_json}]")
                 for game in groupPlaces_json['data']:
                     rootPlaceId = game['rootPlace']['id']
                     groupPlaces.append(rootPlaceId)
@@ -203,7 +203,7 @@ def getUserInfo(userId) -> dict:
             vPrint(f"Error in userInfo_json! [{userInfo_json}]")
             return False
         else:
-            vPrint(f"userInfo_json: [{userInfo_json}]")
+            vvPrint(f"userInfo_json: [{userInfo_json}]")
             return userInfo_json
     return False
 
@@ -219,7 +219,7 @@ def findUserPlaces(userId) -> list:
                 vPrint(f"Error in userPlaces_json! [{userPlaces_json}]")
                 return userPlaces
             else:
-                vPrint(f"userPlaces_json: [{userPlaces_json}]")
+                vvPrint(f"userPlaces_json: [{userPlaces_json}]")
                 for game in userPlaces_json['data']:
                     rootPlaceId = game['rootPlace']['id']
                     userPlaces.append(rootPlaceId)
@@ -242,7 +242,7 @@ def getUniverseVotes(universeId) -> dict:
         if "errors" in universeVotes_json:
             vPrint(f"Error in universeVotes_json! [{universeVotes_json}]")
             return False
-        vPrint(f"universeVotes_json: [{universeVotes_json}]")
+        vvPrint(f"universeVotes_json: [{universeVotes_json}]")
         return universeVotes_json["data"][0]
     return False
 
@@ -285,10 +285,10 @@ def checkUniverseForAnyBadges(universeId) -> dict:
     universeBadgesCheck = getRequestURL(f"https://badges.roblox.com/v1/universes/{str(universeId)}/badges")#?limit=10&sortOrder=Asc")
     if universeBadgesCheck.ok:
         universeBadges_json = universeBadgesCheck.json()
-        vPrint(f"universeBadges_json: [{universeBadges_json}]")
+        vvPrint(f"universeBadges_json: [{universeBadges_json}]")
         if universeBadges_json["data"] == []: return False # no badges
         else:
-            vPrint(f"universeBadges_json: [{universeBadges_json}]"); return universeBadges_json["data"]
+            return universeBadges_json["data"]
     return None
 
 # {"universeId":13058}
@@ -296,7 +296,7 @@ def getUniverseFromPlaceId(placeId) -> dict:
     universeIdCheck = getRequestURL(f"https://apis.roblox.com/universes/v1/places/{str(placeId)}/universe")
     if universeIdCheck.ok:
         universeId_json = universeIdCheck.json()
-        vPrint(f"universeId_json: [{universeId_json}]")
+        vvPrint(f"universeId_json: [{universeId_json}]")
         return universeId_json["universeId"]
     return None
 

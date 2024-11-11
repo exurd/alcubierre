@@ -6,7 +6,7 @@ import re
 from enum import Enum
 
 from . import apiReqs
-from .verbosePrint import vPrint
+from .verbosePrint import vPrint, vvPrint
 
 def checkIfStringIsInteger(string:str):
     vPrint(f"Checking if string {string} is an integer...")
@@ -72,9 +72,9 @@ TYPE_STRINGS = {
 
 def checkTypeStrings(string:str):
     for RBX_TYPE, COLON_STRINGS in TYPE_STRINGS.items():
-        vPrint(f"Checking '::' strings for type: {RBX_TYPE}")
+        vvPrint(f"Checking '::' strings for type: {RBX_TYPE}")
         for colonString in COLON_STRINGS:
-            vPrint(f"'::' string: {colonString}")
+            vvPrint(f"'::' string: {colonString}")
             if colonString in string:
                 id = string.replace(colonString,"")
                 idType = RBX_TYPE
@@ -83,9 +83,9 @@ def checkTypeStrings(string:str):
 
 def checkRegExStrings(string:str):
     for RBX_TYPE, PATTERNS in TYPE_PATTERNS.items():
-        vPrint(f"Checking patterns for type: {RBX_TYPE}")
+        vvPrint(f"Checking patterns for type: {RBX_TYPE}")
         for pattern in PATTERNS:
-            vPrint(f"Pattern: {pattern}")
+            vvPrint(f"Pattern: {pattern}")
             match = pattern.search(string)
             if match:
                 id = match.group(1)

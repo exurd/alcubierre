@@ -4,15 +4,25 @@
 
 verbose = False
 vPrint = None
-def toggleVerbosity():
+veryVerbose = False
+vvPrint = None
+def toggleVerbosePrint():
     global verbose
     verbose = not verbose
     #print(verbose)
     activateLambda()
+
+def toggleVeryVerbosePrint():
+    global veryVerbose
+    veryVerbose = not veryVerbose
+    #print(verbose)
+    activateLambda()
+
 def activateLambda():
     global vPrint
+    global vvPrint
     vPrint = print if verbose else lambda *a, **k: None
-    vPrint("Verbose mode is now enabled, else you wouldn't be seeing this...")
+    vvPrint = print if veryVerbose else lambda *a, **k: None
 activateLambda()
 
 # This program is free software: you can redistribute it and/or modify
