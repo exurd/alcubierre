@@ -32,7 +32,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>."""
 URL_PATTERN = re.compile(r"https?://")
 def file_or_url(path):
     if URL_PATTERN.match(path):
-        print(f"The input appears to be a URL: {path}.\nDownloading files without checking them can allow XSS injection or joining a game that could ban your account!\nIt is HIGHLY RECOMMENDED to download the file yourself, inspect what games you're going to join and clean up any misconfigured lines.")
+        print(f"The input appears to be a URL: {path}\nDownloading files without checking them can allow XSS injection or joining a game that could ban your account!\nIt is HIGHLY RECOMMENDED to download the file yourself, inspect what games you're going to join and clean up any misconfigured lines.")
         time.sleep(10)
         confirm = input("Do you *really* want to download the file? (yes/no): ")
         if confirm.lower() != "yes":

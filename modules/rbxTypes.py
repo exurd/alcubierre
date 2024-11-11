@@ -139,7 +139,7 @@ class rbxInstance:
             return info
     
     def stringIdThingy(self,string:str):
-        if type(string) != str: self.type = None; return None
+        if not isinstance(string,str): self.type = None; return None
         vPrint("Detecting type from string...")
         id = None
         idType = None
@@ -151,15 +151,15 @@ class rbxInstance:
             id, idType = checkRegExStrings(string)
         
         if id == None and idType == None:
+            if id == "": self.type = None; return None
             vPrint("Is the string just numbers?")
             id = string
-        checkInt = checkIfStringIsInteger(id)
-        if checkInt == None:
-            if id == "": self.type = None; return None
-            vPrint("Setting type to rbxType.UNKNOWN")
-            idType = rbxType.UNKNOWN
-        else:
-            id = checkInt
+            checkInt = checkIfStringIsInteger(id)
+            if checkInt == None: self.type = None; return None
+            else:
+                id = checkInt
+                vPrint("Setting type to rbxType.UNKNOWN")
+                idType = rbxType.UNKNOWN
 
         self.id = id
         self.type = idType

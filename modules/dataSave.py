@@ -48,7 +48,7 @@ def save_data(data, filename):
     vPrint(f"Saving data to [{filename}]...")
     global data_folder
     data_file_path = os.path.join(data_folder, filename)
-    if type(data) == dict:
+    if isinstance(data, dict):
         with open(data_file_path, "wb") as f:
             pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
             f.close()

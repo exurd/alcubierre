@@ -36,14 +36,14 @@ def kill_roblox_process():
     time.sleep(5)
     vPrint(f"Killing in the name of `{robloxProcess_name}`")
     proc = roblox_process_exists()
-    if type(proc) == psutil.Process:
+    if isinstance(proc,psutil.Process):
         proc.kill()
         vPrint(f"Killed process with PID {proc.pid}")
 
 def openRobloxPlace(rootPlaceId, name=None, use_bloxstrap=True, use_sober=True, sober_opts=""):
     if name == None:
         print(f"Going to Roblox Place #{str(rootPlaceId)}")
-    elif type(name) == str:
+    elif isinstance(name,str):
         print(f"Going to {str(name)} ({str(rootPlaceId)})")
 
     dataSave.played_places.append(rootPlaceId)
@@ -94,7 +94,7 @@ def waitForProcessOrBadgeCollect(an_rbxInstance:rbxInstance,user_Id=0,secs_reinc
         print("Exit the game when you have finished.")
         while True:
             time.sleep(3)
-            if not type(roblox_process_exists()) == psutil.Process:
+            if not isinstance(roblox_process_exists(),psutil.Process):
                 return rbxReason.processClosed
             if an_rbxInstance.type == rbxType.BADGE and user_Id != 0:
                 if singleBadge == True:

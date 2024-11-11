@@ -42,7 +42,7 @@ def init(user_agent=None,rbx_token=None):
 def isTokenCookieThere() -> bool: return ".ROBLOSECURITY" in requestSession.cookies
 
 def getRequestURL(url,retryAmount=8,acceptForbidden=False,acceptNotFound=True,initialWaitTime=None,cacheResults=True) -> requests.Response:
-    if type(url) != str: vPrint("getRequestURL: url was not string type, sending None"); return None
+    if not isinstance(url,str): vPrint("getRequestURL: url was not string type, sending None"); return None
     if cacheResults and url in respCache: return respCache[url]
     tries = 0
     vPrint(f"Requesting {url}...")
