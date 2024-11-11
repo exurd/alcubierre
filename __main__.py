@@ -2,7 +2,7 @@
 # ./__main__.py
 # Licensed under the GNU General Public License Version 3.0 (see below for more details)
 
-import os, sys, argparse, time
+import os, re, sys, argparse, time
 from modules.verbosePrint import toggleVerbosity
 
 __prog__ = "alcubierre" 
@@ -29,6 +29,22 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>."""
 
+URL_PATTERN = re.compile(r"https?://")
+def file_or_url(path):
+    if URL_PATTERN.match(path):
+        print(f"The input appears to be a URL: {path}.\nDownloading files without checking them can allow XSS injection or joining a game that could ban your account!\nIt is HIGHLY RECOMMENDED to download the file yourself, inspect what games you're going to join and clean up any misconfigured lines.")
+        time.sleep(10)
+        confirm = input("Do you *really* want to download the file? (yes/no): ")
+        if confirm.lower() != "yes":
+            print("Aborting.")
+            sys.exit(1)
+        return path
+    else:
+        try:
+            return open(path, "r")
+        except OSError as e:
+            raise argparse.ArgumentTypeError(f"Cannot open file: {e}")
+
 def get_parser() -> argparse.ArgumentParser:
     """
     Creates a new argument parser.
@@ -42,7 +58,7 @@ def get_parser() -> argparse.ArgumentParser:
     version = "%(prog)s " + __version__
     parser.add_argument("--version", action="version", version=version)
     
-    parser.add_argument("file_path", nargs="?", type=argparse.FileType("r"), default=None,
+    parser.add_argument("file_path", nargs="?", type=file_or_url, default=None,
                         help="Filename path of Badge IDs/URLs.")
     
     parser.add_argument("--env-file", "-e", default=None, #type=argparse.FileType("w"),
@@ -156,12 +172,21 @@ def main(args=None):
             if user_agent == parser.get_default("USER_AGENT") and "USER_AGENT" in data:
                 user_agent = data["USER_AGENT"]
 
-    if args.file_path == None: parser.error("the following arguments are required to continue: file_path")
-    lines = [l.strip() for l in args.file_path.readlines()]
-    args.file_path.close()
-    # print(lines)
-
     from modules import apiReqs, dataSave
+
+    if args.file_path == None: parser.error("the following arguments are required to continue: file_path")
+
+    lines = []
+    if isinstance(args.file_path, str):
+        print(f"URL provided: {args.file_path}")
+        url_check = apiReqs.getRequestURL(args.file_path,cacheResults=False)
+        if url_check.ok:
+            lines = url_check.text.splitlines()
+    else:
+        print(f"File loaded: {args.file_path.name}")
+        lines = args.file_path.read().splitlines()
+        args.file_path.close()
+
     apiReqs.init(user_agent, rbx_token)
 
     user_id = args.user_id
@@ -169,7 +194,6 @@ def main(args=None):
         userInfo = apiReqs.getUserFromToken()
         vPrint(f"userInfo: [{userInfo}]")
         user_id = userInfo["id"]
-        #print(userInfo)
 
     data_folder = dataSave.get_data_file_path(args.cache_directory)
     if user_id != parser.get_default("user_id"):
