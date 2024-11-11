@@ -62,7 +62,7 @@ def get_parser() -> argparse.ArgumentParser:
                         help="Filename path of Badge IDs/URLs.")
     
     parser.add_argument("--env-file", "-e", default=None, #type=argparse.FileType("w"),
-                    help=f"An .env file allows you to specify settings (the below options) for {parser.prog} to follow without cluttering the terminal or risking important tokens. If the file doesn't exist, the program will create a template in it's place. More infomation on .env files can be found in the README.")
+                    help=f"An .env file allows you to specify settings (the below options) for {parser.prog} to follow without cluttering the terminal or risking important tokens. If the file doesn't exist, the program will create a template in its place. More information on .env files can be found in the README.")
     # The .env file will allow you to check if the place is playable or not.
     # Caution: To create an .env file, you will need your account's Roblox cookies, which can pose a risk if someone hacks into your computer.
     # It should have the following:
@@ -73,7 +73,7 @@ def get_parser() -> argparse.ArgumentParser:
                     help=".ROBLOSECURITY token. By using this option, you agree that this is your unique token and not anyone else's. DO NOT SHARE YOUR ROBLOX TOKEN WITH ANYONE! More info can be found here: https://ro.py.jmk.gg/dev/tutorials/roblosecurity/")
     
     parser.add_argument("--user-id", "-u", type=int, default=None,
-                    help="Specifys a Roblox User ID to check inventory for badges. Not required if you're already using --rbx-token. The User ID argument takes priority from --rbx-token.")
+                    help="Specify a Roblox User ID to check inventory for badges. Not required if you're already using --rbx-token. The User ID argument takes priority from --rbx-token.")
     # Your Roblox User ID. It can be found your profile. If set to 0 it will not use any features that need your User ID, like badge checking.
     # Example: mrflimflam --> https://www.roblox.com/users/339310190/profile --> 339310190
     #                                                     [---------]
@@ -85,10 +85,10 @@ def get_parser() -> argparse.ArgumentParser:
     # If you want all badges to go through, then set it to -1
 
     parser.add_argument("--vote-threshold", "-vt", type=float, default=-1, metavar="RATIO",
-                    help="The threshold ratio of likes and dislikes. If a game has a lower ratio than the threshold, it gets skipped. Setting to -1 (default) disables the threshold.")
+                    help="Threshold ratio of likes and dislikes. If a game has a lower ratio than the threshold, it gets skipped. Setting to -1 (default) disables the threshold.")
     
     parser.add_argument("--seconds", "-s", type=int, default=-1,
-                    help="How many seconds before script kills Roblox process and goes to next line in file. Setting to -1 (default) disables the timer.")
+                    help="How many seconds before killing the Roblox process. Setting to -1 (default) disables the timer.")
     # How long until you join the next game.
     # 45 seconds is long enough if you're only looking around for the welcome badge when joining the games.
     # If you want more time, say, to look around in the game, try 5-10 minutes (300-600 seconds)
@@ -103,7 +103,7 @@ def get_parser() -> argparse.ArgumentParser:
                     help="Linux only! Commands to give Sober. Connect with an equal sign for it to work (`--sober-opts='--opengl'`) See --no-sober for more info on Sober.")
     
     parser.add_argument("--open-in-browser", "-ob", action="store_true",
-                    help="Opens the Roblox place in default browser. Highly recommended, but set to False as default.")
+                    help="Opens the Roblox place in the default browser. Highly recommended, but set to False as default.")
     # Opens the URL to the place in your web browser as you join, so you can track the badges you need to collect. Simple as.
     
     parser.add_argument("--verbose", "-v", action="store_true",
@@ -119,13 +119,13 @@ def get_parser() -> argparse.ArgumentParser:
                     help="Turns off one badge place detection, which automatically closes Roblox after the user has collected the solo badge on a place.")
 
     parser.add_argument("--cache-directory", "-cd", default=os.path.join(os.path.dirname(__file__), "alcubierre_cache"),
-                    help="The directory where caches/saved data is kept.")
+                    help="The directory where cache data is kept.")
 
     parser.add_argument("--user-agent", "-ua", default=f"{parser.prog} - badge-to-badge teleporter {__version__}",
                     help="Sets the user agent for requests made by the program.")
     
     parser.add_argument("--save-response-cache", "-src", action="store_true",
-                    help="Save API responses from Roblox into a file. This can save bandwidth, at the cost of new infomation from already checked responses being ignored.")
+                    help="Save API responses from Roblox into a file. This can save bandwidth, at the cost of new information from already checked responses being ignored.")
 
     parser.add_argument("--play-sound", "-ps", action="store_true",
                     help="Play sounds for important context.")
