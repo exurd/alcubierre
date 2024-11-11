@@ -8,15 +8,6 @@ from enum import Enum
 from . import apiReqs
 from .verbosePrint import vPrint
 
-place_patterns = [
-    r"roblox\.com/games/(\d+)",
-    r"place\?id=(\d+)"
-]
-badge_patterns = [
-    r"roblox\.com/badges/(\d+)",
-    r"item\?id=(\d+)"
-]
-
 def checkIfStringIsInteger(string:str):
     vPrint(f"Checking if string {string} is an integer...")
     try:
@@ -28,15 +19,86 @@ def checkIfStringIsInteger(string:str):
         return None
 
 class rbxType(Enum):
+    """
+    Positive: singular item
+    Negative: multiple items
+    """
+    def __str__(self): return self.name
+    USER = -2
+    GROUP = -1
     UNKNOWN = 0
     BADGE = 1
     PLACE = 2
     UNIVERSE = 3
 
+TYPE_PATTERNS = {
+    rbxType.PLACE: [
+        re.compile(r"roblox\.com/games/(\d+)", re.IGNORECASE),
+        re.compile(r"place\?id=(\d+)", re.IGNORECASE),
+        re.compile(r"roblox\.com/Place\.aspx\?ID=(\d+)", re.IGNORECASE),
+        re.compile(r"roblox\.com/PlaceItem\.aspx\?id=(\d+)", re.IGNORECASE)
+    ],
+    rbxType.BADGE: [
+        re.compile(r"roblox\.com/badges/(\d+)", re.IGNORECASE),
+        re.compile(r"item\?id=(\d+)", re.IGNORECASE)
+    ],
+    rbxType.GROUP: [
+        re.compile(r"roblox\.com/groups/(\d+)", re.IGNORECASE),
+    ],
+    rbxType.USER: [
+        re.compile(r"roblox\.com/users/(\d+)", re.IGNORECASE),
+        re.compile(r"roblox\.com/User\.aspx\?ID=(\d+)", re.IGNORECASE)
+    ]
+}
+
+TYPE_STRINGS = {
+    rbxType.PLACE: [
+        "place::", "places::", "p::",
+        "game::", "games::"
+    ],
+    rbxType.BADGE: [
+        "badge::", "badges::", "b::"
+    ],
+    rbxType.UNIVERSE: [
+        "universe::", "universes::", "u::"
+    ],
+    rbxType.GROUP: [
+        "group::", "groups::", "g::"
+    ],
+    rbxType.USER: [
+        "user::", "users::", "u::"
+    ]
+}
+
+def checkTypeStrings(string:str):
+    for RBX_TYPE, COLON_STRINGS in TYPE_STRINGS.items():
+        vPrint(f"Checking '::' strings for type: {RBX_TYPE}")
+        for colonString in COLON_STRINGS:
+            vPrint(f"'::' string: {colonString}")
+            if colonString in string:
+                id = string.replace(colonString,"")
+                idType = RBX_TYPE
+                return id, idType
+    return None, None
+
+def checkRegExStrings(string:str):
+    for RBX_TYPE, PATTERNS in TYPE_PATTERNS.items():
+        vPrint(f"Checking patterns for type: {RBX_TYPE}")
+        for pattern in PATTERNS:
+            vPrint(f"Pattern: {pattern}")
+            match = pattern.search(string)
+            if match:
+                id = match.group(1)
+                idType = RBX_TYPE
+                return id, idType
+    return None, None
+
 class rbxReason(Enum):
     """
-    Positive numbers 'good', negative numbers 'bad'.
+    Positive: 'good' outcome
+    Negative: 'bad' outcome
     """
+    def __str__(self): return self.name
     badgeCollected = 4
     timeUp = 3
     processClosed = 2
@@ -60,57 +122,40 @@ class rbxInstance:
     
     def getInfoFromType(self):
         vPrint(f"Getting info for {self.id} with type {self.type}")
+        info = False
         if self.type == rbxType.BADGE:
-            badgeInfo = apiReqs.getBadgeInfo(self.id)
-            if badgeInfo != False:
-                self.info = badgeInfo
-                return badgeInfo
+            info = apiReqs.getBadgeInfo(self.id)
         if self.type == rbxType.PLACE:
-            placeInfo = apiReqs.getPlaceInfo(self.id)
-            if placeInfo != False:
-                self.info = placeInfo
-                return placeInfo
+            info = apiReqs.getPlaceInfo(self.id)
         if self.type == rbxType.UNIVERSE:
-            universeInfo = apiReqs.getUniverseInfo(self.id)
-            if universeInfo != False:
-                self.info = universeInfo
-                return universeInfo
+            info = apiReqs.getUniverseInfo(self.id)
+        if self.type == rbxType.GROUP:
+            info = apiReqs.getGroupInfo(self.id)
+        if self.type == rbxType.USER:
+            info = apiReqs.getUserInfo(self.id)
+        
+        if info != False:
+            self.info = info
+            return info
     
     def stringIdThingy(self,string:str):
+        if type(string) != str: self.type = None; return None
         vPrint("Detecting type from string...")
         id = None
         idType = None
-        if "badge::" in string:
-            #print(string)
-            id = string.replace("badge::","")
-            idType = rbxType.BADGE
-        if "place::" in string:
-            #print(string)
-            id = string.replace("place::","")
-            idType = rbxType.PLACE
-        if "universe::" in string:
-            id = string.replace("universe::","")
-            idType = rbxType.UNIVERSE
+
+        if "::" in string:
+            id, idType = checkTypeStrings(string)
         
-        for pattern in place_patterns:
-            if id != None and idType != None:   break
-            match = re.search(pattern, string)
-            if match:
-                id = match.group(1)
-                idType = rbxType.PLACE
-        
-        for pattern in badge_patterns:
-            if id != None and idType != None:   break
-            match = re.search(pattern, string)
-            if match:
-                id = match.group(1)
-                idType = rbxType.BADGE
+        if id == None and idType == None:
+            id, idType = checkRegExStrings(string)
         
         if id == None and idType == None:
             vPrint("Is the string just numbers?")
             id = string
         checkInt = checkIfStringIsInteger(id)
         if checkInt == None:
+            if id == "": self.type = None; return None
             vPrint("Setting type to rbxType.UNKNOWN")
             idType = rbxType.UNKNOWN
         else:
@@ -122,14 +167,14 @@ class rbxInstance:
     
     def detectTypeFromId(self,ignore=[]) -> rbxType:
         id = self.id
-        vPrint(f"Attempt to detect type from {id} (Previous type was: {self.type})")
+        old_type = self.type
+        vPrint(f"Attempt to detect type from {id} (Previous type was: {old_type})")
 
         vPrint("Badge?")
         if not rbxType.BADGE in ignore:
             badgeInfo = apiReqs.getBadgeInfo(id)
             if badgeInfo != False:
                 self.type = rbxType.BADGE
-                return rbxType.BADGE
 
         vPrint("Place?")
         if not rbxType.PLACE in ignore:
@@ -138,23 +183,22 @@ class rbxInstance:
                 # economy api is broad; check if the asset type is 9 (place)
                 if economyInfo["AssetTypeId"] == 9:
                     self.type = rbxType.PLACE
-                    return rbxType.PLACE
         
-        # universes use a seperate id system from places and badges, so one could be confused for the other.
-        # when making a text file with just the ids *please* use {type}::{id} to specify what type each line is!
+        # universes, users and groups use a separate id system from places and badges, so one could be confused for the other.
+        # when making a text file with minimal ids *please* use {type}::{id} to specify what type each id is!
         # otherwise, most if not all universe ids will get misjudged as a badge/place id.
         vPrint("Universe?")
         if not rbxType.UNIVERSE in ignore:
             universeInfo = apiReqs.getUniverseInfo(id)
             if universeInfo != False:
                 self.type = rbxType.UNIVERSE
-                return rbxType.UNIVERSE
 
-        # tried everything? set to None and give up on this one
-        vPrint("Mineral...? *shrug*")
-        vPrint("Tried every type. Setting self.type to None.")
-        self.type = None
-        return None
+        if self.type == old_type:
+            # tried everything? set to None and give up on this one
+            vPrint("Mineral...? *shrug*")
+            vPrint("Tried every type. Setting self.type to None.")
+            self.type = None
+        return self.type
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

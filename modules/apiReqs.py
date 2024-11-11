@@ -156,6 +156,84 @@ def getUniverseInfo(universeId) -> dict:
             return universe_json["data"][0]
     return False
 
+def getGroupInfo(groupId) -> dict:
+    groupInfo_check = getRequestURL(f"https://groups.roblox.com/v2/groups?groupIds={str(groupId)}")
+    if groupInfo_check.ok:
+        groupInfo_json = groupInfo_check.json()
+        if "errors" in groupInfo_json:
+            vPrint(f"Error in groupInfo_json! [{groupInfo_json}]")
+            return False
+        else:
+            vPrint(f"groupInfo_json: [{groupInfo_json}]")
+            return groupInfo_json["data"][0]
+    return False
+
+def findGroupPlaces(groupId) -> list:
+    vPrint(f"Searching group {str(groupId)}'s games...")
+    groupPlaces = []
+    url = f"https://games.roblox.com/v2/groups/{str(groupId)}/games?accessFilter=2&limit=100&sortOrder=Asc"
+    while True:
+        groupPlaces_check = getRequestURL(url)
+        if groupPlaces_check.ok:
+            groupPlaces_json = groupPlaces_check.json()
+            if 'errors' in groupPlaces_json:
+                vPrint(f"Error in groupPlaces_json! [{groupPlaces_json}]")
+                return groupPlaces
+            else:
+                vPrint(f"groupPlaces_json: [{groupPlaces_json}]")
+                for game in groupPlaces_json['data']:
+                    rootPlaceId = game['rootPlace']['id']
+                    groupPlaces.append(rootPlaceId)
+
+                if groupPlaces_json['nextPageCursor'] == None:
+                    vPrint("Found all games in group.")
+                    return groupPlaces
+                else:
+                    vPrint("Checking next page of games...")
+                    url = f"https://games.roblox.com/v2/groups/{str(groupId)}/games?accessFilter=2&limit=100&sortOrder=Asc&cursor={groupPlaces_json['nextPageCursor']}"
+        else:
+            print(f"Error! [{groupPlaces_check}]")
+            return groupPlaces
+
+def getUserInfo(userId) -> dict:
+    userInfo_check = getRequestURL(f"https://users.roblox.com/v1/users/{str(userId)}")
+    if userInfo_check.ok:
+        userInfo_json = userInfo_check.json()
+        if "errors" in userInfo_json:
+            vPrint(f"Error in userInfo_json! [{userInfo_json}]")
+            return False
+        else:
+            vPrint(f"userInfo_json: [{userInfo_json}]")
+            return userInfo_json
+    return False
+
+def findUserPlaces(userId) -> list:
+    vPrint(f"Searching group {str(userId)}'s games...")
+    userPlaces = []
+    url = f"https://games.roblox.com/v2/users/{str(userId)}/games?limit=50&sortOrder=Asc"
+    while True:
+        userPlaces_check = getRequestURL(url)
+        if userPlaces_check.ok:
+            userPlaces_json = userPlaces_check.json()
+            if 'errors' in userPlaces_json:
+                vPrint(f"Error in userPlaces_json! [{userPlaces_json}]")
+                return userPlaces
+            else:
+                vPrint(f"userPlaces_json: [{userPlaces_json}]")
+                for game in userPlaces_json['data']:
+                    rootPlaceId = game['rootPlace']['id']
+                    userPlaces.append(rootPlaceId)
+
+                if userPlaces_json['nextPageCursor'] == None:
+                    vPrint("Found all games in user.")
+                    return userPlaces
+                else:
+                    vPrint("Checking next page of games...")
+                    url = f"https://games.roblox.com/v2/users/{str(userId)}/games?limit=50&sortOrder=Asc&cursor={userPlaces_json['nextPageCursor']}"
+        else:
+            print(f"Error! [{userPlaces_check}]")
+            return userPlaces
+
 # {"data":[{"id":5988568657,"upVotes":8922,"downVotes":670}]}
 def getUniverseVotes(universeId) -> dict:
     universeVotes_check = getRequestURL(f"https://games.roblox.com/v1/games/votes?universeIds={str(universeId)}")

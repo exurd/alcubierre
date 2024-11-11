@@ -2,13 +2,7 @@
 # ./modules/scriptLoop.py
 # Licensed under the GNU General Public License Version 3.0 (see below for more details)
 
-import os
-from urllib.parse import unquote, urlparse
-import pathlib #import PurePosixPath
 import time
-import webbrowser
-import subprocess
-import json
 #import pygame
 
 from . import apiReqs, dataSave, processHandle, playSound
@@ -68,7 +62,8 @@ def dealWithBadge(badge_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1
 
     if open_place_in_browser: processHandle.openPlaceInBrowser(rootPlaceId)
 
-    processHandle.openRobloxPlace(rootPlaceId,
+    processHandle.openRobloxPlace(
+        rootPlaceId,
         name=badge_info["awardingUniverse"]["name"],
         use_bloxstrap=use_bloxstrap,
         use_sober=use_sober,
@@ -100,7 +95,8 @@ def dealWithPlace(place_rbxInstance:rbxInstance,voteThreshold=-1.0,checkIfBadges
     
     if open_place_in_browser: processHandle.openPlaceInBrowser(place_rbxInstance.id)
 
-    processHandle.openRobloxPlace(place_rbxInstance.id,
+    processHandle.openRobloxPlace(
+        place_rbxInstance.id,
         name=place_Info["name"],
         use_bloxstrap=use_bloxstrap,
         use_sober=use_sober,
@@ -147,6 +143,7 @@ def dealWithInstance(an_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1
     """
     Deals with rbxInstance; should either return a new process or rbxReason
     """
+    result = None
     if an_rbxInstance.type == rbxType.BADGE:
         result = dealWithBadge(
             badge_rbxInstance=an_rbxInstance,
@@ -213,8 +210,89 @@ def isUniverseOneBadge(an_rbxInstance:rbxInstance) -> bool:
 
 dataSave.init()
 
+def handleLine(line,user_id=None,awardedThreshold=-1,voteThreshold=-1.0,secs_reincarnation=-1,open_place_in_browser=False,use_bloxstrap=True,use_sober=True,sober_opts="",checkIfBadgesOnUniverse=True,detectOneBadgeUniverses=True):
+    line_rbxInstance = rbxInstance()
+    line_rbxInstance.stringIdThingy(line)
+
+    if line_rbxInstance.id == None:
+        return False
+    
+    if line_rbxInstance.id in dataSave.gotten_badges:
+        print(f"Skipping {line}, already collected!")
+        return rbxReason.alreadyCollected
+    if line_rbxInstance.id in dataSave.played_places:
+        print(f"Skipping {line}, already played!")
+        return rbxReason.alreadyPlayed
+    
+    if line_rbxInstance.type == rbxType.UNKNOWN:
+        line_rbxInstance.detectTypeFromId()
+    if line_rbxInstance.type == None:
+        return False
+    
+    vPrint(f"line_rbxInstance: {line_rbxInstance}")
+    line_rbxInstance.getInfoFromType()
+    #print(line_rbxInstance.type)
+
+    if line_rbxInstance.type == rbxType.GROUP or line_rbxInstance.type == rbxType.USER:
+        places = []
+        if line_rbxInstance.type == rbxType.GROUP:
+            places = apiReqs.findGroupPlaces(line_rbxInstance.id)
+        if line_rbxInstance.type == rbxType.USER:
+            places = apiReqs.findUserPlaces(line_rbxInstance.id)
+        
+        if places != []:
+            for place_number, placeId in enumerate(places,start=1):
+                print(f"Sub-place {str(place_number)}: {str(placeId)}")
+                handleLine(
+                    line=f"place::{str(placeId)}",
+                    user_id=user_id,
+                    awardedThreshold=awardedThreshold,
+                    voteThreshold=voteThreshold,
+                    secs_reincarnation=secs_reincarnation,
+                    open_place_in_browser=open_place_in_browser,
+                    use_bloxstrap=use_bloxstrap,
+                    use_sober=use_sober,
+                    sober_opts=sober_opts,
+                    checkIfBadgesOnUniverse=checkIfBadgesOnUniverse,
+                    detectOneBadgeUniverses=detectOneBadgeUniverses
+                    )
+    
+    line_rbxReason = dealWithInstance(
+        an_rbxInstance=line_rbxInstance,
+        user_id=user_id,
+        awardedThreshold=awardedThreshold,
+        voteThreshold=voteThreshold,
+        checkIfBadgesOnUniverse=checkIfBadgesOnUniverse,
+        open_place_in_browser=open_place_in_browser,
+        use_bloxstrap=use_bloxstrap,
+        use_sober=use_sober,
+        sober_opts=sober_opts
+        )
+    print(f"line_rbxReason: {line_rbxReason}")
+
+    if line_rbxReason == rbxReason.processOpened:
+        singleBadge = False
+        if line_rbxInstance.type == rbxType.BADGE and detectOneBadgeUniverses == True:
+            if isUniverseOneBadge(line_rbxInstance):
+                print("[SOLO BADGE! ONLY 1 TO COLLECT FOR THIS GAME!]")
+                playSound.playSound("notify")
+                singleBadge = True
+
+        time.sleep(15)
+
+        process_rbxReason = processHandle.waitForProcessOrBadgeCollect(line_rbxInstance,user_id,secs_reincarnation,singleBadge)
+        vPrint(f"process_rbxReason: {process_rbxReason}")
+        if process_rbxReason == rbxReason.badgeCollected:
+            print("Badge has been awarded!")
+            dataSave.gotten_badges.append(line_rbxInstance.id)
+            dataSave.save_data(dataSave.gotten_badges,"gotten_badges.json")
+            playSound.playSound("success")
+            processHandle.kill_roblox_process()
+    return True
+
 def start(lines,user_id=None,awardedThreshold=-1,voteThreshold=-1.0,secs_reincarnation=-1,open_place_in_browser=False,use_bloxstrap=True,use_sober=True,sober_opts="",checkIfBadgesOnUniverse=True,detectOneBadgeUniverses=True):
     # check if variables are correctly set
+    if not type(user_id) == int: user_id = None
     if not type(awardedThreshold) == int: awardedThreshold = -1
     if not type(voteThreshold) == float: voteThreshold = -1.0
     if not type(secs_reincarnation) == int: secs_reincarnation = -1
@@ -230,54 +308,23 @@ def start(lines,user_id=None,awardedThreshold=-1,voteThreshold=-1.0,secs_reincar
         stripped_line = line.strip()
         print(f"Line {line_number}: {stripped_line}")
 
-        line_rbxInstance = rbxInstance()
-        line_rbxInstance.stringIdThingy(stripped_line)
-        if line_rbxInstance.id == None:
+        if stripped_line == "":
+            vPrint("Empty line, skipping...")
             continue
-        if line_rbxInstance.id in dataSave.gotten_badges:
-            print(f"Skipping {stripped_line}, already collected!")
-            continue
-        if line_rbxInstance.id in dataSave.played_places:
-            print(f"Skipping {stripped_line}, already played!")
-            continue
-        if line_rbxInstance.type == rbxType.UNKNOWN:
-            line_rbxInstance.detectTypeFromId()
-        if line_rbxInstance.type == None:
-            continue
-
-        vPrint(f"line_rbxInstance; {line_rbxInstance}")
-        line_rbxInstance.getInfoFromType()
-        #print(line_rbxInstance.type)
         
-        line_rbxReason = dealWithInstance(
-            an_rbxInstance=line_rbxInstance,
+        handleLine(
+            line=stripped_line,
             user_id=user_id,
             awardedThreshold=awardedThreshold,
             voteThreshold=voteThreshold,
-            checkIfBadgesOnUniverse=checkIfBadgesOnUniverse,
+            secs_reincarnation=secs_reincarnation,
             open_place_in_browser=open_place_in_browser,
             use_bloxstrap=use_bloxstrap,
             use_sober=use_sober,
-            sober_opts=sober_opts
+            sober_opts=sober_opts,
+            checkIfBadgesOnUniverse=checkIfBadgesOnUniverse,
+            detectOneBadgeUniverses=detectOneBadgeUniverses
             )
-
-        if line_rbxReason == rbxReason.processOpened:
-            singleBadge = False
-            if line_rbxInstance.type == rbxType.BADGE and detectOneBadgeUniverses == True:
-                if isUniverseOneBadge(line_rbxInstance):
-                    print("[SOLO BADGE! ONLY 1 TO COLLECT FOR THIS GAME!]")
-                    playSound.playSound("notify")
-                    singleBadge = True
-
-            time.sleep(15)
-
-            process_rbxReason = processHandle.waitForProcessOrBadgeCollect(line_rbxInstance,user_id,secs_reincarnation,singleBadge)
-            if process_rbxReason == rbxReason.badgeCollected:
-                print("Badge has been awarded!")
-                dataSave.gotten_badges.append(line_rbxInstance.id)
-                dataSave.save_data(dataSave.gotten_badges,"gotten_badges.json")
-                playSound.playSound("success")
-                processHandle.kill_roblox_process()
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
