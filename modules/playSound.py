@@ -2,16 +2,17 @@
 # ./modules/playSound.py
 # Licensed under the GNU General Public License Version 3.0 (see below for more details)
 
-import os
+import os, sys, time
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "CONTRIBUTE TO PYGAME!! https://www.pygame.org/wiki/Contribute"
 import pygame
-import time
 
 from .verbosePrint import vPrint
 
 active_sndPack = None
 
-sounds_folder = os.path.join(".","sounds")
+if getattr(sys, "frozen", False): base_path = sys._MEIPASS
+else: base_path = os.path.join(os.path.dirname(__file__),"..")
+sounds_folder = os.path.join(base_path,"sounds")
 soundPacks = os.listdir(sounds_folder)
 # print(sounds_folder)
 

@@ -29,6 +29,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>."""
 
+if getattr(sys, "frozen", False): base_path = sys._MEIPASS
+else: base_path = os.path.dirname(__file__)
+
+if getattr(sys, "frozen", False): base_cache_path = os.path.dirname(sys.executable)
+else: base_cache_path = os.path.dirname(__file__)
+
 URL_PATTERN = re.compile(r"https?://")
 def file_or_url(path):
     if URL_PATTERN.match(path):
@@ -118,7 +124,7 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument("--no-detect-one-badge", "-ndob", action="store_false",
                     help="Turns off one badge place detection, which automatically closes Roblox after the user has collected the solo badge on a place.")
 
-    parser.add_argument("--cache-directory", "-cd", default=os.path.join(os.path.dirname(__file__), "alcubierre_cache"),
+    parser.add_argument("--cache-directory", "-cd", default=os.path.join(base_cache_path, "alcubierre_cache"),
                     help="The directory where cache data is kept.")
 
     parser.add_argument("--user-agent", "-ua", default=f"{parser.prog} - badge-to-badge teleporter {__version__}",
@@ -131,8 +137,10 @@ def get_parser() -> argparse.ArgumentParser:
                     help="Play sounds for important context.")
     
     parser.add_argument("--sound-pack", type=str, default="piano",
-                    help=f"Sound packs to choose from: {os.listdir(os.path.join('.','sounds'))}")
+                    help=f"Sound packs to choose from: {os.listdir(os.path.join(base_path,'sounds'))}")
     
+    parser.description += f"\n\nThere are {str(len(parser._actions) - 1)} arguments available."
+
     return parser
 
 def main(args=None):
