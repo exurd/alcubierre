@@ -5,7 +5,7 @@
 import os
 import json
 try:
-    import pickle5 as pickle
+    import pickle5 as pickle # type: ignore
 except ImportError:
     import pickle
 
