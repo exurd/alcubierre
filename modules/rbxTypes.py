@@ -67,6 +67,7 @@ TYPE_STRINGS = {
     ],
     rbxType.USER: [
         "user::", "users::", "u::"
+        "player::", "players::"
     ]
 }
 
