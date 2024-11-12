@@ -66,7 +66,7 @@ TYPE_STRINGS = {
         "group::", "groups::", "g::"
     ],
     rbxType.USER: [
-        "user::", "users::", "u::"
+        "user::", "users::", "u::",
         "player::", "players::"
     ]
 }
