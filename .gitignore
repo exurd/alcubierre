@@ -1,7 +1,8 @@
 # alcubierre stuff
 alcubierre_cache/
 textFiles/
-.envs/
+.envs/*
+!.envs/.example.env
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
