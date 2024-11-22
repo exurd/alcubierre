@@ -2,9 +2,11 @@
 # ./modules/playSound.py
 # Licensed under the GNU General Public License Version 3.0 (see below for more details)
 
-import os, sys, time
-os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "CONTRIBUTE TO PYGAME!! https://www.pygame.org/wiki/Contribute"
-import pygame
+import os, sys
+try:
+    from playsound3 import playsound # type: ignore
+except ImportError:
+    from playsound import playsound # type: ignore
 
 from .verbosePrint import vPrint
 
@@ -19,9 +21,9 @@ soundPacks = os.listdir(sounds_folder)
 def genSoundDict(folder):
     soundDict = {}
     for file in os.listdir(folder):
-        if file.endswith(".ogg"):
+        if file.endswith(".wav"):
             sound_file = os.path.join(folder, file)
-            soundDict[file.replace(".ogg","")] = sound_file
+            soundDict[file.replace(".wav","")] = sound_file
     return soundDict
 
 class sndPack:
@@ -39,27 +41,17 @@ class sndPack:
 
 def playSound(soundName:str):
     global active_sndPack
-    if pygame.mixer.get_init() and active_sndPack:
+    if active_sndPack:
         if soundName in active_sndPack.sounds:
             vPrint(f"Playing sound `{soundName}`...")
             soundFile = active_sndPack.sounds[soundName]
-            snd = pygame.mixer.Sound(soundFile)
-            channel = snd.play()
-            while channel.get_busy():
-                pygame.time.delay(100)
+            playsound(soundFile)
 
 def toggleSoundWithSoundPack(soundPack):
     global playSound
     if soundPack != None:
-        pygame.mixer.init()
         sndPack(soundPack)
-
     playSound = playSound if soundPack != None else lambda *a, **k: None
-
-def fadeAllSounds(milliSecs=1000):
-    if pygame.mixer.get_init():
-        pygame.mixer.fadeout(milliSecs)
-        time.sleep((milliSecs/1000))
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
