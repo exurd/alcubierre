@@ -3,7 +3,10 @@
 # Licensed under the GNU General Public License Version 3.0 (see below for more details)
 
 import os, sys
-from playsound3 import playsound
+try:
+    from playsound3 import playsound # type: ignore
+except ImportError:
+    from playsound import playsound # type: ignore
 
 from .verbosePrint import vPrint
 
