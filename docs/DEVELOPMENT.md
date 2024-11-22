@@ -35,7 +35,7 @@ Example commands:
 pyinstaller --name=alcubierre --add-data="sounds:sounds" --icon="docs/icon.ico" __main__.py
 
 # to make a one file version of this program, add --onefile
-pyinstaller --onefile --name=alcubierre --add-data="sounds:sounds" --icon="docs/icon.ico" --strip __main__.py
+pyinstaller --onefile --name=alcubierre --add-data="sounds:sounds" --icon="docs/icon.ico" __main__.py
 ```
 
 You will need to add the "[sounds](/sounds)" folder with `--add-data` (shown in the above examples).
