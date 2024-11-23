@@ -1,29 +1,51 @@
 # alcubierre - Roblox Badge-to-Badge Place Teleporter
 # ./modules/verbosePrint.py
-# Licensed under the GNU General Public License Version 3.0 (see below for more details)
+"""
+Allows for the program to print out debug text,
+but only when the user specifies for it.
 
-verbose = False
+I could've used logging. I should've used logging.
+"""
+# Licensed under the GNU General Public License Version 3.0
+# (see below for more details)
+
+VERBOSE = False
 vPrint = None
-veryVerbose = False
+VERY_VERBOSE = False
 vvPrint = None
-def toggleVerbosePrint():
-    global verbose
-    verbose = not verbose
-    #print(verbose)
-    activateLambda()
 
-def toggleVeryVerbosePrint():
-    global veryVerbose
-    veryVerbose = not veryVerbose
-    #print(verbose)
-    activateLambda()
 
-def activateLambda():
+def toggle_verbose_print():
+    """
+    Toggles verbose printing.
+    """
+    global VERBOSE
+    VERBOSE = not VERBOSE
+    # print(verbose)
+    activate_lambda()
+
+
+def toggle_very_verbose_print():
+    """
+    Toggles *very* verbose printing.
+    """
+    global VERY_VERBOSE
+    VERY_VERBOSE = not VERY_VERBOSE
+    # print(verbose)
+    activate_lambda()
+
+
+def activate_lambda():
+    """
+    Activates verbose/very verbose printing if the variables are True.
+    """
     global vPrint
     global vvPrint
-    vPrint = print if verbose else lambda *a, **k: None
-    vvPrint = print if veryVerbose else lambda *a, **k: None
-activateLambda()
+    vPrint = print if VERBOSE else lambda *a, **k: None
+    vvPrint = print if VERY_VERBOSE else lambda *a, **k: None
+
+
+activate_lambda()
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

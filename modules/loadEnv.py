@@ -1,36 +1,48 @@
 # alcubierre - Roblox Badge-to-Badge Place Teleporter
 # ./modules/loadEnv.py
-# Licensed under the GNU General Public License Version 3.0 (see below for more details)
+"""
+Loads enviroment file.
+"""
+# Licensed under the GNU General Public License Version 3.0
+# (see below for more details)
 
-import os, argparse, typing
+import os
+import argparse
 from dotenv import load_dotenv
 
-def createEnvTemplate(parser: argparse.ArgumentParser, env_file):
+
+def create_env_template(parser: argparse.ArgumentParser, env_file):
     """
     Create a template .env from the argparse arguments.
-    HIGHLY EXPERIMENTAL AND NOT NEEDED! Currently, loading an .env file only accepts [rbx_token] and [user_agent].
+    HIGHLY EXPERIMENTAL AND NOT NEEDED!
+    Currently, loading an .env file only accepts [rbx_token] and [user_agent].
     """
-    with open(env_file, "w") as f:
+    with open(env_file, "w", encoding="utf-8") as f:
         for argument in parser._option_string_actions:
             action = parser._option_string_actions[argument]
             if argument in ["--env-file", "--help", "--version"]: continue
-            #print(argument)
+            # print(argument)
             if argument.startswith("--"):
                 env_var_name = argument[2:].replace("-", "_").upper()
                 default_value = action.default if action.default is not argparse.SUPPRESS else ""
                 f.write(f"# {action.help}\n")
                 f.write(f"{env_var_name}={default_value}\n\n")
 
-def loadEnvFile(envFile) -> dict:
+
+def load_env_file(filename) -> dict:
+    """
+    Loads env file from a filename and puts data into dict.
+    """
     # env_loaded = False
-    if os.path.isfile(envFile):
-        load_dotenv(envFile)
-        envData = {}
+    if os.path.isfile(filename):
+        load_dotenv(filename)
+        env_data = {}
         if os.getenv("RBX_TOKEN"):
-            envData["RBX_TOKEN"] = str(os.getenv("RBX_TOKEN"))
+            env_data["RBX_TOKEN"] = str(os.getenv("RBX_TOKEN"))
         if os.getenv("USER_AGENT"):
-            envData["USER_AGENT"] = str(os.getenv("USER_AGENT"))
-        return envData
+            env_data["USER_AGENT"] = str(os.getenv("USER_AGENT"))
+        return env_data
+    return {}
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

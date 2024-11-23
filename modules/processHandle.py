@@ -1,13 +1,21 @@
 # alcubierre - Roblox Badge-to-Badge Place Teleporter
 # ./modules/processHandle.py
-# Licensed under the GNU General Public License Version 3.0 (see below for more details)
+"""
+Loads enviroment file.
+"""
+# Licensed under the GNU General Public License Version 3.0
+# (see below for more details)
 
-import os, subprocess, platform, time, psutil
+import os
+import subprocess
+import platform
+import time
 import webbrowser
+import psutil
 
-from . import apiReqs, dataSave
-from .rbxTypes import rbxInstance, rbxReason, rbxType
-from .verbosePrint import vPrint
+from modules import apiReqs, dataSave
+from modules.rbxTypes import RbxInstance, RbxReason, RbxType
+from modules.verbosePrint import vPrint
 
 CREATE_NEW_PROCESS_GROUP = 0x00000200
 DETACHED_PROCESS = 0x00000008
@@ -17,47 +25,70 @@ FLATPAK_SOBER_OPTS = "run --branch=master --arch=x86_64 --command=sober --file-f
 SYSTEM = platform.system()
 vPrint(f"System: {SYSTEM}")
 
+ROBLOX_PROCESS_NAME = ""
 if SYSTEM == "Windows":
-    robloxProcess_name = "RobloxPlayerBeta.exe"
+    ROBLOX_PROCESS_NAME = "RobloxPlayerBeta.exe"
 elif SYSTEM == "Linux":
-    robloxProcess_name = "sober"
+    ROBLOX_PROCESS_NAME = "sober"
 if SYSTEM == "Darwin":
-    robloxProcess_name = "RobloxPlayer"
+    ROBLOX_PROCESS_NAME = "RobloxPlayer"
+
 
 def roblox_process_exists() -> psutil.Process:
+    """
+    Checks if the Roblox process exists.
+    Uses psutil to detect the name
+    """
     for proc in psutil.process_iter():
         try:
-            if proc.name() == robloxProcess_name: return proc
-        except psutil.NoSuchProcess: pass
+            if proc.name() == ROBLOX_PROCESS_NAME:
+                return proc
+        except psutil.NoSuchProcess:
+            pass
     return None
 
+
 def kill_roblox_process():
+    """
+    Kills the Roblox process.
+    To allow the user to react, a 5 second delay is given before closing.
+    """
     print("Closing Roblox in 5 seconds...")
     time.sleep(5)
-    vPrint(f"Killing in the name of `{robloxProcess_name}`")
+    vPrint(f"Killing in the name of `{ROBLOX_PROCESS_NAME}`")
     proc = roblox_process_exists()
-    if isinstance(proc,psutil.Process):
+    if isinstance(proc, psutil.Process):
         proc.kill()
         vPrint(f"Killed process with PID {proc.pid}")
 
-def openRobloxPlace(rootPlaceId, name=None, use_bloxstrap=True, use_sober=True, sober_opts=""):
-    if name == None:
-        print(f"Going to Roblox Place #{str(rootPlaceId)}")
-    elif isinstance(name,str):
-        print(f"Going to {str(name)} ({str(rootPlaceId)})")
 
-    dataSave.played_places.append(rootPlaceId)
-    dataSave.save_data(dataSave.played_places,"played_places.json")
+def open_roblox_place(root_place_id, name=None, use_bloxstrap=True, use_sober=True, sober_opts=""):
+    """
+    Opens a Roblox place.
+    `name` prints alongside the 'going to' message.
+    `use_bloxstrap` uses Bloxstrap if available.
+    `use_sober` uses Sober if available.
+    `sober_opts` sets the options for Sober.
+    """
+    if name is None:
+        print(f"Going to Roblox Place #{str(root_place_id)}")
+    elif isinstance(name, str):
+        print(f"Going to {str(name)} ({str(root_place_id)})")
 
-    roblox_uri = f"roblox://experiences/start?placeId={str(rootPlaceId)}"
+    dataSave.PLAYED_PLACES.append(root_place_id)
+    dataSave.save_data(dataSave.PLAYED_PLACES, "played_places.json")
 
-    #if bloxstrap exists and on windows, use it (unless ignored by args)
+    roblox_uri = f"roblox://experiences/start?placeId={str(root_place_id)}"
+
+    # if bloxstrap exists and on windows, use it (unless ignored by args)
     if SYSTEM == "Windows" and use_bloxstrap:
         bs_path = f"{os.getenv('LOCALAPPDATA')}\\Bloxstrap"
         if os.path.exists(bs_path):
             # https://stackoverflow.com/questions/14797236/python-howto-launch-a-full-process-not-a-child-process-and-retrieve-the-pid
             # otherwise, quitting script also closes roblox
-            process = subprocess.Popen([f"{bs_path}\\Bloxstrap.exe", "-player", roblox_uri], creationflags=DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP)
+            process = subprocess.Popen(
+                [f"{bs_path}\\Bloxstrap.exe", "-player", roblox_uri],
+                creationflags=DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP)
             vPrint(process)
             # return good or bad(...?)
     elif SYSTEM == "Linux" and use_sober:
@@ -69,9 +100,11 @@ def openRobloxPlace(rootPlaceId, name=None, use_bloxstrap=True, use_sober=True, 
             else:
                 sober_command += [roblox_uri]
             vPrint(f"sober_command: [{sober_command}]")
-            process = subprocess.Popen(sober_command, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            process = subprocess.Popen(sober_command,
+                                       stdout=subprocess.DEVNULL,
+                                       stderr=subprocess.STDOUT)
             vPrint(process)
-    else: # fallback that might or might not work *shrug*
+    else:  # fallback that might or might not work *shrug*
         # TODO: test if this part of the script works after all these years
 
         # if not process_exists("RobloxPlayerBeta.exe"):
@@ -81,12 +114,17 @@ def openRobloxPlace(rootPlaceId, name=None, use_bloxstrap=True, use_sober=True, 
 
         webbrowser.open(roblox_uri)
 
-def openPlaceInBrowser(placeId):
-    url = "https://www.roblox.com/games/" + str(placeId)
+
+def open_place_in_browser(place_id):
+    """
+    Uses webbrowser to open the webpage for the game in the default browser.
+    """
+    url = "https://www.roblox.com/games/" + str(place_id)
     vPrint(f"Opening {url}")
     webbrowser.open(url)
 
-def waitForProcessOrBadgeCollect(an_rbxInstance:rbxInstance,user_Id=0,secs_reincarnation=-1,singleBadge=True) -> rbxReason:
+
+def wait_for_process_or_badge_collect(a_rbx_instance: RbxInstance, user_id=0, secs_reincarnation=-1, single_badge=True) -> RbxReason:
     """
     Wait for Roblox process to close or badge to be collected.
     """
@@ -94,18 +132,18 @@ def waitForProcessOrBadgeCollect(an_rbxInstance:rbxInstance,user_Id=0,secs_reinc
         print("Exit the game when you have finished.")
         while True:
             time.sleep(3)
-            if not isinstance(roblox_process_exists(),psutil.Process):
-                return rbxReason.processClosed
-            if an_rbxInstance.type == rbxType.BADGE and user_Id != 0:
-                if singleBadge == True:
-                    userBadge_check = apiReqs.checkUserInvForBadge(user_Id,an_rbxInstance.id)
-                    if userBadge_check:
-                        return rbxReason.badgeCollected
-                    time.sleep(7) # 10 secs to avoid rate limiting
+            if not isinstance(roblox_process_exists(), psutil.Process):
+                return RbxReason.PROCESS_CLOSED
+            if a_rbx_instance.type == RbxType.BADGE and user_id != 0:
+                if single_badge:
+                    user_badge_check = apiReqs.check_user_inv_for_badge(user_id, a_rbx_instance.id)
+                    if user_badge_check:
+                        return RbxReason.BADGE_COLLECTED
+                    time.sleep(7)  # 10 secs to avoid rate limiting
     else:
         print("You got " + str(secs_reincarnation) + " seconds")
         time.sleep(secs_reincarnation)
-        return rbxReason.timeUp
+        return RbxReason.TIME_UP
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

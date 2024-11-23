@@ -1,29 +1,39 @@
 # alcubierre - Roblox Badge-to-Badge Place Teleporter
 # ./modules/rbxTypes.py
-# Licensed under the GNU General Public License Version 3.0 (see below for more details)
+"""
+Roblox asset type handling for alcubierre.
+"""
+# Licensed under the GNU General Public License Version 3.0
+# (see below for more details)
 
 import re
 from enum import Enum
 
-from . import apiReqs
-from .verbosePrint import vPrint, vvPrint
+from modules import apiReqs
+from modules.verbosePrint import vPrint, vvPrint
 
-def checkIfStringIsInteger(string:str):
+
+def check_if_string_is_integer(string: str):
+    """
+    Checks if the string is an integer or not.
+    """
     vPrint(f"Checking if string {string} is an integer...")
     try:
-        checkInt = int(string)
+        check_int = int(string)
         vPrint("String is an integer.")
-        return checkInt
+        return check_int
     except ValueError:
         vPrint("String is not an integer.")
         return None
 
-class rbxType(Enum):
+
+class RbxType(Enum):
     """
     Positive: singular item
     Negative: multiple items
     """
-    def __str__(self): return self.name
+    def __str__(self):
+        return self.name
     USER = -2
     GROUP = -1
     UNKNOWN = 0
@@ -31,168 +41,203 @@ class rbxType(Enum):
     PLACE = 2
     UNIVERSE = 3
 
+
 TYPE_PATTERNS = {
-    rbxType.PLACE: [
+    RbxType.PLACE: [
         re.compile(r"roblox\.com/games/(\d+)", re.IGNORECASE),
         re.compile(r"place\?id=(\d+)", re.IGNORECASE),
         re.compile(r"roblox\.com/Place\.aspx\?ID=(\d+)", re.IGNORECASE),
         re.compile(r"roblox\.com/PlaceItem\.aspx\?id=(\d+)", re.IGNORECASE)
     ],
-    rbxType.BADGE: [
+    RbxType.BADGE: [
         re.compile(r"roblox\.com/badges/(\d+)", re.IGNORECASE),
         re.compile(r"item\?id=(\d+)", re.IGNORECASE)
     ],
-    rbxType.GROUP: [
+    RbxType.GROUP: [
         re.compile(r"roblox\.com/groups/(\d+)", re.IGNORECASE),
     ],
-    rbxType.USER: [
+    RbxType.USER: [
         re.compile(r"roblox\.com/users/(\d+)", re.IGNORECASE),
         re.compile(r"roblox\.com/User\.aspx\?ID=(\d+)", re.IGNORECASE)
     ]
 }
 
 TYPE_STRINGS = {
-    rbxType.PLACE: [
+    RbxType.PLACE: [
         "place::", "places::", "p::",
         "game::", "games::"
     ],
-    rbxType.BADGE: [
+    RbxType.BADGE: [
         "badge::", "badges::", "b::"
     ],
-    rbxType.UNIVERSE: [
+    RbxType.UNIVERSE: [
         "universe::", "universes::", "u::"
     ],
-    rbxType.GROUP: [
+    RbxType.GROUP: [
         "group::", "groups::", "g::"
     ],
-    rbxType.USER: [
+    RbxType.USER: [
         "user::", "users::", "u::",
         "player::", "players::"
     ]
 }
 
-def checkTypeStrings(string:str):
-    for RBX_TYPE, COLON_STRINGS in TYPE_STRINGS.items():
-        vvPrint(f"Checking '::' strings for type: {RBX_TYPE}")
-        for colonString in COLON_STRINGS:
-            vvPrint(f"'::' string: {colonString}")
-            if colonString in string:
-                id = string.replace(colonString,"")
-                idType = RBX_TYPE
-                return id, idType
+
+def check_for_coloncolon_string(string: str):
+    """
+    Checks if a string is a colon-colon ('::') string.
+    """
+    for rbx_type, colon_strings in TYPE_STRINGS.items():
+        vvPrint(f"Checking '::' strings for type: {rbx_type}")
+        for colon_string in colon_strings:
+            vvPrint(f"'::' string: {colon_string}")
+            if colon_string in string:
+                roblox_id = string.replace(colon_string, "")
+                id_type = rbx_type
+                return roblox_id, id_type
     return None, None
 
-def checkRegExStrings(string:str):
-    for RBX_TYPE, PATTERNS in TYPE_PATTERNS.items():
-        vvPrint(f"Checking patterns for type: {RBX_TYPE}")
-        for pattern in PATTERNS:
+
+def check_regex_strings(string: str):
+    """
+    Checks if a string can be RegEx'd for a type.
+    """
+    for rbx_type, patterns in TYPE_PATTERNS.items():
+        vvPrint(f"Checking patterns for type: {rbx_type}")
+        for pattern in patterns:
             vvPrint(f"Pattern: {pattern}")
             match = pattern.search(string)
             if match:
-                id = match.group(1)
-                idType = RBX_TYPE
-                return id, idType
+                roblox_id = match.group(1)
+                id_type = rbx_type
+                return roblox_id, id_type
     return None, None
 
-class rbxReason(Enum):
+
+class RbxReason(Enum):
     """
     Positive: 'good' outcome
     Negative: 'bad' outcome
     """
-    def __str__(self): return self.name
-    badgeCollected = 4
-    timeUp = 3
-    processClosed = 2
-    processOpened = 1
-    alreadyCollected = -1
-    notEnabled = -2
-    noBadgesInUniverse = -3
-    alreadyPlayed = -4
-    notPlayable = -5
-    notEnoughPlayersAwarded = -6
-    noUniverse = -7
-    badVoteRatio = -8
+    def __str__(self):
+        return self.name
 
-class rbxInstance:
-    def __init__(self, id=None, type=None):
-        self.id = id
-        self.type = type
-        self.info = None # no info yet as it was just created
+    BADGE_COLLECTED = 4
+    TIME_UP = 3
+    PROCESS_CLOSED = 2
+    PROCESS_OPENED = 1
+    ALREADY_COLLECTED = -1
+    NOT_ENABLED = -2
+    NO_BADGES_IN_UNIVERSE = -3
+    ALREADY_PLAYED = -4
+    NOT_PLAYABLE = -5
+    NOT_ENOUGH_PLAYERS_AWARDED = -6
+    NO_UNIVERSE = -7
+    BAD_VOTE_RATIO = -8
 
-    def __str__(self): return f"rbxInstance [id: {self.id}, type: {self.type}]"
-    
-    def getInfoFromType(self):
+
+class RbxInstance:
+    """
+    A class for holding information for each line.
+    """
+    def __init__(self, roblox_id=None, asset_type=None):
+        self.id = roblox_id
+        self.type = asset_type
+        self.info = None  # no info yet as it was just created
+
+    def __str__(self):
+        return f"RbxInstance [id: {self.id}, type: {self.type}]"
+
+    def get_info_from_type(self):
+        """
+        Gets infomation from RbxType.
+        """
         vPrint(f"Getting info for {self.id} with type {self.type}")
         info = False
-        if self.type == rbxType.BADGE:
-            info = apiReqs.getBadgeInfo(self.id)
-        if self.type == rbxType.PLACE:
-            info = apiReqs.getPlaceInfo(self.id)
-        if self.type == rbxType.UNIVERSE:
-            info = apiReqs.getUniverseInfo(self.id)
-        if self.type == rbxType.GROUP:
-            info = apiReqs.getGroupInfo(self.id)
-        if self.type == rbxType.USER:
-            info = apiReqs.getUserInfo(self.id)
-        
-        if info != False:
+        if self.type == RbxType.BADGE:
+            info = apiReqs.get_badge_info(self.id)
+        if self.type == RbxType.PLACE:
+            info = apiReqs.get_place_info(self.id)
+        if self.type == RbxType.UNIVERSE:
+            info = apiReqs.get_universe_info(self.id)
+        if self.type == RbxType.GROUP:
+            info = apiReqs.get_group_info(self.id)
+        if self.type == RbxType.USER:
+            info = apiReqs.get_user_info(self.id)
+
+        if info is not False:
             self.info = info
-            return info
-    
-    def stringIdThingy(self,string:str):
-        if not isinstance(string,str): self.type = None; return None
+        return info
+
+    def detect_string_type(self, string: str):
+        """
+        Goes through a bunch of checks to find what type the string is.
+        """
+        if not isinstance(string, str):
+            self.type = None
+            return None
         vPrint("Detecting type from string...")
-        id = None
-        idType = None
+        roblox_id = None
+        id_type = None
 
         if "::" in string:
-            id, idType = checkTypeStrings(string)
-        
-        if id == None and idType == None:
-            id, idType = checkRegExStrings(string)
-        
-        if id == None and idType == None:
-            if id == "": self.type = None; return None
-            vPrint("Is the string just numbers?")
-            id = string
-            checkInt = checkIfStringIsInteger(id)
-            if checkInt == None: self.type = None; return None
-            else:
-                id = checkInt
-                vPrint("Setting type to rbxType.UNKNOWN")
-                idType = rbxType.UNKNOWN
+            roblox_id, id_type = check_for_coloncolon_string(string)
 
-        self.id = id
-        self.type = idType
+        if roblox_id is None and id_type is None:
+            roblox_id, id_type = check_regex_strings(string)
+
+        if roblox_id is None and id_type is None:
+            if roblox_id == "":
+                self.type = None
+                return None
+            vPrint("Is the string just numbers?")
+            roblox_id = string
+            check_int = check_if_string_is_integer(roblox_id)
+            if check_int is None:
+                self.type = None
+                return None
+            else:
+                roblox_id = check_int
+                vPrint("Setting type to rbxType.UNKNOWN")
+                id_type = RbxType.UNKNOWN
+
+        self.id = roblox_id
+        self.type = id_type
         vPrint(self)
-    
-    def detectTypeFromId(self,ignore=[]) -> rbxType:
-        id = self.id
+
+    def detect_type_from_int(self, ignore=None) -> RbxType:
+        """
+        Detects RbxType from integer.
+        """
+        if ignore is None:
+            ignore = []
+
+        roblox_id = self.id
         old_type = self.type
-        vPrint(f"Attempt to detect type from {id} (Previous type was: {old_type})")
+        vPrint(f"Attempt to detect type from {roblox_id} (Previous type was: {old_type})")
 
         vPrint("Badge?")
-        if not rbxType.BADGE in ignore:
-            badgeInfo = apiReqs.getBadgeInfo(id)
-            if badgeInfo != False:
-                self.type = rbxType.BADGE
+        if RbxType.BADGE not in ignore:
+            badge_info = apiReqs.get_badge_info(roblox_id)
+            if badge_info is not False:
+                self.type = RbxType.BADGE
 
         vPrint("Place?")
-        if not rbxType.PLACE in ignore:
-            economyInfo = apiReqs.getEconomyInfo(id)
-            if economyInfo != False:
+        if RbxType.PLACE not in ignore:
+            economy_info = apiReqs.get_economy_info(roblox_id)
+            if economy_info is not False:
                 # economy api is broad; check if the asset type is 9 (place)
-                if economyInfo["AssetTypeId"] == 9:
-                    self.type = rbxType.PLACE
-        
+                if economy_info["AssetTypeId"] == 9:
+                    self.type = RbxType.PLACE
+
         # universes, users and groups use a separate id system from places and badges, so one could be confused for the other.
         # when making a text file with minimal ids *please* use {type}::{id} to specify what type each id is!
         # otherwise, most if not all universe ids will get misjudged as a badge/place id.
         vPrint("Universe?")
-        if not rbxType.UNIVERSE in ignore:
-            universeInfo = apiReqs.getUniverseInfo(id)
-            if universeInfo != False:
-                self.type = rbxType.UNIVERSE
+        if RbxType.UNIVERSE not in ignore:
+            universe_info = apiReqs.get_universe_info(roblox_id)
+            if universe_info is not False:
+                self.type = RbxType.UNIVERSE
 
         if self.type == old_type:
             # tried everything? set to None and give up on this one

@@ -1,190 +1,209 @@
 # alcubierre - Roblox Badge-to-Badge Place Teleporter
 # ./modules/scriptLoop.py
-# Licensed under the GNU General Public License Version 3.0 (see below for more details)
+"""
+Main loop for alcubierre
+"""
+# Licensed under the GNU General Public License Version 3.0
+# (see below for more details)
 
 import time
 
-from . import apiReqs, dataSave, processHandle, playSound
-from .rbxTypes import rbxInstance, rbxType, rbxReason
-from .verbosePrint import vPrint
+from modules import apiReqs, dataSave, processHandle, playSound
+from modules.rbxTypes import RbxInstance, RbxType, RbxReason
+from modules.verbosePrint import vPrint
 
-def dealWithBadge(badge_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1,voteThreshold=-1.0,open_place_in_browser=False,use_bloxstrap=True,use_sober=True,sober_opts="") -> rbxReason:
-    badge_info = badge_rbxInstance.info
-    rootPlaceId = badge_info["awardingUniverse"]["rootPlaceId"]
-    badgeName = badge_info["name"]
-    print(f"Badge Name: {badgeName}")
 
-    if badge_rbxInstance.id in dataSave.gotten_badges:
+def deal_with_badge(badge_rbxinstance: RbxInstance, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="") -> RbxReason:
+    """
+    Deals with RbxInstances with RbxType.BADGE
+    """
+    badge_info = badge_rbxinstance.info
+    root_place_id = badge_info["awardingUniverse"]["rootPlaceId"]
+    badge_name = badge_info["name"]
+    print(f"Badge Name: {badge_name}")
+
+    if badge_rbxinstance.id in dataSave.GOTTEN_BADGES:
         print("Badge in 'gotten_badges.json' list, skipping!")
-        return rbxReason.alreadyCollected
-    
-    if rootPlaceId in dataSave.played_places:
-        print(f"Skipping place {str(rootPlaceId)}; already played!")
-        return rbxReason.alreadyPlayed
+        return RbxReason.ALREADY_COLLECTED
 
-    awardedCount = badge_info["statistics"]["awardedCount"]
-    if not awardedCount >= awardedThreshold:
-        print(str(awardedCount) + " people with this badge is not enough for set threshold, skipping...")
-        return rbxReason.notEnoughPlayersAwarded
+    if root_place_id in dataSave.PLAYED_PLACES:
+        print(f"Skipping place {str(root_place_id)}; already played!")
+        return RbxReason.ALREADY_PLAYED
 
-    if badge_info["enabled"] == False:
+    awarded_count = badge_info["statistics"]["awardedCount"]
+    if not awarded_count >= awarded_threshold:
+        print(str(awarded_count) + " people with this badge is not enough for set threshold, skipping...")
+        return RbxReason.NOT_ENOUGH_PLAYERS_AWARDED
+
+    if badge_info["enabled"] is False:
         print("Badge is not enabled, skipping!")
-        return rbxReason.notEnabled
+        return RbxReason.NOT_ENABLED
 
-    if user_id != None:
-        check_inventory = apiReqs.checkUserInvForAsset(user_id,badge_rbxInstance.id)
-        if check_inventory == True:
+    if user_id is not None:
+        check_inventory = apiReqs.check_user_inv_for_asset(user_id, badge_rbxinstance.id)
+        if check_inventory:
             print("Badge has already been collected, skipping!")
-            dataSave.gotten_badges.append(badge_rbxInstance.id)
-            dataSave.save_data(dataSave.gotten_badges,"gotten_badges.json")
-            return rbxReason.alreadyCollected
+            dataSave.GOTTEN_BADGES.append(badge_rbxinstance.id)
+            dataSave.save_data(dataSave.GOTTEN_BADGES, "gotten_badges.json")
+            return RbxReason.ALREADY_COLLECTED
 
-    check_universe_badges = apiReqs.checkUniverseForAnyBadges(badge_info["awardingUniverse"]["id"])
-    if check_universe_badges == False:
+    check_universe_badges = apiReqs.check_universe_for_any_badges(badge_info["awardingUniverse"]["id"])
+    if not check_universe_badges:
         print("No badges found in the universe/place, skipping...")
-        return rbxReason.noBadgesInUniverse
-    
-    if voteThreshold != -1:
-        universeVotes = apiReqs.getUniverseVotes(badge_info["awardingUniverse"]["id"])
-        vPrint(f"universeVotes: {universeVotes}")
-        uvRatio = int(universeVotes["upVotes"]) / int(universeVotes["downVotes"])
-        vPrint(f"uvRatio: {uvRatio}")
-        if uvRatio <= voteThreshold:
+        return RbxReason.NO_BADGES_IN_UNIVERSE
+
+    if vote_threshold != -1:
+        universe_votes = apiReqs.get_universe_votes(badge_info["awardingUniverse"]["id"])
+        vPrint(f"universe_votes: {universe_votes}")
+        uv_ratio = int(universe_votes["upVotes"]) / int(universe_votes["downVotes"])
+        vPrint(f"uv_ratio: {uv_ratio}")
+        if uv_ratio <= vote_threshold:
             print("Universe has a bad like-to-dislike ratio, skipping...")
-            return rbxReason.badVoteRatio
+            return RbxReason.BAD_VOTE_RATIO
 
-    placeDetails = apiReqs.getPlaceInfo(rootPlaceId,noAlternative=True) # need the auth-only place api for playability stats
-    if placeDetails != False:
-        if placeDetails["isPlayable"] == False:
+    place_details = apiReqs.get_place_info(root_place_id, no_alternative=True)  # need the auth-only place api for playability stats
+    if place_details:
+        if not place_details["isPlayable"]:
             print("Not playable, skipping!")
-            return rbxReason.notPlayable
+            return RbxReason.NOT_PLAYABLE
 
-    if open_place_in_browser: processHandle.openPlaceInBrowser(rootPlaceId)
+    if open_place_in_browser:
+        processHandle.open_place_in_browser(root_place_id)
 
-    processHandle.openRobloxPlace(
-        rootPlaceId,
-        name=badge_info["awardingUniverse"]["name"],
-        use_bloxstrap=use_bloxstrap,
-        use_sober=use_sober,
-        sober_opts=sober_opts
-        )
-    return rbxReason.processOpened
+    processHandle.open_roblox_place(root_place_id,
+                                    name=badge_info["awardingUniverse"]["name"],
+                                    use_bloxstrap=use_bloxstrap,
+                                    use_sober=use_sober,
+                                    sober_opts=sober_opts
+                                    )
+    return RbxReason.PROCESS_OPENED
 
-def dealWithPlace(place_rbxInstance:rbxInstance,voteThreshold=-1.0,checkIfBadgesOnUniverse=True,open_place_in_browser=False,use_bloxstrap=True,use_sober=True,sober_opts="") -> rbxReason:
-    place_Info = place_rbxInstance.info
 
-    if checkIfBadgesOnUniverse:
-        universeId = apiReqs.getUniverseFromPlaceId(place_rbxInstance.id)
-        if universeId != None:
-            check_universe_badges = apiReqs.checkUniverseForAnyBadges(universeId)
-            if check_universe_badges == False:
+def deal_with_place(place_rbxinstance: RbxInstance, vote_threshold=-1.0, check_if_badges_on_universe=True, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="") -> RbxReason:
+    """
+    Deals with RbxInstances with RbxType.PLACE
+    """
+    place_info = place_rbxinstance.info
+
+    if check_if_badges_on_universe:
+        universe_id = apiReqs.get_universe_from_place_id(place_rbxinstance.id)
+        if universe_id is not None:
+            check_universe_badges = apiReqs.check_universe_for_any_badges(universe_id)
+            if not check_universe_badges:
                 print("No badges found in the universe/place, skipping...")
-                return rbxReason.noBadgesInUniverse
-            if voteThreshold != -1:
-                universeVotes = apiReqs.getUniverseVotes(universeId)
-                vPrint(f"universeVotes: {universeVotes}")
-                uvRatio = int(universeVotes["upVotes"]) / int(universeVotes["downVotes"])
-                vPrint(f"uvRatio: {uvRatio}")
-                if uvRatio <= voteThreshold:
+                return RbxReason.NO_BADGES_IN_UNIVERSE
+            if vote_threshold != -1:
+                universe_votes = apiReqs.get_universe_votes(universe_id)
+                vPrint(f"universe_votes: {universe_votes}")
+                uv_ratio = int(universe_votes["upVotes"]) / int(universe_votes["downVotes"])
+                vPrint(f"uv_ratio: {uv_ratio}")
+                if uv_ratio <= vote_threshold:
                     print("Universe has a bad like-to-dislike ratio, skipping...")
-                    return rbxReason.badVoteRatio
+                    return RbxReason.BAD_VOTE_RATIO
 
-        else: # no universe means that it"s most likely *not* a place...
-            return rbxReason.noUniverse
-    
-    if open_place_in_browser: processHandle.openPlaceInBrowser(place_rbxInstance.id)
+        else:  # no universe means that it"s most likely *not* a place...
+            return RbxReason.NO_UNIVERSE
 
-    processHandle.openRobloxPlace(
-        place_rbxInstance.id,
-        name=place_Info["name"],
-        use_bloxstrap=use_bloxstrap,
-        use_sober=use_sober,
-        sober_opts=sober_opts
-        )
-    return rbxReason.processOpened
+    if open_place_in_browser:
+        processHandle.open_place_in_browser(place_rbxinstance.id)
 
-def dealWithUniverse(universe_rbxInstance:rbxInstance,voteThreshold=-1.0,checkIfBadgesOnUniverse=True,open_place_in_browser=False,use_bloxstrap=True,use_sober=True,sober_opts="") -> rbxReason:
-    universe_info = universe_rbxInstance.info
-    rootPlaceId = universe_info["rootPlaceId"]
+    processHandle.open_roblox_place(place_rbxinstance.id,
+                                    name=place_info["name"],
+                                    use_bloxstrap=use_bloxstrap,
+                                    use_sober=use_sober,
+                                    sober_opts=sober_opts
+                                    )
+    return RbxReason.PROCESS_OPENED
 
-    if checkIfBadgesOnUniverse:
-        check_universe_badges = apiReqs.checkUniverseForAnyBadges(universe_rbxInstance.id)
-        if check_universe_badges == False:
+
+def deal_with_universe(universe_rbxinstance: RbxInstance, vote_threshold=-1.0, check_if_badges_on_universe=True, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="") -> RbxReason:
+    """
+    Deals with RbxInstances with RbxType.UNIVERSE
+    """
+    universe_info = universe_rbxinstance.info
+    root_place_id = universe_info["rootPlaceId"]
+
+    if check_if_badges_on_universe:
+        check_universe_badges = apiReqs.check_universe_for_any_badges(universe_rbxinstance.id)
+        if not check_universe_badges:
             print("No badges found in the universe/place, skipping...")
-            return rbxReason.noBadgesInUniverse
-        
-    if voteThreshold != -1:
-        universeVotes = apiReqs.getUniverseVotes(universe_rbxInstance.id)
-        vPrint(f"universeVotes: {universeVotes}")
-        uvRatio = int(universeVotes["upVotes"]) / int(universeVotes["downVotes"])
-        vPrint(f"uvRatio: {uvRatio}")
-        if uvRatio <= voteThreshold:
+            return RbxReason.NO_BADGES_IN_UNIVERSE
+
+    if vote_threshold != -1:
+        universe_votes = apiReqs.get_universe_votes(universe_rbxinstance.id)
+        vPrint(f"universe_votes: {universe_votes}")
+        uv_ratio = int(universe_votes["upVotes"]) / int(universe_votes["downVotes"])
+        vPrint(f"uv_ratio: {uv_ratio}")
+        if uv_ratio <= vote_threshold:
             print("Universe has a bad like-to-dislike ratio, skipping...")
-            return rbxReason.badVoteRatio
-    
-    placeDetails = apiReqs.getPlaceInfo(rootPlaceId,noAlternative=True) # need the auth-only place api for playability stats
-    if placeDetails != False:
-        if placeDetails["isPlayable"] == False:
+            return RbxReason.BAD_VOTE_RATIO
+
+    place_details = apiReqs.get_place_info(root_place_id, no_alternative=True)  # need the auth-only place api for playability stats
+    if place_details:
+        if not place_details["isPlayable"]:
             print("Not playable, skipping!")
-            return rbxReason.notPlayable
+            return RbxReason.NOT_PLAYABLE
 
-    if open_place_in_browser: processHandle.openPlaceInBrowser(rootPlaceId)
+    if open_place_in_browser:
+        processHandle.open_place_in_browser(root_place_id)
 
-    processHandle.openRobloxPlace(rootPlaceId,
-        name=universe_info["name"],
-        use_bloxstrap=use_bloxstrap,
-        use_sober=use_sober,
-        sober_opts=sober_opts
-        )
-    return rbxReason.processOpened
+    processHandle.open_roblox_place(root_place_id,
+                                    name=universe_info["name"],
+                                    use_bloxstrap=use_bloxstrap,
+                                    use_sober=use_sober,
+                                    sober_opts=sober_opts
+                                    )
+    return RbxReason.PROCESS_OPENED
 
-def dealWithInstance(an_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1,voteThreshold=-1.0,checkIfBadgesOnUniverse=True,open_place_in_browser=False,use_bloxstrap=True,use_sober=True,sober_opts="",nested=False) -> rbxReason:
+
+def deal_with_rbxinstance(an_rbxinstance: RbxInstance, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, check_if_badges_on_universe=True, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="", nested=False) -> RbxReason:
     """
     Deals with rbxInstance; should either return a new process or rbxReason
     """
     result = None
-    if an_rbxInstance.type == rbxType.BADGE:
-        result = dealWithBadge(
-            badge_rbxInstance=an_rbxInstance,
+    if an_rbxinstance.type == RbxType.BADGE:
+        result = deal_with_badge(
+            badge_rbxinstance=an_rbxinstance,
             user_id=user_id,
-            awardedThreshold=awardedThreshold,
-            voteThreshold=voteThreshold,
+            awarded_threshold=awarded_threshold,
+            vote_threshold=vote_threshold,
             open_place_in_browser=open_place_in_browser,
             use_bloxstrap=use_bloxstrap,
             use_sober=use_sober,
             sober_opts=sober_opts
             )
-    if an_rbxInstance.type == rbxType.PLACE:
-        result = dealWithPlace(
-            place_rbxInstance=an_rbxInstance,
-            voteThreshold=voteThreshold,
+    if an_rbxinstance.type == RbxType.PLACE:
+        result = deal_with_place(
+            place_rbxinstance=an_rbxinstance,
+            vote_threshold=vote_threshold,
             open_place_in_browser=open_place_in_browser,
             use_bloxstrap=use_bloxstrap,
             use_sober=use_sober,
             sober_opts=sober_opts
             )
-        if result == rbxReason.noUniverse:
-            if nested == True: return False # already tried this; stop
-            an_rbxInstance.detectTypeFromId()
+        if result == RbxReason.NO_UNIVERSE:
+            if nested:
+                return False  # already tried this; stop
+            an_rbxinstance.detect_type_from_int()
             # and then go back again...
             vPrint("Time to do an inception on this instance...")
-            return dealWithInstance(
-                an_rbxInstance=an_rbxInstance,
+            return deal_with_rbxinstance(
+                an_rbxinstance=an_rbxinstance,
                 user_id=user_id,
-                awardedThreshold=awardedThreshold,
-                voteThreshold=voteThreshold,
-                checkIfBadgesOnUniverse=checkIfBadgesOnUniverse,
+                awarded_threshold=awarded_threshold,
+                vote_threshold=vote_threshold,
+                check_if_badges_on_universe=check_if_badges_on_universe,
                 open_place_in_browser=open_place_in_browser,
                 use_bloxstrap=use_bloxstrap,
                 use_sober=use_sober,
                 sober_opts=sober_opts,
                 nested=True
                 )
-    if an_rbxInstance.type == rbxType.UNIVERSE:
-        result = dealWithUniverse(
-            universe_rbxInstance=an_rbxInstance,
-            voteThreshold=voteThreshold,
-            checkIfBadgesOnUniverse=checkIfBadgesOnUniverse,
+    if an_rbxinstance.type == RbxType.UNIVERSE:
+        result = deal_with_universe(
+            universe_rbxinstance=an_rbxinstance,
+            vote_threshold=vote_threshold,
+            check_if_badges_on_universe=check_if_badges_on_universe,
             open_place_in_browser=open_place_in_browser,
             use_bloxstrap=use_bloxstrap,
             use_sober=use_sober,
@@ -192,138 +211,158 @@ def dealWithInstance(an_rbxInstance:rbxInstance,user_id=None,awardedThreshold=-1
             )
     return result
 
-def isUniverseOneBadge(an_rbxInstance:rbxInstance) -> bool:
+
+def is_universe_one_badge(an_rbxinstance: RbxInstance) -> bool:
     """
     This should be for *after* dealWithInstance(), not before. This is so the tempRespCache from apiReqs get used.
     """
-    if an_rbxInstance.type == rbxType.BADGE:
-        check_universe_badges = apiReqs.checkUniverseForAnyBadges(an_rbxInstance.info["awardingUniverse"]["id"])
-    if an_rbxInstance.type == rbxType.PLACE:
-        universeId = apiReqs.getUniverseFromPlaceId(an_rbxInstance.id)
-        check_universe_badges = apiReqs.checkUniverseForAnyBadges(universeId)
-    if an_rbxInstance.type == rbxType.UNIVERSE:
-        check_universe_badges = apiReqs.checkUniverseForAnyBadges(an_rbxInstance.id)
+    check_universe_badges = ""
+    if an_rbxinstance.type == RbxType.BADGE:
+        check_universe_badges = apiReqs.check_universe_for_any_badges(an_rbxinstance.info["awardingUniverse"]["id"])
+    if an_rbxinstance.type == RbxType.PLACE:
+        universe_id = apiReqs.get_universe_from_place_id(an_rbxinstance.id)
+        check_universe_badges = apiReqs.check_universe_for_any_badges(universe_id)
+    if an_rbxinstance.type == RbxType.UNIVERSE:
+        check_universe_badges = apiReqs.check_universe_for_any_badges(an_rbxinstance.id)
 
-    if len(check_universe_badges) == 1: return True
+    if len(check_universe_badges) == 1:
+        return True
     return False
+
 
 dataSave.init()
 
-def handleLine(line,user_id=None,awardedThreshold=-1,voteThreshold=-1.0,secs_reincarnation=-1,open_place_in_browser=False,use_bloxstrap=True,use_sober=True,sober_opts="",checkIfBadgesOnUniverse=True,detectOneBadgeUniverses=True):
-    line_rbxInstance = rbxInstance()
-    line_rbxInstance.stringIdThingy(line)
 
-    if line_rbxInstance.id == None:
+def handle_line(line, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, secs_reincarnation=-1, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="", check_if_badges_on_universe=True, detect_one_badge_universes=True):
+    """
+    Handles lines from text file.
+    """
+    line_rbxinstance = RbxInstance()
+    line_rbxinstance.detect_string_type(line)
+
+    if line_rbxinstance.id is None:
         return False
-    
-    if line_rbxInstance.id in dataSave.gotten_badges:
+
+    if line_rbxinstance.id in dataSave.GOTTEN_BADGES:
         print(f"Skipping {line}, already collected!")
-        return rbxReason.alreadyCollected
-    if line_rbxInstance.id in dataSave.played_places:
+        return RbxReason.ALREADY_COLLECTED
+    if line_rbxinstance.id in dataSave.PLAYED_PLACES:
         print(f"Skipping {line}, already played!")
-        return rbxReason.alreadyPlayed
-    
-    if line_rbxInstance.type == rbxType.UNKNOWN:
-        line_rbxInstance.detectTypeFromId()
-    if line_rbxInstance.type == None:
-        return False
-    
-    vPrint(f"line_rbxInstance: {line_rbxInstance}")
-    line_rbxInstance.getInfoFromType()
-    #print(line_rbxInstance.type)
+        return RbxReason.ALREADY_PLAYED
 
-    if line_rbxInstance.type == rbxType.GROUP or line_rbxInstance.type == rbxType.USER:
+    if line_rbxinstance.type == RbxType.UNKNOWN:
+        line_rbxinstance.detect_type_from_int()
+    if line_rbxinstance.type is None:
+        return False
+
+    vPrint(f"line_rbxinstance: {line_rbxinstance}")
+    line_rbxinstance.get_info_from_type()
+    # print(line_rbxInstance.type)
+
+    if line_rbxinstance.type == RbxType.GROUP or line_rbxinstance.type == RbxType.USER:
         places = []
-        if line_rbxInstance.type == rbxType.GROUP:
-            places = apiReqs.findGroupPlaces(line_rbxInstance.id)
-        if line_rbxInstance.type == rbxType.USER:
-            places = apiReqs.findUserPlaces(line_rbxInstance.id)
-        
+        if line_rbxinstance.type == RbxType.GROUP:
+            places = apiReqs.find_group_places(line_rbxinstance.id)
+        if line_rbxinstance.type == RbxType.USER:
+            places = apiReqs.find_user_places(line_rbxinstance.id)
+
         if places != []:
-            for place_number, placeId in enumerate(places,start=1):
-                print(f"Sub-place {str(place_number)}: {str(placeId)}")
-                handleLine(
-                    line=f"place::{str(placeId)}",
+            for place_number, place_id in enumerate(places, start=1):
+                print(f"Sub-place {str(place_number)}: {str(place_id)}")
+                handle_line(
+                    line=f"place::{str(place_id)}",
                     user_id=user_id,
-                    awardedThreshold=awardedThreshold,
-                    voteThreshold=voteThreshold,
+                    awarded_threshold=awarded_threshold,
+                    vote_threshold=vote_threshold,
                     secs_reincarnation=secs_reincarnation,
                     open_place_in_browser=open_place_in_browser,
                     use_bloxstrap=use_bloxstrap,
                     use_sober=use_sober,
                     sober_opts=sober_opts,
-                    checkIfBadgesOnUniverse=checkIfBadgesOnUniverse,
-                    detectOneBadgeUniverses=detectOneBadgeUniverses
+                    check_if_badges_on_universe=check_if_badges_on_universe,
+                    detect_one_badge_universes=detect_one_badge_universes
                     )
-    
-    line_rbxReason = dealWithInstance(
-        an_rbxInstance=line_rbxInstance,
-        user_id=user_id,
-        awardedThreshold=awardedThreshold,
-        voteThreshold=voteThreshold,
-        checkIfBadgesOnUniverse=checkIfBadgesOnUniverse,
-        open_place_in_browser=open_place_in_browser,
-        use_bloxstrap=use_bloxstrap,
-        use_sober=use_sober,
-        sober_opts=sober_opts
-        )
-    vPrint(f"line_rbxReason: {line_rbxReason}")
 
-    if line_rbxReason == rbxReason.processOpened:
-        singleBadge = False
-        if line_rbxInstance.type == rbxType.BADGE and detectOneBadgeUniverses == True:
-            if isUniverseOneBadge(line_rbxInstance):
+    line_rbxreason = deal_with_rbxinstance(an_rbxinstance=line_rbxinstance,
+                                           user_id=user_id,
+                                           awarded_threshold=awarded_threshold,
+                                           vote_threshold=vote_threshold,
+                                           check_if_badges_on_universe=check_if_badges_on_universe,
+                                           open_place_in_browser=open_place_in_browser,
+                                           use_bloxstrap=use_bloxstrap,
+                                           use_sober=use_sober,
+                                           sober_opts=sober_opts
+                                           )
+    vPrint(f"line_rbxreason: {line_rbxreason}")
+
+    if line_rbxreason == RbxReason.PROCESS_OPENED:
+        single_badge = False
+        if line_rbxinstance.type == RbxType.BADGE and detect_one_badge_universes is True:
+            if is_universe_one_badge(line_rbxinstance):
                 print("[SOLO BADGE! ONLY 1 TO COLLECT FOR THIS GAME!]")
-                playSound.playSound("notify")
-                singleBadge = True
+                playSound.play_sound("notify")
+                single_badge = True
 
         time.sleep(15)
 
-        process_rbxReason = processHandle.waitForProcessOrBadgeCollect(line_rbxInstance,user_id,secs_reincarnation,singleBadge)
-        vPrint(f"process_rbxReason: {process_rbxReason}")
-        if process_rbxReason == rbxReason.badgeCollected:
+        process_rbxreason = processHandle.wait_for_process_or_badge_collect(line_rbxinstance, user_id, secs_reincarnation, single_badge)
+        vPrint(f"process_rbxreason: {process_rbxreason}")
+        if process_rbxreason == RbxReason.BADGE_COLLECTED:
             print("Badge has been awarded!")
-            dataSave.gotten_badges.append(line_rbxInstance.id)
-            dataSave.save_data(dataSave.gotten_badges,"gotten_badges.json")
-            playSound.playSound("success")
+            dataSave.GOTTEN_BADGES.append(line_rbxinstance.id)
+            dataSave.save_data(dataSave.GOTTEN_BADGES, "gotten_badges.json")
+            playSound.play_sound("success")
             processHandle.kill_roblox_process()
     return True
 
-def start(lines,user_id=None,awardedThreshold=-1,voteThreshold=-1.0,secs_reincarnation=-1,open_place_in_browser=False,use_bloxstrap=True,use_sober=True,sober_opts="",checkIfBadgesOnUniverse=True,detectOneBadgeUniverses=True):
+
+def start(lines, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, secs_reincarnation=-1, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="", check_if_badges_on_universe=True, detect_one_badge_universes=True):
+    """
+    'Start from lines, give what needs to be new'
+    """
     # check if variables are correctly set
-    if not isinstance(user_id,int): user_id = None
-    if not isinstance(awardedThreshold,int): awardedThreshold = -1
-    if not isinstance(voteThreshold,float): voteThreshold = -1.0
-    if not isinstance(secs_reincarnation,int): secs_reincarnation = -1
-    if not isinstance(open_place_in_browser,bool): open_place_in_browser = False
-    if not isinstance(use_bloxstrap,bool): use_bloxstrap = True
-    if not isinstance(use_sober,bool): use_sober = True
-    if not isinstance(open_place_in_browser,bool): open_place_in_browser = False
-    if not isinstance(checkIfBadgesOnUniverse,bool): checkIfBadgesOnUniverse = True
-    if not isinstance(detectOneBadgeUniverses,bool): detectOneBadgeUniverses = True
-    
-    for line_number, line in enumerate(lines,start=1):
-        #print(line)
+    if not isinstance(user_id, int):
+        user_id = None
+    if not isinstance(awarded_threshold, int):
+        awarded_threshold = -1
+    if not isinstance(vote_threshold, float):
+        vote_threshold = -1.0
+    if not isinstance(secs_reincarnation, int):
+        secs_reincarnation = -1
+    if not isinstance(open_place_in_browser, bool):
+        open_place_in_browser = False
+    if not isinstance(use_bloxstrap, bool):
+        use_bloxstrap = True
+    if not isinstance(use_sober, bool):
+        use_sober = True
+    if not isinstance(open_place_in_browser, bool):
+        open_place_in_browser = False
+    if not isinstance(check_if_badges_on_universe, bool):
+        check_if_badges_on_universe = True
+    if not isinstance(detect_one_badge_universes, bool):
+        detect_one_badge_universes = True
+
+    for line_number, line in enumerate(lines, start=1):
+        # print(line)
         stripped_line = line.strip()
         print(f"Line {line_number}: {stripped_line}")
 
         if stripped_line == "":
             vPrint("Empty line, skipping...")
             continue
-        
-        handleLine(
-            line=stripped_line,
-            user_id=user_id,
-            awardedThreshold=awardedThreshold,
-            voteThreshold=voteThreshold,
-            secs_reincarnation=secs_reincarnation,
-            open_place_in_browser=open_place_in_browser,
-            use_bloxstrap=use_bloxstrap,
-            use_sober=use_sober,
-            sober_opts=sober_opts,
-            checkIfBadgesOnUniverse=checkIfBadgesOnUniverse,
-            detectOneBadgeUniverses=detectOneBadgeUniverses
-            )
+
+        handle_line(line=stripped_line,
+                    user_id=user_id,
+                    awarded_threshold=awarded_threshold,
+                    vote_threshold=vote_threshold,
+                    secs_reincarnation=secs_reincarnation,
+                    open_place_in_browser=open_place_in_browser,
+                    use_bloxstrap=use_bloxstrap,
+                    use_sober=use_sober,
+                    sober_opts=sober_opts,
+                    check_if_badges_on_universe=check_if_badges_on_universe,
+                    detect_one_badge_universes=detect_one_badge_universes
+                    )
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
