@@ -11,7 +11,8 @@ import re
 import sys
 import argparse
 import time
-from modules.verbosePrint import toggle_verbose_print, toggle_very_verbose_print
+from modules import api_reqs
+from modules.verbose_print import toggle_verbose_print, toggle_very_verbose_print
 
 __prog__ = "alcubierre"
 __desc__ = "Teleports to every place on a file."
@@ -174,15 +175,15 @@ def main(args=None):
     if args.very_verbose:
         toggle_very_verbose_print()
 
-    from modules.verbosePrint import vPrint, vvPrint
+    from modules.verbose_print import vPrint, vvPrint
     vPrint("Verbose mode is now enabled, else you wouldn't be seeing this...")
     vvPrint("Very verbose mode is also enabled... Have fun!")
 
     if args.play_sound:
-        from modules import playSound
-        playSound.toggle_sound(args.sound_pack)
-        vvPrint(playSound.ACTIVE_SND_PACK)
-        playSound.play_sound("startup")
+        from modules import play_sound
+        play_sound.toggle_sound(args.sound_pack)
+        vvPrint(play_sound.ACTIVE_SND_PACK)
+        play_sound.play_sound("startup")
 
     vPrint("-------------------------")
     vPrint(f"Timestamp: {time.time()}")
@@ -195,14 +196,14 @@ def main(args=None):
 
     env_file = args.env_file
     if env_file is not None:
-        from modules import loadEnv
+        from modules import load_env
         if not os.path.isfile(env_file):
-            loadEnv.create_env_template(parser, env_file)
+            load_env.create_env_template(parser, env_file)
             print(".env file was successfully created! Use a text editor to edit")
             sys.exit(0)
         else:
             vPrint(f"Loading .env file [{args.env_file}]...")
-            data = loadEnv.load_env_file(env_file)
+            data = load_env.load_env_file(env_file)
             if rbx_token == parser.get_default("RBX_TOKEN"):
                 if "RBX_TOKEN" in data and data["USER_AGENT"] != "":
                     rbx_token = data["RBX_TOKEN"]
@@ -211,7 +212,7 @@ def main(args=None):
                 if "USER_AGENT" in data and data["USER_AGENT"] != "":
                     user_agent = data["USER_AGENT"]
 
-    from modules import apiReqs, dataSave
+    from modules import data_save
 
     if args.file_path is None:
         parser.error("the following arguments are required to continue: file_path")
@@ -219,7 +220,7 @@ def main(args=None):
     lines = []
     if isinstance(args.file_path, str):
         print(f"URL provided: {args.file_path}")
-        url_check = apiReqs.get_request_url(args.file_path, cache_results=False)
+        url_check = api_reqs.get_request_url(args.file_path, cache_results=False)
         if url_check.ok:
             lines = url_check.text.splitlines()
     else:
@@ -227,27 +228,27 @@ def main(args=None):
         lines = args.file_path.read().splitlines()
         args.file_path.close()
 
-    apiReqs.init(user_agent, rbx_token)
+    api_reqs.init(user_agent, rbx_token)
 
     user_id = args.user_id
-    if user_id == parser.get_default("user_id") and apiReqs.is_token_cookie_there():
-        user_info = apiReqs.get_user_from_token()
+    if user_id == parser.get_default("user_id") and api_reqs.is_token_cookie_there():
+        user_info = api_reqs.get_user_from_token()
         vPrint(f"userInfo: [{user_info}]")
         user_id = user_info["id"]
 
-    data_folder = dataSave.get_data_file_path(args.cache_directory)
+    data_folder = data_save.get_data_file_path(args.cache_directory)
     if user_id != parser.get_default("user_id"):
         data_folder = os.path.join(data_folder, str(user_id))
     else:
         data_folder = os.path.join(data_folder, "guest")
-    data_folder = dataSave.get_data_file_path(data_folder)
+    data_folder = data_save.get_data_file_path(data_folder)
 
     if args.save_response_cache:
-        apiReqs.get_perm_cache()
+        api_reqs.get_perm_cache()
 
     vPrint("Starting scriptLoop...")
-    from modules import scriptLoop
-    scriptLoop.start(
+    from modules import script_loop
+    script_loop.start(
         lines,
         user_id=user_id,
         awarded_threshold=args.awarded_threshold,

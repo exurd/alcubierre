@@ -1,5 +1,5 @@
 # alcubierre - Roblox Badge-to-Badge Place Teleporter
-# ./modules/processHandle.py
+# ./modules/process_handle.py
 """
 Loads enviroment file.
 """
@@ -13,9 +13,9 @@ import time
 import webbrowser
 import psutil
 
-from modules import apiReqs, dataSave
-from modules.rbxTypes import RbxInstance, RbxReason, RbxType
-from modules.verbosePrint import vPrint
+from modules import api_reqs, data_save
+from modules.rbx_types import RbxInstance, RbxReason, RbxType
+from modules.verbose_print import vPrint
 
 CREATE_NEW_PROCESS_GROUP = 0x00000200
 DETACHED_PROCESS = 0x00000008
@@ -75,8 +75,8 @@ def open_roblox_place(root_place_id, name=None, use_bloxstrap=True, use_sober=Tr
     elif isinstance(name, str):
         print(f"Going to {str(name)} ({str(root_place_id)})")
 
-    dataSave.PLAYED_PLACES.append(root_place_id)
-    dataSave.save_data(dataSave.PLAYED_PLACES, "played_places.json")
+    data_save.PLAYED_PLACES.append(root_place_id)
+    data_save.save_data(data_save.PLAYED_PLACES, "played_places.json")
 
     roblox_uri = f"roblox://experiences/start?placeId={str(root_place_id)}"
 
@@ -136,7 +136,7 @@ def wait_for_process_or_badge_collect(a_rbx_instance: RbxInstance, user_id=0, se
                 return RbxReason.PROCESS_CLOSED
             if a_rbx_instance.type == RbxType.BADGE and user_id != 0:
                 if single_badge:
-                    user_badge_check = apiReqs.check_user_inv_for_badge(user_id, a_rbx_instance.id)
+                    user_badge_check = api_reqs.check_user_inv_for_badge(user_id, a_rbx_instance.id)
                     if user_badge_check:
                         return RbxReason.BADGE_COLLECTED
                     time.sleep(7)  # 10 secs to avoid rate limiting

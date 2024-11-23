@@ -1,5 +1,5 @@
 # alcubierre - Roblox Badge-to-Badge Place Teleporter
-# ./modules/rbxTypes.py
+# ./modules/rbx_types.py
 """
 Roblox asset type handling for alcubierre.
 """
@@ -9,8 +9,8 @@ Roblox asset type handling for alcubierre.
 import re
 from enum import Enum
 
-from modules import apiReqs
-from modules.verbosePrint import vPrint, vvPrint
+from modules import api_reqs
+from modules.verbose_print import vPrint, vvPrint
 
 
 def check_if_string_is_integer(string: str):
@@ -155,15 +155,15 @@ class RbxInstance:
         vPrint(f"Getting info for {self.id} with type {self.type}")
         info = False
         if self.type == RbxType.BADGE:
-            info = apiReqs.get_badge_info(self.id)
+            info = api_reqs.get_badge_info(self.id)
         if self.type == RbxType.PLACE:
-            info = apiReqs.get_place_info(self.id)
+            info = api_reqs.get_place_info(self.id)
         if self.type == RbxType.UNIVERSE:
-            info = apiReqs.get_universe_info(self.id)
+            info = api_reqs.get_universe_info(self.id)
         if self.type == RbxType.GROUP:
-            info = apiReqs.get_group_info(self.id)
+            info = api_reqs.get_group_info(self.id)
         if self.type == RbxType.USER:
-            info = apiReqs.get_user_info(self.id)
+            info = api_reqs.get_user_info(self.id)
 
         if info is not False:
             self.info = info
@@ -218,13 +218,13 @@ class RbxInstance:
 
         vPrint("Badge?")
         if RbxType.BADGE not in ignore:
-            badge_info = apiReqs.get_badge_info(roblox_id)
+            badge_info = api_reqs.get_badge_info(roblox_id)
             if badge_info is not False:
                 self.type = RbxType.BADGE
 
         vPrint("Place?")
         if RbxType.PLACE not in ignore:
-            economy_info = apiReqs.get_economy_info(roblox_id)
+            economy_info = api_reqs.get_economy_info(roblox_id)
             if economy_info is not False:
                 # economy api is broad; check if the asset type is 9 (place)
                 if economy_info["AssetTypeId"] == 9:
@@ -235,7 +235,7 @@ class RbxInstance:
         # otherwise, most if not all universe ids will get misjudged as a badge/place id.
         vPrint("Universe?")
         if RbxType.UNIVERSE not in ignore:
-            universe_info = apiReqs.get_universe_info(roblox_id)
+            universe_info = api_reqs.get_universe_info(roblox_id)
             if universe_info is not False:
                 self.type = RbxType.UNIVERSE
 

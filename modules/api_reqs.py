@@ -1,5 +1,5 @@
 # alcubierre - Roblox Badge-to-Badge Place Teleporter
-# ./modules/apiReqs.py
+# ./modules/api_reqs.py
 """
 Request handling for alcubierre.
 """
@@ -11,8 +11,8 @@ import random
 import math
 import requests
 
-from modules import dataSave
-from modules.verbosePrint import vPrint, vvPrint
+from modules import data_save
+from modules.verbose_print import vPrint, vvPrint
 
 RESPONSE_CACHE = {}
 USING_PERM_CACHE = False
@@ -26,7 +26,7 @@ def get_perm_cache():
     global RESPONSE_CACHE
 
     USING_PERM_CACHE = True
-    perm_response_cache = dataSave.load_data("responseCache.pickle", as_dict=True)
+    perm_response_cache = data_save.load_data("responseCache.pickle", as_dict=True)
     if perm_response_cache == {}:
         return
     RESPONSE_CACHE = perm_response_cache
@@ -40,7 +40,7 @@ def save_to_perm_cache(url, response, cache_results=True) -> requests.Response:
     if cache_results:
         RESPONSE_CACHE[url] = response
         if USING_PERM_CACHE:
-            dataSave.save_data(RESPONSE_CACHE, "responseCache.pickle")
+            data_save.save_data(RESPONSE_CACHE, "responseCache.pickle")
     return response
 
 

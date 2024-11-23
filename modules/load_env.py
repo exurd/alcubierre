@@ -1,5 +1,5 @@
 # alcubierre - Roblox Badge-to-Badge Place Teleporter
-# ./modules/loadEnv.py
+# ./modules/load_env.py
 """
 Loads enviroment file.
 """

@@ -1,5 +1,5 @@
 # alcubierre - Roblox Badge-to-Badge Place Teleporter
-# ./modules/verbosePrint.py
+# ./modules/verbose_print.py
 """
 Allows for the program to print out debug text,
 but only when the user specifies for it.

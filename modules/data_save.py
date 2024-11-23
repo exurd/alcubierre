@@ -1,5 +1,5 @@
 # alcubierre - Roblox Badge-to-Badge Place Teleporter
-# ./modules/dataSave.py
+# ./modules/data_save.py
 """
 Handles data saving/loading.
 Uses pickle (or pickle5 for older pythons) and json.
@@ -14,7 +14,7 @@ try:
 except ImportError:
     import pickle
 
-from modules.verbosePrint import vPrint
+from modules.verbose_print import vPrint
 
 DATA_FOLDER = None
 

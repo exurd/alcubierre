@@ -1,5 +1,5 @@
 # alcubierre
-# ./modules/playSound.py
+# ./modules/play_sound.py
 """
 Plays sound for the program. Akin to verbosePrint.py,
 the user can toggle it on/off, via toggle_sound(SndPack)
@@ -14,7 +14,7 @@ try:
 except ImportError:
     from playsound import playsound  # type: ignore
 
-from modules.verbosePrint import vPrint
+from modules.verbose_print import vPrint
 
 ACTIVE_SND_PACK = None
 
