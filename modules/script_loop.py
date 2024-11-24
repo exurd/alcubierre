@@ -47,7 +47,7 @@ def deal_with_badge(badge_rbxinstance: RbxInstance, user_id=None, awarded_thresh
             data_save.save_data(data_save.GOTTEN_BADGES, "gotten_badges.json")
             return RbxReason.ALREADY_COLLECTED
 
-    check_universe_badges = api_reqs.check_universe_for_any_badges(badge_info["awardingUniverse"]["id"])
+    check_universe_badges = api_reqs.get_universe_badges_first_page(badge_info["awardingUniverse"]["id"])
     if not check_universe_badges:
         print("No badges found in the universe/place, skipping...")
         return RbxReason.NO_BADGES_IN_UNIVERSE
@@ -88,7 +88,7 @@ def deal_with_place(place_rbxinstance: RbxInstance, vote_threshold=-1.0, check_i
     if check_if_badges_on_universe:
         universe_id = api_reqs.get_universe_from_place_id(place_rbxinstance.id)
         if universe_id is not None:
-            check_universe_badges = api_reqs.check_universe_for_any_badges(universe_id)
+            check_universe_badges = api_reqs.get_universe_badges_first_page(universe_id)
             if not check_universe_badges:
                 print("No badges found in the universe/place, skipping...")
                 return RbxReason.NO_BADGES_IN_UNIVERSE
@@ -124,7 +124,7 @@ def deal_with_universe(universe_rbxinstance: RbxInstance, vote_threshold=-1.0, c
     root_place_id = universe_info["rootPlaceId"]
 
     if check_if_badges_on_universe:
-        check_universe_badges = api_reqs.check_universe_for_any_badges(universe_rbxinstance.id)
+        check_universe_badges = api_reqs.get_universe_badges_first_page(universe_rbxinstance.id)
         if not check_universe_badges:
             print("No badges found in the universe/place, skipping...")
             return RbxReason.NO_BADGES_IN_UNIVERSE
@@ -218,12 +218,12 @@ def is_universe_one_badge(an_rbxinstance: RbxInstance) -> bool:
     """
     check_universe_badges = ""
     if an_rbxinstance.type == RbxType.BADGE:
-        check_universe_badges = api_reqs.check_universe_for_any_badges(an_rbxinstance.info["awardingUniverse"]["id"])
+        check_universe_badges = api_reqs.get_universe_badges_first_page(an_rbxinstance.info["awardingUniverse"]["id"])
     if an_rbxinstance.type == RbxType.PLACE:
         universe_id = api_reqs.get_universe_from_place_id(an_rbxinstance.id)
-        check_universe_badges = api_reqs.check_universe_for_any_badges(universe_id)
+        check_universe_badges = api_reqs.get_universe_badges_first_page(universe_id)
     if an_rbxinstance.type == RbxType.UNIVERSE:
-        check_universe_badges = api_reqs.check_universe_for_any_badges(an_rbxinstance.id)
+        check_universe_badges = api_reqs.get_universe_badges_first_page(an_rbxinstance.id)
 
     if len(check_universe_badges) == 1:
         return True

@@ -190,10 +190,10 @@ def get_badge_info(badge_id) -> dict:
     """
     Gets badge information from badge ID.
 
-    example JSON:
+    Example JSON:
     {"id": 14427263, "name": "Juice Tycoon Money Player Badge", "description": "Go On My Juice Tycoon To Earn This!!!", "displayName": "Juice Tycoon Money Player Badge", "displayDescription": "Go On My Juice Tycoon To Earn This!!!", "enabled": True, "iconImageId": 14426818, "displayIconImageId": 14426818, "created": "2009-08-13T07:56:44.337-05:00", "updated": "2015-12-21T15:09:14.887-06:00", "statistics": {"pastDayAwardedCount": 0, "awardedCount": 1756, "winRatePercentage": 0.0}, "awardingUniverse": {"id": 685746, "name": "JUICE TYCOON!! YOU CAN EARN A BADGE HERE!!!!", "rootPlaceId": 4285089}}
 
-    example error:
+    Example error:
     {"errors": [{"code": 1, "message": "Badge is invalid or does not exist.", "userFacingMessage": "Something went wrong"}]}
     """
     badge_check = get_request_url(f"https://badges.roblox.com/v1/badges/{str(badge_id)}")
@@ -229,7 +229,10 @@ def get_universe_info(universe_id) -> dict:
 
 def get_group_info(group_id) -> dict:
     """
-    Gets group information from group ID.
+    Gets group/community information from group ID.
+
+    Example JSON:
+    {"data":[{"id":7,"name":"Roblox","description":"Official fan club of Roblox!","owner":{"id":21557,"type":"User"},"created":"2009-07-30T05:36:10.417Z","hasVerifiedBadge":false}]}
     """
     groupinfo_check = get_request_url(f"https://groups.roblox.com/v2/groups?groupIds={str(group_id)}")
     if groupinfo_check.ok:
@@ -277,6 +280,9 @@ def find_group_places(group_id) -> list:
 def get_user_info(user_id) -> dict:
     """
     Gets user information from user ID.
+
+    Example JSON:
+    {"description":"Welcome to the Roblox profile! This is where you can check out the newest items in the catalog, and get a jumpstart on exploring and building on our Imagination Platform. If you want news on updates to the Roblox platform, or great new experiences to play with friends, check out blog.roblox.com. Please note, this is an automated account. If you need to reach Roblox for any customer service needs find help at www.roblox.com/help","created":"2006-02-27T21:06:40.3Z","isBanned":false,"externalAppDisplayName":null,"hasVerifiedBadge":true,"id":1,"name":"Roblox","displayName":"Roblox"}
     """
     userinfo_check = get_request_url(f"https://users.roblox.com/v1/users/{str(user_id)}")
     if userinfo_check.ok:
@@ -293,6 +299,7 @@ def get_user_info(user_id) -> dict:
 def find_user_places(user_id) -> list:
     """
     Finds user places from user ID.
+    Loops through until final page is found.
     """
     vPrint(f"Searching user {str(user_id)}'s games...")
     user_places = []
@@ -343,6 +350,7 @@ def get_universe_votes(universe_id) -> dict:
 def check_user_inv_for_asset(user_id=0, asset_id=0) -> bool:
     """
     Checks if user has an *ASSET* in their inventory.
+    Results are not cached.
 
     DO NOT USE THIS TO CHECK FOR BADGES! (Specifically, any new badges)
     Technically deprecated, might become useful in the future.
@@ -352,7 +360,7 @@ def check_user_inv_for_asset(user_id=0, asset_id=0) -> bool:
     """
     if user_id != 0 and user_id is not None and asset_id != 0:
         # inventory_api outputs just "true" or "false" in lowercase
-        userasset_check = get_request_url(f"https://inventory.roblox.com/v1/users/{str(user_id)}/items/2/{str(asset_id)}/is-owned",cache_results=False)
+        userasset_check = get_request_url(f"https://inventory.roblox.com/v1/users/{str(user_id)}/items/2/{str(asset_id)}/is-owned", cache_results=False)
         if userasset_check.ok:
             if userasset_check.text == "true":
                 return True
@@ -364,6 +372,7 @@ def check_user_inv_for_asset(user_id=0, asset_id=0) -> bool:
 def check_user_inv_for_badge(user_id=0, badge_id=0) -> bool:
     """
     Checks if user has a *BADGE* in their inventory.
+    Results are not cached.
 
     Badge IDs and Asset IDs use different ID systems.
 
@@ -384,9 +393,14 @@ def check_user_inv_for_badge(user_id=0, badge_id=0) -> bool:
     return None
 
 
-def check_universe_for_any_badges(universe_id) -> dict:
+def get_universe_badges_first_page(universe_id) -> dict:
     """
-    Checks if the universe contains any badges.
+    Gets the first page of universe badges.
+    If there are no badges in 'data', it returns false.
+    Used to check if the universe contains any badges.
+
+    Example JSON:
+    {"previousPageCursor":null,"nextPageCursor":"{NEXTPAGECURSOR}","data":[{"id":2124422674,"name":"You visited!","description":"Thanks for visiting!","displayName":"You visited!","displayDescription":"Thanks for visiting!","enabled":true,"iconImageId":2177787489,"displayIconImageId":2177787489,"created":"2018-08-06T05:47:40.36+00:00","updated":"2024-11-19T19:24:07.956+00:00","statistics":{"pastDayAwardedCount":1,"awardedCount":8113,"winRatePercentage":1.0},"awardingUniverse":{"id":718992538,"name":"Escape The Clown Obby","rootPlaceId":2039280318}},{"id":2124422675,"name":"YOU WON!","description":"Congratulations, you made it all the way!","displayName":"YOU WON!","displayDescription":"Congratulations, you made it all the way!","enabled":true,"iconImageId":2177807506,"displayIconImageId":2177807506,"created":"2018-08-06T05:54:17.323+00:00","updated":"2024-11-19T19:24:07.957+00:00","statistics":{"pastDayAwardedCount":1,"awardedCount":324,"winRatePercentage":1.0},"awardingUniverse":{"id":718992538,"name":"Escape The Clown Obby","rootPlaceId":2039280318}}]}
     """
     universebadges_check = get_request_url(f"https://badges.roblox.com/v1/universes/{str(universe_id)}/badges")  # ?limit=10&sortOrder=Asc")
     if universebadges_check.ok:
@@ -416,6 +430,7 @@ def get_universe_from_place_id(place_id) -> dict:
 def get_user_from_token() -> dict:
     """
     Gets user ID from .ROBLOSECURITY token.
+    Results are not cached.
     """
     usercheck = get_request_url("https://users.roblox.com/v1/users/authenticated", cache_results=False)
     if usercheck.ok:

@@ -1,7 +1,8 @@
 # alcubierre - Roblox Badge-to-Badge Place Teleporter
 # ./modules/load_env.py
 """
-Loads enviroment file.
+Loads an environment file for use.
+Mainly for api_reqs: RBX_TOKEN and USER_AGENT.
 """
 # Licensed under the GNU General Public License Version 3.0
 # (see below for more details)
@@ -31,7 +32,7 @@ def create_env_template(parser: argparse.ArgumentParser, env_file):
 
 def load_env_file(filename) -> dict:
     """
-    Loads env file from a filename and puts data into dict.
+    Loads env file from a filename and puts data found into dict.
     """
     # env_loaded = False
     if os.path.isfile(filename):
