@@ -347,16 +347,13 @@ def get_universe_votes(universe_id) -> dict:
     return False
 
 
-def check_user_inv_for_asset(user_id=0, asset_id=0) -> bool:
+def check_user_inv_with_inventory_api(user_id=0, asset_id=0) -> bool:
     """
     Checks if user has an *ASSET* in their inventory.
     Results are not cached.
 
-    DO NOT USE THIS TO CHECK FOR BADGES! (Specifically, any new badges)
-    Technically deprecated, might become useful in the future.
+    DO NOT USE THIS TO CHECK FOR BADGES ABOVE 2124421088!
     See checkUserInvForBadge for info.
-
-    (TODO: find last asset-badge id, create hybrid function using both apis)
     """
     if user_id != 0 and user_id is not None and asset_id != 0:
         # inventory_api outputs just "true" or "false" in lowercase
@@ -377,12 +374,21 @@ def check_user_inv_for_badge(user_id=0, badge_id=0) -> bool:
     Badge IDs and Asset IDs use different ID systems.
 
     Badges split off from assets in July 2018,
-    using the above function looks like it will work for
+    the above function looks like it will work for
     every badge until you get to those newer badges.
 
-    This function uses the correct API to check for badges.
-    Only downside is that it's more rate limited than the inventory API.
+    This function uses the Badges API, which
+    will check the newer badges as intended.
+    The only downside is that it's more rate
+    limited than the inventory API.
+
+    So, if the specifed badge ID is below 2124421087 (the first badge ID - 1),
+    the function will call check_user_inv_with_inventory_api to utilise
+    the better rate limit api.
     """
+    if badge_id <= 2124421087:  # should be before the first badge id
+        return check_user_inv_with_inventory_api(user_id=user_id, asset_id=badge_id)
+
     if user_id != 0 and user_id is not None and badge_id != 0:
         userbadge_check = get_request_url(f"https://badges.roblox.com/v1/users/{str(user_id)}/badges/awarded-dates?badgeIds={str(badge_id)}", cache_results=False)
         if userbadge_check.ok:

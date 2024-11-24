@@ -40,7 +40,7 @@ def deal_with_badge(badge_rbxinstance: RbxInstance, user_id=None, awarded_thresh
         return RbxReason.NOT_ENABLED
 
     if user_id is not None:
-        check_inventory = api_reqs.check_user_inv_for_asset(user_id, badge_rbxinstance.id)
+        check_inventory = api_reqs.check_user_inv_for_badge(user_id, badge_rbxinstance.id)
         if check_inventory:
             print("Badge has already been collected, skipping!")
             data_save.GOTTEN_BADGES.append(badge_rbxinstance.id)
@@ -71,11 +71,11 @@ def deal_with_badge(badge_rbxinstance: RbxInstance, user_id=None, awarded_thresh
         process_handle.open_place_in_browser(root_place_id)
 
     process_handle.open_roblox_place(root_place_id,
-                                    name=badge_info["awardingUniverse"]["name"],
-                                    use_bloxstrap=use_bloxstrap,
-                                    use_sober=use_sober,
-                                    sober_opts=sober_opts
-                                    )
+                                     name=badge_info["awardingUniverse"]["name"],
+                                     use_bloxstrap=use_bloxstrap,
+                                     use_sober=use_sober,
+                                     sober_opts=sober_opts
+                                     )
     return RbxReason.PROCESS_OPENED
 
 
@@ -108,11 +108,11 @@ def deal_with_place(place_rbxinstance: RbxInstance, vote_threshold=-1.0, check_i
         process_handle.open_place_in_browser(place_rbxinstance.id)
 
     process_handle.open_roblox_place(place_rbxinstance.id,
-                                    name=place_info["name"],
-                                    use_bloxstrap=use_bloxstrap,
-                                    use_sober=use_sober,
-                                    sober_opts=sober_opts
-                                    )
+                                     name=place_info["name"],
+                                     use_bloxstrap=use_bloxstrap,
+                                     use_sober=use_sober,
+                                     sober_opts=sober_opts
+                                     )
     return RbxReason.PROCESS_OPENED
 
 
@@ -148,11 +148,11 @@ def deal_with_universe(universe_rbxinstance: RbxInstance, vote_threshold=-1.0, c
         process_handle.open_place_in_browser(root_place_id)
 
     process_handle.open_roblox_place(root_place_id,
-                                    name=universe_info["name"],
-                                    use_bloxstrap=use_bloxstrap,
-                                    use_sober=use_sober,
-                                    sober_opts=sober_opts
-                                    )
+                                     name=universe_info["name"],
+                                     use_bloxstrap=use_bloxstrap,
+                                     use_sober=use_sober,
+                                     sober_opts=sober_opts
+                                     )
     return RbxReason.PROCESS_OPENED
 
 

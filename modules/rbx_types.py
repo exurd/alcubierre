@@ -201,7 +201,7 @@ class RbxInstance:
                 vPrint("Setting type to rbxType.UNKNOWN")
                 id_type = RbxType.UNKNOWN
 
-        self.id = roblox_id
+        self.id = int(roblox_id)
         self.type = id_type
         vPrint(self)
 
