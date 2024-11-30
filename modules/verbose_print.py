@@ -9,6 +9,11 @@ I could've used logging. I should've used logging.
 # Licensed under the GNU General Public License Version 3.0
 # (see below for more details)
 
+import logging
+import inspect
+
+logger = logging.getLogger()
+
 VERBOSE = False
 vPrint = None
 VERY_VERBOSE = False
@@ -35,14 +40,53 @@ def toggle_very_verbose_print():
     activate_lambda()
 
 
+def log_n_print(message):
+    """
+    Logs and prints the message (debug level).
+
+    It inspects the stack to get the module name
+    and line number that called this function.
+    """
+    print(message)
+    frm = inspect.stack()[1]
+    log(message, frm)
+
+
+def error_n_print(message):
+    """
+    Logs and prints the message (error level).
+
+    It inspects the stack to get the module name
+    and line number that called this function.
+    """
+    print(message)
+    frm = inspect.stack()[1]
+    log(message, frm, level=logging.ERROR)
+
+
+def log(message, frm=None, level=logging.DEBUG):
+    """
+    Logs the string given to a file.
+
+    It inspects the stack to get the module name
+    and line number that called this function.
+    """
+    if frm is None:
+        frm = inspect.stack()[1]
+
+    mod = inspect.getmodule(frm[0])
+    message = f"{mod.__name__}:{frm.lineno} - {message}"
+    logger.log(level, message)
+
+
 def activate_lambda():
     """
     Activates verbose/very verbose printing if the variables are True.
     """
     global vPrint
     global vvPrint
-    vPrint = print if VERBOSE else lambda *a, **k: None
-    vvPrint = print if VERY_VERBOSE else lambda *a, **k: None
+    vPrint = log_n_print if VERBOSE else log  # lambda *a, **k: None
+    vvPrint = log_n_print if VERY_VERBOSE else log  # lambda *a, **k: None
 
 
 activate_lambda()

@@ -15,7 +15,7 @@ import psutil
 
 from modules import api_reqs, data_save
 from modules.rbx_types import RbxInstance, RbxReason, RbxType
-from modules.verbose_print import vPrint
+from modules.verbose_print import vPrint, log_n_print
 
 CREATE_NEW_PROCESS_GROUP = 0x00000200
 DETACHED_PROCESS = 0x00000008
@@ -53,7 +53,7 @@ def kill_roblox_process():
     Kills the Roblox process.
     To allow the user to react, a 5 second delay is given before closing.
     """
-    print("Closing Roblox in 5 seconds...")
+    log_n_print("Closing Roblox in 5 seconds...")
     time.sleep(5)
     vPrint(f"Killing in the name of `{ROBLOX_PROCESS_NAME}`")
     proc = roblox_process_exists()
@@ -71,9 +71,9 @@ def open_roblox_place(root_place_id, name=None, use_bloxstrap=True, use_sober=Tr
     `sober_opts` sets the options for Sober.
     """
     if name is None:
-        print(f"Going to Roblox Place #{str(root_place_id)}")
+        log_n_print(f"Going to Roblox Place #{str(root_place_id)}")
     elif isinstance(name, str):
-        print(f"Going to {str(name)} ({str(root_place_id)})")
+        log_n_print(f"Going to {str(name)} ({str(root_place_id)})")
 
     data_save.PLAYED_PLACES.append(root_place_id)
     data_save.save_data(data_save.PLAYED_PLACES, "played_places.json")

@@ -10,7 +10,7 @@ import time
 
 from modules import api_reqs, data_save, play_sound, process_handle
 from modules.rbx_types import RbxInstance, RbxType, RbxReason
-from modules.verbose_print import vPrint
+from modules.verbose_print import vPrint, log_n_print
 
 
 def deal_with_badge(badge_rbxinstance: RbxInstance, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="") -> RbxReason:
@@ -20,36 +20,36 @@ def deal_with_badge(badge_rbxinstance: RbxInstance, user_id=None, awarded_thresh
     badge_info = badge_rbxinstance.info
     root_place_id = badge_info["awardingUniverse"]["rootPlaceId"]
     badge_name = badge_info["name"]
-    print(f"Badge Name: {badge_name}")
+    log_n_print(f"Badge Name: {badge_name}")
 
     if badge_rbxinstance.id in data_save.GOTTEN_BADGES:
-        print("Badge in 'gotten_badges.json' list, skipping!")
+        log_n_print("Badge in 'gotten_badges.json' list, skipping!")
         return RbxReason.ALREADY_COLLECTED
 
     if root_place_id in data_save.PLAYED_PLACES:
-        print(f"Skipping place {str(root_place_id)}; already played!")
+        log_n_print(f"Skipping place {str(root_place_id)}; already played!")
         return RbxReason.ALREADY_PLAYED
 
     awarded_count = badge_info["statistics"]["awardedCount"]
     if not awarded_count >= awarded_threshold:
-        print(str(awarded_count) + " people with this badge is not enough for set threshold, skipping...")
+        log_n_print(str(awarded_count) + " people with this badge is not enough for set threshold, skipping...")
         return RbxReason.NOT_ENOUGH_PLAYERS_AWARDED
 
     if badge_info["enabled"] is False:
-        print("Badge is not enabled, skipping!")
+        log_n_print("Badge is not enabled, skipping!")
         return RbxReason.NOT_ENABLED
 
     if user_id is not None:
         check_inventory = api_reqs.check_user_inv_for_badge(user_id, badge_rbxinstance.id)
         if check_inventory:
-            print("Badge has already been collected, skipping!")
+            log_n_print("Badge has already been collected, skipping!")
             data_save.GOTTEN_BADGES.append(badge_rbxinstance.id)
             data_save.save_data(data_save.GOTTEN_BADGES, "gotten_badges.json")
             return RbxReason.ALREADY_COLLECTED
 
     check_universe_badges = api_reqs.get_universe_badges_first_page(badge_info["awardingUniverse"]["id"])
     if not check_universe_badges:
-        print("No badges found in the universe/place, skipping...")
+        log_n_print("No badges found in the universe/place, skipping...")
         return RbxReason.NO_BADGES_IN_UNIVERSE
 
     if vote_threshold != -1:
@@ -58,13 +58,13 @@ def deal_with_badge(badge_rbxinstance: RbxInstance, user_id=None, awarded_thresh
         uv_ratio = int(universe_votes["upVotes"]) / int(universe_votes["downVotes"])
         vPrint(f"uv_ratio: {uv_ratio}")
         if uv_ratio <= vote_threshold:
-            print("Universe has a bad like-to-dislike ratio, skipping...")
+            log_n_print("Universe has a bad like-to-dislike ratio, skipping...")
             return RbxReason.BAD_VOTE_RATIO
 
     place_details = api_reqs.get_place_info(root_place_id, no_alternative=True)  # need the auth-only place api for playability stats
     if place_details:
         if not place_details["isPlayable"]:
-            print("Not playable, skipping!")
+            log_n_print("Not playable, skipping!")
             return RbxReason.NOT_PLAYABLE
 
     if open_place_in_browser:
@@ -90,7 +90,7 @@ def deal_with_place(place_rbxinstance: RbxInstance, vote_threshold=-1.0, check_i
         if universe_id is not None:
             check_universe_badges = api_reqs.get_universe_badges_first_page(universe_id)
             if not check_universe_badges:
-                print("No badges found in the universe/place, skipping...")
+                log_n_print("No badges found in the universe/place, skipping...")
                 return RbxReason.NO_BADGES_IN_UNIVERSE
             if vote_threshold != -1:
                 universe_votes = api_reqs.get_universe_votes(universe_id)
@@ -98,7 +98,7 @@ def deal_with_place(place_rbxinstance: RbxInstance, vote_threshold=-1.0, check_i
                 uv_ratio = int(universe_votes["upVotes"]) / int(universe_votes["downVotes"])
                 vPrint(f"uv_ratio: {uv_ratio}")
                 if uv_ratio <= vote_threshold:
-                    print("Universe has a bad like-to-dislike ratio, skipping...")
+                    log_n_print("Universe has a bad like-to-dislike ratio, skipping...")
                     return RbxReason.BAD_VOTE_RATIO
 
         else:  # no universe means that it"s most likely *not* a place...
@@ -126,7 +126,7 @@ def deal_with_universe(universe_rbxinstance: RbxInstance, vote_threshold=-1.0, c
     if check_if_badges_on_universe:
         check_universe_badges = api_reqs.get_universe_badges_first_page(universe_rbxinstance.id)
         if not check_universe_badges:
-            print("No badges found in the universe/place, skipping...")
+            log_n_print("No badges found in the universe/place, skipping...")
             return RbxReason.NO_BADGES_IN_UNIVERSE
 
     if vote_threshold != -1:
@@ -135,13 +135,13 @@ def deal_with_universe(universe_rbxinstance: RbxInstance, vote_threshold=-1.0, c
         uv_ratio = int(universe_votes["upVotes"]) / int(universe_votes["downVotes"])
         vPrint(f"uv_ratio: {uv_ratio}")
         if uv_ratio <= vote_threshold:
-            print("Universe has a bad like-to-dislike ratio, skipping...")
+            log_n_print("Universe has a bad like-to-dislike ratio, skipping...")
             return RbxReason.BAD_VOTE_RATIO
 
     place_details = api_reqs.get_place_info(root_place_id, no_alternative=True)  # need the auth-only place api for playability stats
     if place_details:
         if not place_details["isPlayable"]:
-            print("Not playable, skipping!")
+            log_n_print("Not playable, skipping!")
             return RbxReason.NOT_PLAYABLE
 
     if open_place_in_browser:
@@ -244,10 +244,10 @@ def handle_line(line, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, s
         return False
 
     if line_rbxinstance.id in data_save.GOTTEN_BADGES:
-        print(f"Skipping {line}, already collected!")
+        log_n_print(f"Skipping {line}, already collected!")
         return RbxReason.ALREADY_COLLECTED
     if line_rbxinstance.id in data_save.PLAYED_PLACES:
-        print(f"Skipping {line}, already played!")
+        log_n_print(f"Skipping {line}, already played!")
         return RbxReason.ALREADY_PLAYED
 
     if line_rbxinstance.type == RbxType.UNKNOWN:
@@ -268,7 +268,7 @@ def handle_line(line, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, s
 
         if places != []:
             for place_number, place_id in enumerate(places, start=1):
-                print(f"Sub-place {str(place_number)}: {str(place_id)}")
+                log_n_print(f"Sub-place {str(place_number)}: {str(place_id)}")
                 handle_line(
                     line=f"place::{str(place_id)}",
                     user_id=user_id,
@@ -299,7 +299,7 @@ def handle_line(line, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, s
         single_badge = False
         if line_rbxinstance.type == RbxType.BADGE and detect_one_badge_universes is True:
             if is_universe_one_badge(line_rbxinstance):
-                print("[SOLO BADGE! ONLY 1 TO COLLECT FOR THIS GAME!]")
+                log_n_print("[SOLO BADGE! ONLY 1 TO COLLECT FOR THIS GAME!]")
                 play_sound.play_sound("notify")
                 single_badge = True
 
@@ -308,7 +308,7 @@ def handle_line(line, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, s
         process_rbxreason = process_handle.wait_for_process_or_badge_collect(line_rbxinstance, user_id, secs_reincarnation, single_badge)
         vPrint(f"process_rbxreason: {process_rbxreason}")
         if process_rbxreason == RbxReason.BADGE_COLLECTED:
-            print("Badge has been awarded!")
+            log_n_print("Badge has been awarded!")
             data_save.GOTTEN_BADGES.append(line_rbxinstance.id)
             data_save.save_data(data_save.GOTTEN_BADGES, "gotten_badges.json")
             play_sound.play_sound("success")
@@ -345,7 +345,7 @@ def start(lines, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, secs_r
     for line_number, line in enumerate(lines, start=1):
         # print(line)
         stripped_line = line.strip()
-        print(f"Line {line_number}: {stripped_line}")
+        log_n_print(f"Line {line_number}: {stripped_line}")
 
         if stripped_line == "":
             vPrint("Empty line, skipping...")

@@ -11,8 +11,9 @@ import re
 import sys
 import argparse
 import time
+import logging
 from modules import api_reqs
-from modules.verbose_print import toggle_verbose_print, toggle_very_verbose_print
+from modules.verbose_print import toggle_verbose_print, toggle_very_verbose_print, log_n_print
 
 __prog__ = "alcubierre"
 __desc__ = "Teleports to every place on a file."
@@ -46,6 +47,15 @@ else:
     base_cache_path = os.path.dirname(__file__)
 
 URL_PATTERN = re.compile(r"https?://")
+
+
+logging.basicConfig(filename="alcubierre.log",
+                    filemode="a",
+                    format="%(asctime)s,%(msecs)d %(levelname)s %(message)s",
+                    datefmt="%H:%M:%S",
+                    level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+logger.info("New log started!")
 
 
 def file_or_url(path):
@@ -188,7 +198,12 @@ def main(args=None):
     vPrint("-------------------------")
     vPrint(f"Timestamp: {time.time()}")
     vPrint(f"Version: {__version__}")
-    vPrint(f"Current Args: {args}")
+    vvPrint("----")
+    vvPrint("Current Args:")
+    for arg in vars(args):
+        if arg == "rbx_token":  # don't save the rbx token in the log! 
+            continue
+        vvPrint(f"{arg}: {getattr(args, arg)}")
     vPrint("-------------------------")
 
     user_agent = args.user_agent
@@ -219,12 +234,12 @@ def main(args=None):
 
     lines = []
     if isinstance(args.file_path, str):
-        print(f"URL provided: {args.file_path}")
+        log_n_print(f"URL provided: {args.file_path}")
         url_check = api_reqs.get_request_url(args.file_path, cache_results=False)
         if url_check.ok:
             lines = url_check.text.splitlines()
     else:
-        print(f"File loaded: {args.file_path.name}")
+        log_n_print(f"File loaded: {args.file_path.name}")
         lines = args.file_path.read().splitlines()
         args.file_path.close()
 

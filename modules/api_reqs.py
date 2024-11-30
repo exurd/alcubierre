@@ -12,7 +12,7 @@ import math
 import requests
 
 from modules import data_save
-from modules.verbose_print import vPrint, vvPrint
+from modules.verbose_print import vPrint, vvPrint, log_n_print, error_n_print
 
 RESPONSE_CACHE = {}
 USING_PERM_CACHE = False
@@ -78,11 +78,13 @@ def get_request_url(url, retry_amount=8, accept_forbidden=False, accept_not_foun
         vPrint("getRequestURL: url was not string type, sending None")
         return None
     if cache_results and url in RESPONSE_CACHE:
+        vvPrint(f"Found response for {url} in cache.")
         return RESPONSE_CACHE[url]
 
     tries = 0
     vPrint(f"Requesting {url}...")
     for _ in range(retry_amount):
+        vvPrint(f"Attempt {tries}...")
         tries += 1
         try:
             response = request_session.get(url)
@@ -123,8 +125,8 @@ def get_request_url(url, retry_amount=8, accept_forbidden=False, accept_not_foun
             if initial_wait_time is not None:
                 sleep_time = int(initial_wait_time)
                 initial_wait_time = None
-            print(f"Something happened when trying to get [{url}]!")
-            print("Sleeping", sleep_time, "seconds...")
+            error_n_print(f"Something happened when trying to get [{url}]!")
+            log_n_print(f"Sleeping {sleep_time} seconds...")
             time.sleep(sleep_time)
     return False
 
@@ -149,7 +151,7 @@ def get_economy_info(asset_id, act_like_place_details_api=False) -> dict:
     if economy_check.ok:
         economy_json = economy_check.json()
         if "errors" in economy_json:
-            vPrint(f"Error in economy_json! [{economy_json}]")
+            error_n_print(f"Error in economy_json! [{economy_json}]")
             return False
         vvPrint(f"economy_json: [{economy_json}]")
         if act_like_place_details_api:
@@ -171,7 +173,7 @@ def get_place_info(place_id, no_alternative=False) -> dict:
         if place_check.ok:
             place_json = place_check.json()
             if "errors" in place_json:
-                vPrint(f"Error in place_json! [{place_json}]")
+                error_n_print(f"Error in place_json! [{place_json}]")
                 return False
             vvPrint(f"place_json: [{place_json}]")
             return place_json[0]
@@ -200,9 +202,8 @@ def get_badge_info(badge_id) -> dict:
     if badge_check.ok:
         badge_json = badge_check.json()
         if "errors" in badge_json:
-            vPrint(f"Error in badge_json! [{badge_json}]")
+            error_n_print(f"Error in badge_json! [{badge_json}]")
             return False
-
         vvPrint(f"badge_json: [{badge_json}]")
         return badge_json
     return False
@@ -219,7 +220,7 @@ def get_universe_info(universe_id) -> dict:
     if universe_check.ok:
         universe_json = universe_check.json()
         if "errors" in universe_json:
-            vPrint(f"Error in universe_json! [{universe_json}]")
+            error_n_print(f"Error in universe_json! [{universe_json}]")
             return False
         else:
             vvPrint(f"universe_json: [{universe_json}]")
@@ -238,7 +239,7 @@ def get_group_info(group_id) -> dict:
     if groupinfo_check.ok:
         groupinfo_json = groupinfo_check.json()
         if "errors" in groupinfo_json:
-            vPrint(f"Error in groupinfo_json! [{groupinfo_json}]")
+            error_n_print(f"Error in groupinfo_json! [{groupinfo_json}]")
             return False
         else:
             vvPrint(f"groupinfo_json: [{groupinfo_json}]")
@@ -258,10 +259,11 @@ def find_group_places(group_id) -> list:
         if groupplaces_check.ok:
             groupplaces_json = groupplaces_check.json()
             if 'errors' in groupplaces_json:
-                vPrint(f"Error in groupplaces_json! [{groupplaces_json}]")
+                error_n_print(f"Error in groupplaces_json! [{groupplaces_json}]")
                 return group_places
 
             vvPrint(f"groupplaces_json: [{groupplaces_json}]")
+
             for game in groupplaces_json['data']:
                 root_place_id = game['rootPlace']['id']
                 group_places.append(root_place_id)
@@ -273,7 +275,7 @@ def find_group_places(group_id) -> list:
             vPrint("Checking next page of games...")
             url = f"https://games.roblox.com/v2/groups/{str(group_id)}/games?accessFilter=2&limit=100&sortOrder=Asc&cursor={groupplaces_json['nextPageCursor']}"
         else:
-            print(f"Error! [{groupplaces_check}]")
+            error_n_print(f"Error! [{groupplaces_check}]")
             return group_places
 
 
@@ -288,9 +290,8 @@ def get_user_info(user_id) -> dict:
     if userinfo_check.ok:
         userinfo_json = userinfo_check.json()
         if "errors" in userinfo_json:
-            vPrint(f"Error in userinfo_json! [{userinfo_json}]")
+            error_n_print(f"Error in userinfo_json! [{userinfo_json}]")
             return False
-
         vvPrint(f"userinfo_json: [{userinfo_json}]")
         return userinfo_json
     return False
@@ -309,10 +310,10 @@ def find_user_places(user_id) -> list:
         if userplaces_check.ok:
             userplaces_json = userplaces_check.json()
             if 'errors' in userplaces_json:
-                vPrint(f"Error in userplaces_json! [{userplaces_json}]")
+                error_n_print(f"Error in userplaces_json! [{userplaces_json}]")
                 return user_places
 
-            vvPrint(f"userPlaces_json: [{userplaces_json}]")
+            vvPrint(f"userplaces_json: [{userplaces_json}]")
             for game in userplaces_json['data']:
                 root_place_id = game['rootPlace']['id']
                 user_places.append(root_place_id)
@@ -324,7 +325,7 @@ def find_user_places(user_id) -> list:
             vPrint("Checking next page of games...")
             url = f"https://games.roblox.com/v2/users/{str(user_id)}/games?limit=50&sortOrder=Asc&cursor={userplaces_json['nextPageCursor']}"
         else:
-            print(f"Error! [{userplaces_check}]")
+            error_n_print(f"Error! [{userplaces_check}]")
             return user_places
 
 
@@ -339,9 +340,8 @@ def get_universe_votes(universe_id) -> dict:
     if universevotes_check.ok:
         universevotes_json = universevotes_check.json()
         if "errors" in universevotes_json:
-            vPrint(f"Error in universevotes_json! [{universevotes_json}]")
+            error_n_print(f"Error in universevotes_json! [{universevotes_json}]")
             return False
-
         vvPrint(f"universevotes_json: [{universevotes_json}]")
         return universevotes_json["data"][0]
     return False
