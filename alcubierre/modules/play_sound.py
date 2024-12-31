@@ -14,7 +14,7 @@ try:
 except ImportError:
     from playsound import playsound  # type: ignore
 
-from modules.verbose_print import vPrint
+from alcubierre.modules.verbose_print import vPrint
 
 ACTIVE_SND_PACK = None
 

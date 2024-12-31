@@ -14,7 +14,7 @@ try:
 except ImportError:
     import pickle
 
-from modules.verbose_print import vPrint
+from alcubierre.modules.verbose_print import vPrint
 
 DATA_FOLDER = None
 

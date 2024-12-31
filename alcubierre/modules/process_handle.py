@@ -13,9 +13,9 @@ import time
 import webbrowser
 import psutil
 
-from modules import api_reqs, data_save
-from modules.rbx_types import RbxInstance, RbxReason, RbxType
-from modules.verbose_print import vPrint, log_n_print
+from alcubierre.modules import api_reqs, data_save
+from alcubierre.modules.rbx_types import RbxInstance, RbxReason, RbxType
+from alcubierre.modules.verbose_print import vPrint, log_n_print
 
 CREATE_NEW_PROCESS_GROUP = 0x00000200
 DETACHED_PROCESS = 0x00000008

@@ -12,8 +12,8 @@ import sys
 import argparse
 import time
 import logging
-from modules import api_reqs
-from modules.verbose_print import toggle_verbose_print, toggle_very_verbose_print, log_n_print
+from alcubierre.modules import api_reqs
+from alcubierre.modules.verbose_print import toggle_verbose_print, toggle_very_verbose_print, log_n_print
 
 __prog__ = "alcubierre"
 __desc__ = "Teleports to every place on a file."
@@ -185,12 +185,12 @@ def main(args=None):
     if args.very_verbose:
         toggle_very_verbose_print()
 
-    from modules.verbose_print import vPrint, vvPrint
+    from alcubierre.modules.verbose_print import vPrint, vvPrint
     vPrint("Verbose mode is now enabled, else you wouldn't be seeing this...")
     vvPrint("Very verbose mode is also enabled... Have fun!")
 
     if args.play_sound:
-        from modules import play_sound
+        from alcubierre.modules import play_sound
         play_sound.toggle_sound(args.sound_pack)
         vvPrint(play_sound.ACTIVE_SND_PACK)
         play_sound.play_sound("startup")
@@ -211,7 +211,7 @@ def main(args=None):
 
     env_file = args.env_file
     if env_file is not None:
-        from modules import load_env
+        from alcubierre.modules import load_env
         if not os.path.isfile(env_file):
             load_env.create_env_template(parser, env_file)
             print(".env file was successfully created! Use a text editor to edit")
@@ -227,7 +227,7 @@ def main(args=None):
                 if "USER_AGENT" in data and data["USER_AGENT"] != "":
                     user_agent = data["USER_AGENT"]
 
-    from modules import data_save
+    from alcubierre.modules import data_save
 
     if args.file_path is None:
         parser.error("the following arguments are required to continue: file_path")
@@ -262,7 +262,7 @@ def main(args=None):
         api_reqs.get_perm_cache()
 
     vPrint("Starting scriptLoop...")
-    from modules import script_loop
+    from alcubierre.modules import script_loop
     script_loop.start(
         lines,
         user_id=user_id,

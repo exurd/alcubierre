@@ -9,8 +9,8 @@ Roblox asset type handling for alcubierre.
 import re
 from enum import Enum
 
-from modules import api_reqs
-from modules.verbose_print import vPrint, vvPrint
+from alcubierre.modules import api_reqs
+from alcubierre.modules.verbose_print import vPrint, vvPrint
 
 
 def check_if_string_is_integer(string: str):

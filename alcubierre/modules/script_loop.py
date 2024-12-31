@@ -8,9 +8,9 @@ Main loop for alcubierre
 
 import time
 
-from modules import api_reqs, data_save, play_sound, process_handle
-from modules.rbx_types import RbxInstance, RbxType, RbxReason
-from modules.verbose_print import vPrint, log_n_print
+from alcubierre.modules import api_reqs, data_save, play_sound, process_handle
+from alcubierre.modules.rbx_types import RbxInstance, RbxType, RbxReason
+from alcubierre.modules.verbose_print import vPrint, log_n_print
 
 
 def deal_with_badge(badge_rbxinstance: RbxInstance, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="") -> RbxReason:

@@ -11,8 +11,8 @@ import random
 import math
 import requests
 
-from modules import data_save
-from modules.verbose_print import vPrint, vvPrint, log_n_print, error_n_print
+from alcubierre.modules import data_save
+from alcubierre.modules.verbose_print import vPrint, vvPrint, log_n_print, error_n_print
 
 RESPONSE_CACHE = {}
 USING_PERM_CACHE = False
