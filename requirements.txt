@@ -1,7 +1,7 @@
 requests==2.27.1; python_version=="3.6"
 requests==2.31.0; python_version=="3.7"
 requests; python_version>="3.8"
-psutil==6.1.0
+psutil==6.1.1
 playsound3; python_version>="3.7"
 playsound; python_version<="3.6"
 playsound==1.2.2; python_version<="3.6" and sys_platform=="win32"
