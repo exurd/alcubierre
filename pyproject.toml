@@ -2,6 +2,7 @@
 requires = ["hatchling", "hatch-requirements-txt"]
 build-backend = "hatchling.build"
 
+
 [project]
 name = "alcubierre"
 authors = [
@@ -43,17 +44,20 @@ Homepage = "https://github.com/exurd/alcubierre/"
 Repository = "https://github.com/exurd/alcubierre.git"
 Issues = "https://github.com/exurd/alcubierre/issues"
 
+
 [tool.hatch.metadata.hooks.requirements_txt]
 files = ["requirements.txt"]
 
-[tool.hatch.build.targets.sdist]
-include = ["alcubierre/*"]
-
-[tool.hatch.build.targets.wheel]
-include = ["alcubierre/*"]
-packages = ["alcubierre", "alcubierre.modules"]
-
 [tool.hatch.version]
 method = "dynamic"
-path = "alcubierre/__main__.py"
+path = "src/alcubierre/__main__.py"
 variable = "__version__"
+
+[tool.hatch.build]
+sources = ["src"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/alcubierre/**"]
+
+[tool.hatch.build.targets.wheel]
+include = ["src/alcubierre/**"]
