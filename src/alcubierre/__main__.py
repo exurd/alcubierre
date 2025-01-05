@@ -12,12 +12,16 @@ import sys
 import argparse
 import time
 import logging
+import importlib.metadata
 from alcubierre.modules import api_reqs
 from alcubierre.modules.verbose_print import toggle_verbose_print, toggle_very_verbose_print, log_n_print
 
 __prog__ = "alcubierre"
 __desc__ = "Teleports to every place on a file."
-__version__ = "v1.0.0-dev"
+try:
+    __version__ = importlib.metadata.version(__package__ or __name__)
+except:
+    __version__ = "dev"  # fallback version
 __author__ = "exurd"
 __copyright__ = "copyright (c) 2024, exurd"
 __credits__ = ["exurd"]

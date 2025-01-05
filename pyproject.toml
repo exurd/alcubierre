@@ -1,5 +1,9 @@
 [build-system]
-requires = ["hatchling", "hatch-requirements-txt"]
+requires = [
+    "hatchling",
+    "hatch-requirements-txt",
+    "versioningit"
+]
 build-backend = "hatchling.build"
 
 
@@ -48,10 +52,13 @@ Issues = "https://github.com/exurd/alcubierre/issues"
 [tool.hatch.metadata.hooks.requirements_txt]
 files = ["requirements.txt"]
 
+[tool.versioningit.format]
+distance = "{base_version}+{distance}.{vcs}{rev}"
+dirty = "{base_version}+{distance}.{vcs}{rev}.dirty"
+distance-dirty = "{base_version}+{distance}.{vcs}{rev}.dirty"
+
 [tool.hatch.version]
-method = "dynamic"
-path = "src/alcubierre/__main__.py"
-variable = "__version__"
+source = "versioningit"
 
 [tool.hatch.build]
 sources = ["src"]
