@@ -52,11 +52,6 @@ Issues = "https://github.com/exurd/alcubierre/issues"
 [tool.hatch.metadata.hooks.requirements_txt]
 files = ["requirements.txt"]
 
-[tool.versioningit.format]
-distance = "{base_version}+{distance}.{vcs}{rev}"
-dirty = "{base_version}+{distance}.{vcs}{rev}.dirty"
-distance-dirty = "{base_version}+{distance}.{vcs}{rev}.dirty"
-
 [tool.hatch.version]
 source = "versioningit"
 
