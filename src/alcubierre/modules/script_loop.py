@@ -22,10 +22,6 @@ def deal_with_badge(badge_rbxinstance: RbxInstance, user_id=None, awarded_thresh
     badge_name = badge_info["name"]
     log_n_print(f"Badge Name: {badge_name}")
 
-    if badge_rbxinstance.id in data_save.GOTTEN_BADGES:
-        log_n_print("Badge in 'gotten_badges.json' list, skipping!")
-        return RbxReason.ALREADY_COLLECTED
-
     if root_place_id in data_save.PLAYED_PLACES:
         log_n_print(f"Skipping place {str(root_place_id)}; already played!")
         return RbxReason.ALREADY_PLAYED
@@ -38,14 +34,6 @@ def deal_with_badge(badge_rbxinstance: RbxInstance, user_id=None, awarded_thresh
     if badge_info["enabled"] is False:
         log_n_print("Badge is not enabled, skipping!")
         return RbxReason.NOT_ENABLED
-
-    if user_id is not None:
-        check_inventory = api_reqs.check_user_inv_for_badge(user_id, badge_rbxinstance.id)
-        if check_inventory:
-            log_n_print("Badge has already been collected, skipping!")
-            data_save.GOTTEN_BADGES.append(badge_rbxinstance.id)
-            data_save.save_data(data_save.GOTTEN_BADGES, "gotten_badges.json")
-            return RbxReason.ALREADY_COLLECTED
 
     check_universe_badges = api_reqs.get_universe_badges_first_page(badge_info["awardingUniverse"]["id"])
     if not check_universe_badges:
@@ -66,6 +54,15 @@ def deal_with_badge(badge_rbxinstance: RbxInstance, user_id=None, awarded_thresh
         if not place_details["isPlayable"]:
             log_n_print("Not playable, skipping!")
             return RbxReason.NOT_PLAYABLE
+
+    # we check if the user collected the badge last because we're not caching the responses for them
+    if user_id is not None:
+        check_inventory = api_reqs.check_user_inv_for_badge(user_id, badge_rbxinstance.id)
+        if check_inventory:
+            log_n_print("Badge has already been collected, skipping!")
+            data_save.GOTTEN_BADGES.append(badge_rbxinstance.id)
+            data_save.save_data(data_save.GOTTEN_BADGES, "gotten_badges.json")
+            return RbxReason.ALREADY_COLLECTED
 
     if open_place_in_browser:
         process_handle.open_place_in_browser(root_place_id)
