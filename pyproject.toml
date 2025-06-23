@@ -16,12 +16,12 @@ keywords = ["roblox", "achievements", "badges", "sober", "bloxstrap"]
 description = "A Roblox Badge-to-Badge Place Teleporter"
 dynamic = ["version", "dependencies"]
 readme = "README.md"
-license = { file = "LICENSE" }
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
 requires-python = ">=3.6"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: End Users/Desktop",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Topic :: Games/Entertainment",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.6",
