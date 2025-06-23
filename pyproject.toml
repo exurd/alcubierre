@@ -43,6 +43,9 @@ classifiers = [
     "Operating System :: POSIX :: Linux"
 ]
 
+[project.scripts]
+alcubierre = "alcubierre.__main__:main"
+
 [project.urls]
 Homepage = "https://github.com/exurd/alcubierre/"
 Repository = "https://github.com/exurd/alcubierre.git"
