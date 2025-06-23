@@ -22,12 +22,12 @@ To run alcubierre, you will need the same requirements as Roblox: Windows 10 or 
 
 The releases tab contains binary files of this program. Download and run the executable in a terminal.
 
-If you have Python installed and want to run the source code, you will need to use `pip install -r requirements.txt` to install the required packages. It is advised to create a virtual environment for this program ([conda](https://docs.conda.io/projects/conda/en/latest/index.html) / [venv](https://docs.python.org/3/library/venv.html)). You can then use `python .` to run the program.
+If you have Python installed and want to run the source code, you will need to use `pip install -r requirements.txt` to install the required packages. It is advised to create a virtual environment for this program ([conda](https://docs.conda.io/projects/conda/en/latest/index.html) / [venv](https://docs.python.org/3/library/venv.html)). You can then use `pip install .`, `python -m pip install .` or pipx / uv to install the program.
 
 If the command above fails to install the packages, try using `pip install -U pip setuptools wheel` to update the package manager.
 
 ## Usage
-The `--help` command shows the commands you can use.
+The `--help` command shows the commands you can use. You can run it with `python -m alcubierre --help`.
 
 ```
 usage: alcubierre [-h] [--version] [--env-file ENV_FILE]
