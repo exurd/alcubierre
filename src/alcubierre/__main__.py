@@ -23,7 +23,7 @@ try:
 except:
     __version__ = "dev"  # fallback version
 __author__ = "exurd"
-__copyright__ = "copyright (c) 2024, exurd"
+__copyright__ = "copyright (c) 2025, exurd"
 __credits__ = ["exurd"]
 __license__ = "GPL"
 __short_license__ = """This program comes with ABSOLUTELY NO WARRANTY.
