@@ -18,7 +18,7 @@ It can run on Python 3.6 and above. It also supports [Bloxstrap](https://bloxstr
 Any questions?
 
 ## Installation
-To run alcubierre, you will need the same requirements as Roblox: Windows 8.1 or above, macOS 10.13 High Sierra, or any Linux distro that can support Sober. Windows 7 users will need to manually run the source code on Python 3.8 or below.
+To run alcubierre, you will need the same requirements as Roblox: Windows 10 or above, macOS 10.14 Mojave, or any Linux distro that can support Sober.
 
 The releases tab contains binary files of this program. Download and run the executable in a terminal.
 
