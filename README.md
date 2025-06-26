@@ -18,11 +18,9 @@ It can run on Python 3.6 and above. It also supports [Bloxstrap](https://bloxstr
 Any questions?
 
 ## Installation
-To run alcubierre, you will need the same requirements as Roblox: Windows 10 or above, macOS 10.14 Mojave, or any Linux distro that can support Sober.
+To run alcubierre, you will need the same requirements as Roblox: Windows 10 or above, macOS 10.14 Mojave, or any Linux distro that can support Sober. You will also need Python 3 installed.
 
-The releases tab contains binary files of this program. Download and run the executable in a terminal.
-
-If you have Python installed and want to run the source code, you will need to use `pip install -r requirements.txt` to install the required packages. It is advised to create a virtual environment for this program ([conda](https://docs.conda.io/projects/conda/en/latest/index.html) / [venv](https://docs.python.org/3/library/venv.html)). You can then use `pip install .`, `python -m pip install .` or pipx / uv to install the program.
+Install the program with pip by running `pip install git+https://github.com/exurd/alcubierre`. Other Python package managers are supported, like `pipx install` and `uv pip install`. You can then run `alcubierre` or `python -m alcubierre`.
 
 If the command above fails to install the packages, try using `pip install -U pip setuptools wheel` to update the package manager.
 
