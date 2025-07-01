@@ -9,10 +9,7 @@ the user can toggle it on/off, via toggle_sound(SndPack)
 
 import os
 import sys
-try:
-    from playsound3 import playsound  # type: ignore
-except ImportError:
-    from playsound import playsound  # type: ignore
+from playsound3 import playsound
 
 from alcubierre.modules.verbose_print import vPrint
 
