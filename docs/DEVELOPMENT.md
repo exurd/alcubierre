@@ -3,7 +3,7 @@
 > Older versions of Python that are not supported will contain vulnerabilities that will never get patched (as well as any required obsolete packages; e.g. `requests` and `python-dotenv`). If you're going to run alcubierre on an operating system that frequently gets updates, you will most likely be able to run supported versions of Python. The released binaries will always use the latest version of Python to compile.
 
 > [!IMPORTANT]
-> Currently, alcubierre can run on *Python 3.6* and above. *3.5* and below does not support f-strings. 3.6 will be the lowest version this script will try and support. Please do not create a pull request that adds support below 3.5 ([#1](https://github.com/exurd/alcubierre/issues/1)).
+> Currently, alcubierre can technically run on *Python 3.6* and above. *3.5* and below does not support f-strings. However, 3.8 is currently the lowest version that will install on pip. Please do not create a pull request that adds support below 3.5 ([#1](https://github.com/exurd/alcubierre/issues/1)).
 
 To create a conda enviroment, you will need to [have conda installed](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html). It's recommended to use miniconda if you're going to test multiple versions of Python with this code. The .conda folder has been .gitignored; use this folder to contain these enviroments.
 
