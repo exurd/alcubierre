@@ -9,10 +9,7 @@ Uses pickle (or pickle5 for older pythons) and json.
 
 import os
 import json
-try:
-    import pickle5 as pickle  # type: ignore
-except ImportError:
-    import pickle
+import pickle
 
 from alcubierre.modules.verbose_print import vPrint
 
