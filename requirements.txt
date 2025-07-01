@@ -1,12 +1,4 @@
-requests==2.27.1; python_version=="3.6"
-requests==2.31.0; python_version=="3.7"
-requests; python_version>="3.8"
-psutil==6.1.1
-playsound3; python_version>="3.7"
-playsound; python_version<="3.6"
-playsound==1.2.2; python_version<="3.6" and sys_platform=="win32"
-python-dotenv==0.20.0; python_version=="3.6"
-python-dotenv==0.21.1; python_version=="3.7"
-python-dotenv; python_version>="3.8"
-pickle5; python_version<="3.7"
-certifi
+playsound3==3.2.4
+psutil==7.0.0
+python-dotenv==1.1.1
+requests==2.32.4
