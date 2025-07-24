@@ -145,7 +145,41 @@ def get_economy_info(asset_id, act_like_place_details_api=False) -> dict:
     Optional setting allows for this to act like place details api.
 
     Example JSON:
-    {"TargetId":0,"ProductType":null,"AssetId":123456,"ProductId":0,"Name":"blackcatgoth"s Place","Description":"","AssetTypeId":9,"Creator":{"Id":52988,"Name":"blackcatgoth","CreatorType":"User","CreatorTargetId":52988,"HasVerifiedBadge":false},"IconImageAssetId":752403374,"Created":"2007-08-27T17:40:45.12Z","Updated":"2007-08-27T17:40:45.12Z","PriceInRobux":null,"PriceInTickets":null,"Sales":0,"IsNew":false,"IsForSale":false,"IsPublicDomain":false,"IsLimited":false,"IsLimitedUnique":false,"Remaining":null,"MinimumMembershipLevel":0,"ContentRatingTypeId":0,"SaleAvailabilityLocations":null,"SaleLocation":null,"CollectibleItemId":null,"CollectibleProductId":null,"CollectiblesItemDetails":null}
+    {
+        "TargetId": 0,
+        "ProductType": null,
+        "AssetId": 123456,
+        "ProductId": 0,
+        "Name": "blackcatgoth"s Place",
+        "Description": "",
+        "AssetTypeId": 9,
+        "Creator": {
+            "Id": 52988,
+            "Name": "blackcatgoth",
+            "CreatorType": "User",
+            "CreatorTargetId": 52988,
+            "HasVerifiedBadge": false
+        },
+        "IconImageAssetId": 752403374,
+        "Created": "2007-08-27T17: 40: 45.12Z",
+        "Updated": "2007-08-27T17: 40: 45.12Z",
+        "PriceInRobux": null,
+        "PriceInTickets": null,
+        "Sales": 0,
+        "IsNew": false,
+        "IsForSale": false,
+        "IsPublicDomain": false,
+        "IsLimited": false,
+        "IsLimitedUnique": false,
+        "Remaining": null,
+        "MinimumMembershipLevel": 0,
+        "ContentRatingTypeId": 0,
+        "SaleAvailabilityLocations": null,
+        "SaleLocation": null,
+        "CollectibleItemId": null,
+        "CollectibleProductId": null,
+        "CollectiblesItemDetails": null
+    }
     """
     economy_check = get_request_url(f"https://economy.roblox.com/v2/assets/{str(asset_id)}/details", initial_wait_time=60)
     if economy_check.ok:
@@ -166,7 +200,23 @@ def get_place_info(place_id, no_alternative=False) -> dict:
     Guest users cannot use this API. If `no_alternative` is False, then the economy api will be used instead.
 
     Example JSON:
-    {"placeId": 20876709, "name": "[ Content Deleted ]", "description": "[ Content Deleted ]", "sourceName": "[ Content Deleted ]", "sourceDescription": "[ Content Deleted ]", "url": "https://www.roblox.com/games/20876709/Content-Deleted", "builder": "Chevsterr", "builderId": 6128452, "hasVerifiedBadge": False, "isPlayable": False, "reasonProhibited": "AssetUnapproved", "universeId": 19043203, "universeRootPlaceId": 20876709, "price": 0, "imageToken": "T_20876709_5455"}
+    {
+        "placeId": 20876709,
+        "name": "[ Content Deleted ]",
+        "description": "[ Content Deleted ]",
+        "sourceName": "[ Content Deleted ]",
+        "sourceDescription": "[ Content Deleted ]",
+        "url": "https://www.roblox.com/games/20876709/Content-Deleted",
+        "builder": "Chevsterr",
+        "builderId": 6128452,
+        "hasVerifiedBadge": False,
+        "isPlayable": False,
+        "reasonProhibited": "AssetUnapproved",
+        "universeId": 19043203,
+        "universeRootPlaceId": 20876709,
+        "price": 0,
+        "imageToken": "T_20876709_5455"
+    }
     """
     if is_token_cookie_there():
         place_check = get_request_url(f"https://games.roblox.com/v1/games/multiget-place-details?placeIds={str(place_id)}")
@@ -193,10 +243,39 @@ def get_badge_info(badge_id) -> dict:
     Gets badge information from badge ID.
 
     Example JSON:
-    {"id": 14427263, "name": "Juice Tycoon Money Player Badge", "description": "Go On My Juice Tycoon To Earn This!!!", "displayName": "Juice Tycoon Money Player Badge", "displayDescription": "Go On My Juice Tycoon To Earn This!!!", "enabled": True, "iconImageId": 14426818, "displayIconImageId": 14426818, "created": "2009-08-13T07:56:44.337-05:00", "updated": "2015-12-21T15:09:14.887-06:00", "statistics": {"pastDayAwardedCount": 0, "awardedCount": 1756, "winRatePercentage": 0.0}, "awardingUniverse": {"id": 685746, "name": "JUICE TYCOON!! YOU CAN EARN A BADGE HERE!!!!", "rootPlaceId": 4285089}}
+    {
+        "id": 14427263,
+        "name": "Juice Tycoon Money Player Badge",
+        "description": "Go On My Juice Tycoon To Earn This!!!",
+        "displayName": "Juice Tycoon Money Player Badge",
+        "displayDescription": "Go On My Juice Tycoon To Earn This!!!",
+        "enabled": True,
+        "iconImageId": 14426818,
+        "displayIconImageId": 14426818,
+        "created": "2009-08-13T07:56:44.337-05:00",
+        "updated": "2015-12-21T15:09:14.887-06:00",
+        "statistics": {
+            "pastDayAwardedCount": 0,
+            "awardedCount": 1756,
+            "winRatePercentage": 0.0
+        },
+        "awardingUniverse": {
+            "id": 685746,
+            "name": "JUICE TYCOON!! YOU CAN EARN A BADGE HERE!!!!",
+            "rootPlaceId": 4285089
+        }
+    }
 
     Example error:
-    {"errors": [{"code": 1, "message": "Badge is invalid or does not exist.", "userFacingMessage": "Something went wrong"}]}
+    {
+        "errors": [
+            {
+                "code": 1,
+                "message": "Badge is invalid or does not exist.",
+                "userFacingMessage": "Something went wrong"
+            }
+        ]
+    }
     """
     badge_check = get_request_url(f"https://badges.roblox.com/v1/badges/{str(badge_id)}")
     if badge_check.ok:
@@ -214,7 +293,46 @@ def get_universe_info(universe_id) -> dict:
     Gets universe information from universe ID.
 
     Example JSON:
-    {"data":[{"id":13058,"rootPlaceId":1818,"name":"Classic: Crossroads","description":"The classic ROBLOX level is back!","sourceName":"Classic: Crossroads","sourceDescription":"The classic ROBLOX level is back!","creator":{"id":1,"name":"Roblox","type":"User","isRNVAccount":false,"hasVerifiedBadge":true},"price":null,"allowedGearGenres":["Ninja"],"allowedGearCategories":[],"isGenreEnforced":true,"copyingAllowed":true,"playing":21,"visits":10809119,"maxPlayers":8,"created":"2007-05-01T01:07:04.78Z","updated":"2024-01-29T22:05:10.417Z","studioAccessToApisAllowed":false,"createVipServersAllowed":false,"universeAvatarType":"MorphToR6","genre":"Fighting","genre_l1":"Action","genre_l2":"Battlegrounds & Fighting","isAllGenre":false,"isFavoritedByUser":false,"favoritedCount":229776}]}
+    {
+        "data": [
+            {
+                "id": 13058,
+                "rootPlaceId": 1818,
+                "name": "Classic: Crossroads",
+                "description": "The classic ROBLOX level is back!",
+                "sourceName": "Classic: Crossroads",
+                "sourceDescription": "The classic ROBLOX level is back!",
+                "creator": {
+                    "id": 1,
+                    "name": "Roblox",
+                    "type": "User",
+                    "isRNVAccount": false,
+                    "hasVerifiedBadge": true
+                },
+                "price": null,
+                "allowedGearGenres": [
+                    "Ninja"
+                ],
+                "allowedGearCategories": [],
+                "isGenreEnforced": true,
+                "copyingAllowed": true,
+                "playing": 21,
+                "visits": 10809119,
+                "maxPlayers": 8,
+                "created": "2007-05-01T01:07:04.78Z",
+                "updated": "2024-01-29T22:05:10.417Z",
+                "studioAccessToApisAllowed": false,
+                "createVipServersAllowed": false,
+                "universeAvatarType": "MorphToR6",
+                "genre": "Fighting",
+                "genre_l1": "Action",
+                "genre_l2": "Battlegrounds & Fighting",
+                "isAllGenre": false,
+                "isFavoritedByUser": false,
+                "favoritedCount": 229776
+            }
+        ]
+    }
     """
     universe_check = get_request_url(f"https://games.roblox.com/v1/games?universeIds={str(universe_id)}")
     if universe_check.ok:
@@ -233,7 +351,21 @@ def get_group_info(group_id) -> dict:
     Gets group/community information from group ID.
 
     Example JSON:
-    {"data":[{"id":7,"name":"Roblox","description":"Official fan club of Roblox!","owner":{"id":21557,"type":"User"},"created":"2009-07-30T05:36:10.417Z","hasVerifiedBadge":false}]}
+    {
+        "data": [
+            {
+                "id": 7,
+                "name": "Roblox",
+                "description": "Official fan club of Roblox!",
+                "owner": {
+                    "id": 21557,
+                    "type": "User"
+                },
+                "created": "2009-07-30T05:36:10.417Z",
+                "hasVerifiedBadge": false
+            }
+        ]
+    }
     """
     groupinfo_check = get_request_url(f"https://groups.roblox.com/v2/groups?groupIds={str(group_id)}")
     if groupinfo_check.ok:
@@ -284,7 +416,16 @@ def get_user_info(user_id) -> dict:
     Gets user information from user ID.
 
     Example JSON:
-    {"description":"Welcome to the Roblox profile! This is where you can check out the newest items in the catalog, and get a jumpstart on exploring and building on our Imagination Platform. If you want news on updates to the Roblox platform, or great new experiences to play with friends, check out blog.roblox.com. Please note, this is an automated account. If you need to reach Roblox for any customer service needs find help at www.roblox.com/help","created":"2006-02-27T21:06:40.3Z","isBanned":false,"externalAppDisplayName":null,"hasVerifiedBadge":true,"id":1,"name":"Roblox","displayName":"Roblox"}
+    {
+        "description": "Welcome to the Roblox profile! This is where you can check out the newest items in the catalog, and get a jumpstart on exploring and building on our Imagination Platform. If you want news on updates to the Roblox platform, or great new experiences to play with friends, check out blog.roblox.com. Please note, this is an automated account. If you need to reach Roblox for any customer service needs find help at www.roblox.com/help",
+        "created": "2006-02-27T21:06:40.3Z",
+        "isBanned": false,
+        "externalAppDisplayName": null,
+        "hasVerifiedBadge": true,
+        "id": 1,
+        "name": "Roblox",
+        "displayName": "Roblox"
+    }
     """
     userinfo_check = get_request_url(f"https://users.roblox.com/v1/users/{str(user_id)}")
     if userinfo_check.ok:
@@ -334,7 +475,15 @@ def get_universe_votes(universe_id) -> dict:
     Gets universe votes from universe ID.
 
     Example JSON:
-    {"data":[{"id":5988568657,"upVotes":8922,"downVotes":670}]}
+    {
+        "data": [
+            {
+                "id": 5988568657,
+                "upVotes": 8922,
+                "downVotes": 670
+            }
+        ]
+    }
     """
     universevotes_check = get_request_url(f"https://games.roblox.com/v1/games/votes?universeIds={str(universe_id)}")
     if universevotes_check.ok:
@@ -406,7 +555,56 @@ def get_universe_badges_first_page(universe_id) -> dict:
     Used to check if the universe contains any badges.
 
     Example JSON:
-    {"previousPageCursor":null,"nextPageCursor":"{NEXTPAGECURSOR}","data":[{"id":2124422674,"name":"You visited!","description":"Thanks for visiting!","displayName":"You visited!","displayDescription":"Thanks for visiting!","enabled":true,"iconImageId":2177787489,"displayIconImageId":2177787489,"created":"2018-08-06T05:47:40.36+00:00","updated":"2024-11-19T19:24:07.956+00:00","statistics":{"pastDayAwardedCount":1,"awardedCount":8113,"winRatePercentage":1.0},"awardingUniverse":{"id":718992538,"name":"Escape The Clown Obby","rootPlaceId":2039280318}},{"id":2124422675,"name":"YOU WON!","description":"Congratulations, you made it all the way!","displayName":"YOU WON!","displayDescription":"Congratulations, you made it all the way!","enabled":true,"iconImageId":2177807506,"displayIconImageId":2177807506,"created":"2018-08-06T05:54:17.323+00:00","updated":"2024-11-19T19:24:07.957+00:00","statistics":{"pastDayAwardedCount":1,"awardedCount":324,"winRatePercentage":1.0},"awardingUniverse":{"id":718992538,"name":"Escape The Clown Obby","rootPlaceId":2039280318}}]}
+    {
+        "previousPageCursor": null,
+        "nextPageCursor": "{NEXTPAGECURSOR}",
+        "data": [
+            {
+                "id": 2124422674,
+                "name": "You visited!",
+                "description": "Thanks for visiting!",
+                "displayName": "You visited!",
+                "displayDescription": "Thanks for visiting!",
+                "enabled": true,
+                "iconImageId": 2177787489,
+                "displayIconImageId": 2177787489,
+                "created": "2018-08-06T05:47:40.36+00:00",
+                "updated": "2024-11-19T19:24:07.956+00:00",
+                "statistics": {
+                    "pastDayAwardedCount": 1,
+                    "awardedCount": 8113,
+                    "winRatePercentage": 1.0
+                },
+                "awardingUniverse": {
+                    "id": 718992538,
+                    "name": "Escape The Clown Obby",
+                    "rootPlaceId": 2039280318
+                }
+            },
+            {
+                "id": 2124422675,
+                "name": "YOU WON!",
+                "description": "Congratulations, you made it all the way!",
+                "displayName": "YOU WON!",
+                "displayDescription": "Congratulations, you made it all the way!",
+                "enabled": true,
+                "iconImageId": 2177807506,
+                "displayIconImageId": 2177807506,
+                "created": "2018-08-06T05:54:17.323+00:00",
+                "updated": "2024-11-19T19:24:07.957+00:00",
+                "statistics": {
+                    "pastDayAwardedCount": 1,
+                    "awardedCount": 324,
+                    "winRatePercentage": 1.0
+                },
+                "awardingUniverse": {
+                    "id": 718992538,
+                    "name": "Escape The Clown Obby",
+                    "rootPlaceId": 2039280318
+                }
+            }
+        ]
+    }
     """
     universebadges_check = get_request_url(f"https://badges.roblox.com/v1/universes/{str(universe_id)}/badges")  # ?limit=10&sortOrder=Asc")
     if universebadges_check.ok:
@@ -423,7 +621,9 @@ def get_universe_from_place_id(place_id) -> dict:
     Gets the universe ID from a place ID.
 
     Example JSON:
-    {"universeId":13058}
+    {
+        "universeId": 13058
+    }
     """
     universeid_check = get_request_url(f"https://apis.roblox.com/universes/v1/places/{str(place_id)}/universe")
     if universeid_check.ok:
