@@ -7,8 +7,8 @@ Uses pickle (or pickle5 for older pythons) and json.
 # Licensed under the GNU General Public License Version 3.0
 # (see below for more details)
 
-import os
 import json
+import os
 import pickle
 
 from alcubierre.modules.verbose_print import vPrint

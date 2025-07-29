@@ -6,10 +6,10 @@ Request handling for alcubierre.
 # Licensed under the GNU General Public License Version 3.0
 # (see below for more details)
 
-import time
-import random
 import math
+import random
 import requests
+import time
 
 from alcubierre.modules import data_save
 from alcubierre.modules.verbose_print import vPrint, vvPrint, log_n_print, error_n_print

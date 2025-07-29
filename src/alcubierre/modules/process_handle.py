@@ -7,11 +7,11 @@ Loads enviroment file.
 # (see below for more details)
 
 import os
-import subprocess
 import platform
+import psutil
+import subprocess
 import time
 import webbrowser
-import psutil
 
 from alcubierre.modules import api_reqs, data_save
 from alcubierre.modules.rbx_types import RbxInstance, RbxReason, RbxType

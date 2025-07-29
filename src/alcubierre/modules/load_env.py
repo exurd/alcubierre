@@ -7,8 +7,8 @@ Mainly for api_reqs: RBX_TOKEN and USER_AGENT.
 # Licensed under the GNU General Public License Version 3.0
 # (see below for more details)
 
-import os
 import argparse
+import os
 from dotenv import load_dotenv
 
 

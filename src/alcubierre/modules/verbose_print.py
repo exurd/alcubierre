@@ -9,8 +9,8 @@ I could've used logging. I should've used logging.
 # Licensed under the GNU General Public License Version 3.0
 # (see below for more details)
 
-import logging
 import inspect
+import logging
 
 logger = logging.getLogger()
 

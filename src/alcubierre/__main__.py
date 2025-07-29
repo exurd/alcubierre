@@ -6,13 +6,14 @@ Roblox Badge-to-Badge Place Teleporter
 # Licensed under the GNU General Public License Version 3.0
 # (see below for more details)
 
+import argparse
+import importlib.metadata
+import logging
 import os
 import re
 import sys
-import argparse
 import time
-import logging
-import importlib.metadata
+
 from alcubierre.modules import api_reqs
 from alcubierre.modules.verbose_print import toggle_verbose_print, toggle_very_verbose_print, log_n_print
 
