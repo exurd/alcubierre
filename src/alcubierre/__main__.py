@@ -224,7 +224,7 @@ def main(args=None):
             vPrint(f"Loading .env file [{args.env_file}]...")
             data = load_env.load_env_file(env_file)
             if rbx_token == parser.get_default("RBX_TOKEN"):
-                if "RBX_TOKEN" in data and data["USER_AGENT"] != "":
+                if "RBX_TOKEN" in data and data["RBX_TOKEN"] != "":
                     rbx_token = data["RBX_TOKEN"]
 
             if user_agent == parser.get_default("USER_AGENT"):
