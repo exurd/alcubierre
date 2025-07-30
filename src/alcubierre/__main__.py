@@ -154,6 +154,9 @@ def get_parser() -> argparse.ArgumentParser:
 
     parser.add_argument("--no-detect-one-badge", "-ndob", action="store_false",
                         help="Turns off one badge place detection, which automatically closes Roblox after the user has collected the solo badge on a place.")
+    
+    parser.add_argument("--check-badges-beforehand", "-c", action="store_true",
+                        help="Checks which badges a user has already collected in a list before starting the main loop.")
 
     parser.add_argument("--cache-directory", "-cd", default=os.path.join(base_cache_path, "alcubierre_cache"),
                         help="The directory where cache data is kept.")
@@ -265,6 +268,32 @@ def main(args=None):
 
     if args.save_response_cache:
         api_reqs.get_perm_cache()
+
+    data_save.init()
+
+    if args.check_badges_beforehand:
+        if user_id == parser.get_default("user_id"):
+            parser.error("--check-badges-beforehand requires the following arguments: --user-id, --rbx-token or --env-file containing `RBX_TOKEN=`")
+        from alcubierre.modules import rbx_types
+        log_n_print("Checking already awarded badges in list...")
+
+        badge_list = []
+        for line in lines:
+            roblox_id = id_type = None
+
+            if "::" in line:
+                roblox_id, id_type = rbx_types.check_for_coloncolon_string(line)
+            if roblox_id is None and id_type is None:
+                roblox_id, id_type = rbx_types.check_regex_strings(line)
+            
+            if id_type == rbx_types.RbxType.BADGE and roblox_id is not None:
+                badge_list.append(roblox_id)
+
+        badge_list_checks = api_reqs.multicheck_user_inv_for_badges(user_id, badge_list)
+        for badge_id in badge_list_checks:
+            if badge_list_checks[badge_id] and not int(badge_id) in data_save.GOTTEN_BADGES:
+                data_save.GOTTEN_BADGES.append(badge_id)
+        data_save.save_data(data_save.GOTTEN_BADGES, "gotten_badges.json")
 
     vPrint("Starting scriptLoop...")
     from alcubierre.modules import script_loop

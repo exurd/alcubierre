@@ -550,6 +550,50 @@ def check_user_inv_for_badge(user_id=0, badge_id=0) -> bool:
     return None
 
 
+# https://stackoverflow.com/a/312464
+def _chunks(lst, n):
+    """
+    Yield successive n-sized chunks from lst.
+    """
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
+
+
+def multicheck_user_inv_for_badges(user_id=0, badge_ids=[], retry_amount=2) -> list[bool]:
+    """
+    Checks multiple badges in user's inventory.
+    Results are not cached.
+
+    This only uses the badges API to check,
+    as the inventory API does not have a method
+    to multicheck assets.
+    """
+    badge_ids = list(set(badge_ids))  # dedupe list
+    if user_id != 0 and user_id is not None and len(badge_ids) != 0:
+        if len(badge_ids) > 100:
+            combined_badge_dict = {}
+            for b_chunk in _chunks(badge_ids, 100):
+                combined_badge_dict = {**combined_badge_dict, **multicheck_user_inv_for_badges(b_chunk)}
+            return combined_badge_dict
+
+        badge_dict = {}
+        for _ in range(retry_amount):
+            userbadge_check = get_request_url(f"https://badges.roblox.com/v1/users/{str(user_id)}/badges/awarded-dates?badgeIds={','.join(badge_ids)}", cache_results=False)
+            if userbadge_check.ok:
+                userbadge_json = userbadge_check.json()
+                if userbadge_json["data"] == []:
+                    return {}
+
+                for badge in userbadge_json["data"]:
+                    badge_dict[badge["badgeId"]] = False
+                    if str(badge["badgeId"]) in badge_ids:
+                        badge_dict[badge["badgeId"]] = True
+                return badge_dict
+            time.sleep(3)
+        return {}
+    return None
+
+
 def get_universe_badges_first_page(universe_id) -> dict:
     """
     Gets the first page of universe badges.

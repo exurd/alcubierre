@@ -227,9 +227,6 @@ def is_universe_one_badge(an_rbxinstance: RbxInstance) -> bool:
     return False
 
 
-data_save.init()
-
-
 def handle_line(line, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, secs_reincarnation=-1, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="", check_if_badges_on_universe=True, detect_one_badge_universes=True):
     """
     Handles lines from text file.
