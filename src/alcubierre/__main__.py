@@ -49,7 +49,7 @@ if getattr(sys, "frozen", False):
     base_cache_path = os.path.dirname(sys.executable)
 else:
     base_path = os.path.dirname(__file__)
-    base_cache_path = os.path.dirname(__file__)
+    base_cache_path = os.getcwd()
 
 URL_PATTERN = re.compile(r"https?://")
 
