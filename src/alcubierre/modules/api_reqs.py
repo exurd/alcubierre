@@ -573,7 +573,7 @@ def multicheck_user_inv_for_badges(user_id=0, badge_ids=[], retry_amount=2) -> l
         if len(badge_ids) > 100:
             combined_badge_dict = {}
             for b_chunk in _chunks(badge_ids, 100):
-                combined_badge_dict = {**combined_badge_dict, **multicheck_user_inv_for_badges(b_chunk)}
+                combined_badge_dict = {**combined_badge_dict, **multicheck_user_inv_for_badges(user_id, b_chunk)}
             return combined_badge_dict
 
         badge_dict = {}
