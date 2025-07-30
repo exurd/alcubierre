@@ -60,7 +60,9 @@ def init(user_agent=None, rbx_token=None):
     if rbx_token is not None:
         request_session.cookies[".ROBLOSECURITY"] = str(rbx_token)
     else:
-        print("Warning: Ecomony API is limited to 1 request per minute!\nPlace playability info is unavailable!\nAdding your Roblox token is highly recommended!")
+        print("Warning: Ecomony API is limited to 1 request per minute!\n"
+              "Place playability info is unavailable!\n"
+              "Adding your Roblox token is highly recommended!")
 
 
 def is_token_cookie_there() -> bool:
