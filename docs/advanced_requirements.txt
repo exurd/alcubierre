@@ -1,6 +1,0 @@
-# linux
-# requires cario (https://pycairo.readthedocs.io/en/latest/getting_started.html), gobject-introspection-1.0 (https://stackoverflow.com/a/18027346)
-pygobject==3.42.2; python_version<="3.6" and sys_platform=="linux"
-# darwin
-# untested; arm64 macs do not support 3.6 nicely
-pyobjc==8.6; python_version<="3.6" and sys_platform=="darwin"
