@@ -19,6 +19,7 @@ if getattr(sys, "frozen", False):
     base_path = sys._MEIPASS
 else:
     base_path = os.path.join(os.path.dirname(__file__), "..")
+    base_path = os.path.abspath(base_path)
 
 sounds_folder = os.path.join(base_path, "sounds")
 soundPacks = os.listdir(sounds_folder)
