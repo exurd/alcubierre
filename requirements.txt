@@ -1,4 +1,4 @@
-playsound3==3.2.4
+playsound3==3.2.5
 psutil==7.0.0
 python-dotenv==1.1.1
 requests==2.32.4
