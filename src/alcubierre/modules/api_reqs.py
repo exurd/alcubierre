@@ -228,7 +228,11 @@ def get_place_info(place_id, no_alternative=False) -> dict:
                 error_n_print(f"Error in place_json! [{place_json}]")
                 return False
             vvPrint(f"place_json: [{place_json}]")
-            return place_json[0]
+            try:
+                return place_json[0]
+            except IndexError:
+                error_n_print(f"IndexError: place_json response is in unexpected format! [{place_json}]")
+                return False
         return False
 
     if not no_alternative:
@@ -344,7 +348,11 @@ def get_universe_info(universe_id) -> dict:
             return False
         else:
             vvPrint(f"universe_json: [{universe_json}]")
-            return universe_json["data"][0]
+            try:
+                return universe_json["data"][0]
+            except IndexError:
+                error_n_print(f"IndexError: universe_json response is in unexpected format! [{universe_json}]")
+                return False
     return False
 
 
@@ -377,7 +385,11 @@ def get_group_info(group_id) -> dict:
             return False
         else:
             vvPrint(f"groupinfo_json: [{groupinfo_json}]")
-            return groupinfo_json["data"][0]
+            try:
+                return groupinfo_json["data"][0]
+            except IndexError:
+                error_n_print(f"IndexError: groupinfo_json response is in unexpected format! [{groupinfo_json}]")
+                return False
     return False
 
 
@@ -494,7 +506,11 @@ def get_universe_votes(universe_id) -> dict:
             error_n_print(f"Error in universevotes_json! [{universevotes_json}]")
             return False
         vvPrint(f"universevotes_json: [{universevotes_json}]")
-        return universevotes_json["data"][0]
+        try:
+            return universevotes_json["data"][0]
+        except IndexError:
+            error_n_print(f"IndexError: universevotes_json response is in unexpected format! [{universevotes_json}]")
+            return False
     return False
 
 
