@@ -300,8 +300,6 @@ def handle_line(line, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, s
                 play_sound.play_sound("notify")
                 single_badge = True
 
-        time.sleep(15)
-
         process_rbxreason = process_handle.wait_for_process_or_badge_collect(line_rbxinstance, user_id, secs_reincarnation, single_badge)
         vPrint(f"process_rbxreason: {process_rbxreason}")
         if process_rbxreason == RbxReason.BADGE_COLLECTED:

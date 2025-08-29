@@ -113,6 +113,19 @@ def open_roblox_place(root_place_id, name=None, use_bloxstrap=True, use_sober=Tr
         #     #time.sleep(10)
 
         webbrowser.open(roblox_uri)
+    
+    # check if process opened correctly and try again if it closed by itself
+    vPrint("Waiting 15 seconds to check if Roblox opened successfully.")
+    vPrint("Please don't close the Roblox window!")
+    time.sleep(15)
+    if not isinstance(roblox_process_exists(), psutil.Process):
+        vPrint("Presuming Roblox closed by itself, retrying...")
+        return open_roblox_place(root_place_id=root_place_id,
+                                 name=name,
+                                 use_bloxstrap=use_bloxstrap,
+                                 use_sober=use_sober,
+                                 sober_opts=sober_opts
+                                 )
 
 
 def open_place_in_browser(place_id):
