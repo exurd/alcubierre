@@ -124,6 +124,9 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument("--vote-threshold", "-vt", type=float, default=-1, metavar="RATIO",
                         help="Threshold ratio of likes and dislikes. If a game has a lower ratio than the threshold, it gets skipped. Setting to -1 (default) disables the threshold.")
 
+    parser.add_argument("--visits-limit", "-vl", type=int, default=-1, metavar="NUMBER",
+                        help="Limit of the amount of visits on a universe. If the universe has a higher number than the limit, it gets skipped. Setting to -1 (default) disables the limit.")
+
     parser.add_argument("--seconds", "-s", type=int, default=-1,
                         help="How many seconds before killing the Roblox process. Setting to -1 (default) disables the timer.")
     # How long until you join the next game.
@@ -273,6 +276,7 @@ def main(args=None):
         user_id=user_id,
         awarded_threshold=args.awarded_threshold,
         vote_threshold=args.vote_threshold,
+        uni_visits_limit=args.visits_limit,
         secs_reincarnation=args.seconds,
         open_place_in_browser=args.open_in_browser,
         use_bloxstrap=args.no_bloxstrap,

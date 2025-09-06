@@ -134,6 +134,7 @@ class RbxReason(Enum):
     NOT_ENOUGH_PLAYERS_AWARDED = -6
     NO_UNIVERSE = -7
     BAD_VOTE_RATIO = -8
+    TOO_MANY_VISITS = -9
 
 
 class RbxInstance:

@@ -73,6 +73,10 @@ options:
                         Threshold ratio of likes and dislikes. If a game has a
                         lower ratio than the threshold, it gets skipped.
                         Setting to -1 (default) disables the threshold.
+  --visits-limit, -vl NUMBER
+                        Limit of the amount of visits on a universe. If the
+                        universe has a higher number than the limit, it gets
+                        skipped. Setting to -1 (default) disables the limit.
   --seconds, -s SECONDS
                         How many seconds before killing the Roblox process.
                         Setting to -1 (default) disables the timer.

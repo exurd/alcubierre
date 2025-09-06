@@ -13,12 +13,13 @@ from alcubierre.modules.rbx_types import RbxInstance, RbxType, RbxReason
 from alcubierre.modules.verbose_print import vPrint, log_n_print
 
 
-def deal_with_badge(badge_rbxinstance: RbxInstance, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="") -> RbxReason:
+def deal_with_badge(badge_rbxinstance: RbxInstance, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, uni_visits_limit=-1, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="") -> RbxReason:
     """
     Deals with RbxInstances with RbxType.BADGE
     """
     badge_info = badge_rbxinstance.info
     root_place_id = badge_info["awardingUniverse"]["rootPlaceId"]
+    universe_id = badge_info["awardingUniverse"]["id"]
     badge_name = badge_info["name"]
     log_n_print(f"Badge Name: {badge_name}")
 
@@ -35,19 +36,27 @@ def deal_with_badge(badge_rbxinstance: RbxInstance, user_id=None, awarded_thresh
         log_n_print("Badge is not enabled, skipping!")
         return RbxReason.NOT_ENABLED
 
-    check_universe_badges = api_reqs.get_universe_badges_first_page(badge_info["awardingUniverse"]["id"])
+    check_universe_badges = api_reqs.get_universe_badges_first_page(universe_id)
     if not check_universe_badges:
         log_n_print("No badges found in the universe/place, skipping...")
         return RbxReason.NO_BADGES_IN_UNIVERSE
 
     if vote_threshold != -1:
-        universe_votes = api_reqs.get_universe_votes(badge_info["awardingUniverse"]["id"])
+        universe_votes = api_reqs.get_universe_votes(universe_id)
         vPrint(f"universe_votes: {universe_votes}")
         uv_ratio = int(universe_votes["upVotes"]) / int(universe_votes["downVotes"])
         vPrint(f"uv_ratio: {uv_ratio}")
         if uv_ratio <= vote_threshold:
             log_n_print("Universe has a bad like-to-dislike ratio, skipping...")
             return RbxReason.BAD_VOTE_RATIO
+
+    if uni_visits_limit != -1:
+        universe_info = api_reqs.get_universe_info(universe_id)
+        if universe_info:
+            universe_visits = universe_info["visits"]
+            if universe_visits > uni_visits_limit:
+                log_n_print(f"Universe has too many visits ({universe_visits}), skipping...")
+                return RbxReason.TOO_MANY_VISITS
 
     place_details = api_reqs.get_place_info(root_place_id, no_alternative=True)  # need the auth-only place api for playability stats
     if place_details:
@@ -76,30 +85,38 @@ def deal_with_badge(badge_rbxinstance: RbxInstance, user_id=None, awarded_thresh
     return RbxReason.PROCESS_OPENED
 
 
-def deal_with_place(place_rbxinstance: RbxInstance, vote_threshold=-1.0, check_if_badges_on_universe=True, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="") -> RbxReason:
+def deal_with_place(place_rbxinstance: RbxInstance, vote_threshold=-1.0, uni_visits_limit=-1, check_if_badges_on_universe=True, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="") -> RbxReason:
     """
     Deals with RbxInstances with RbxType.PLACE
     """
     place_info = place_rbxinstance.info
 
-    if check_if_badges_on_universe:
-        universe_id = api_reqs.get_universe_from_place_id(place_rbxinstance.id)
-        if universe_id is not None:
-            check_universe_badges = api_reqs.get_universe_badges_first_page(universe_id)
-            if not check_universe_badges:
-                log_n_print("No badges found in the universe/place, skipping...")
-                return RbxReason.NO_BADGES_IN_UNIVERSE
-            if vote_threshold != -1:
-                universe_votes = api_reqs.get_universe_votes(universe_id)
-                vPrint(f"universe_votes: {universe_votes}")
-                uv_ratio = int(universe_votes["upVotes"]) / int(universe_votes["downVotes"])
-                vPrint(f"uv_ratio: {uv_ratio}")
-                if uv_ratio <= vote_threshold:
-                    log_n_print("Universe has a bad like-to-dislike ratio, skipping...")
-                    return RbxReason.BAD_VOTE_RATIO
+    universe_id = api_reqs.get_universe_from_place_id(place_rbxinstance.id)
+    if universe_id is None:  # no universe means that it"s most likely *not* a place...
+        return RbxReason.NO_UNIVERSE
 
-        else:  # no universe means that it"s most likely *not* a place...
-            return RbxReason.NO_UNIVERSE
+    if check_if_badges_on_universe:
+        check_universe_badges = api_reqs.get_universe_badges_first_page(universe_id)
+        if not check_universe_badges:
+            log_n_print("No badges found in the universe/place, skipping...")
+            return RbxReason.NO_BADGES_IN_UNIVERSE
+
+    if vote_threshold != -1:
+        universe_votes = api_reqs.get_universe_votes(universe_id)
+        vPrint(f"universe_votes: {universe_votes}")
+        uv_ratio = int(universe_votes["upVotes"]) / int(universe_votes["downVotes"])
+        vPrint(f"uv_ratio: {uv_ratio}")
+        if uv_ratio <= vote_threshold:
+            log_n_print("Universe has a bad like-to-dislike ratio, skipping...")
+            return RbxReason.BAD_VOTE_RATIO
+
+    if uni_visits_limit != -1:
+        universe_info = api_reqs.get_universe_info(universe_id)
+        if universe_info:
+            universe_visits = universe_info["visits"]
+            if universe_visits > uni_visits_limit:
+                log_n_print(f"Universe has too many visits ({universe_visits}), skipping...")
+                return RbxReason.TOO_MANY_VISITS
 
     if open_place_in_browser:
         process_handle.open_place_in_browser(place_rbxinstance.id)
@@ -113,7 +130,7 @@ def deal_with_place(place_rbxinstance: RbxInstance, vote_threshold=-1.0, check_i
     return RbxReason.PROCESS_OPENED
 
 
-def deal_with_universe(universe_rbxinstance: RbxInstance, vote_threshold=-1.0, check_if_badges_on_universe=True, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="") -> RbxReason:
+def deal_with_universe(universe_rbxinstance: RbxInstance, vote_threshold=-1.0, uni_visits_limit=-1, check_if_badges_on_universe=True, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="") -> RbxReason:
     """
     Deals with RbxInstances with RbxType.UNIVERSE
     """
@@ -135,6 +152,12 @@ def deal_with_universe(universe_rbxinstance: RbxInstance, vote_threshold=-1.0, c
             log_n_print("Universe has a bad like-to-dislike ratio, skipping...")
             return RbxReason.BAD_VOTE_RATIO
 
+    if uni_visits_limit != -1:
+        universe_visits = universe_info["visits"]
+        if universe_visits > uni_visits_limit:
+            log_n_print(f"Universe has too many visits ({universe_visits}), skipping...")
+            return RbxReason.TOO_MANY_VISITS
+
     place_details = api_reqs.get_place_info(root_place_id, no_alternative=True)  # need the auth-only place api for playability stats
     if place_details:
         if not place_details["isPlayable"]:
@@ -153,7 +176,7 @@ def deal_with_universe(universe_rbxinstance: RbxInstance, vote_threshold=-1.0, c
     return RbxReason.PROCESS_OPENED
 
 
-def deal_with_rbxinstance(an_rbxinstance: RbxInstance, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, check_if_badges_on_universe=True, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="", nested=False) -> RbxReason:
+def deal_with_rbxinstance(an_rbxinstance: RbxInstance, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, uni_visits_limit=-1, check_if_badges_on_universe=True, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="", nested=False) -> RbxReason:
     """
     Deals with rbxInstance; should either return a new process or rbxReason
     """
@@ -164,6 +187,7 @@ def deal_with_rbxinstance(an_rbxinstance: RbxInstance, user_id=None, awarded_thr
             user_id=user_id,
             awarded_threshold=awarded_threshold,
             vote_threshold=vote_threshold,
+            uni_visits_limit=uni_visits_limit,
             open_place_in_browser=open_place_in_browser,
             use_bloxstrap=use_bloxstrap,
             use_sober=use_sober,
@@ -173,6 +197,7 @@ def deal_with_rbxinstance(an_rbxinstance: RbxInstance, user_id=None, awarded_thr
         result = deal_with_place(
             place_rbxinstance=an_rbxinstance,
             vote_threshold=vote_threshold,
+            uni_visits_limit=uni_visits_limit,
             open_place_in_browser=open_place_in_browser,
             use_bloxstrap=use_bloxstrap,
             use_sober=use_sober,
@@ -189,6 +214,7 @@ def deal_with_rbxinstance(an_rbxinstance: RbxInstance, user_id=None, awarded_thr
                 user_id=user_id,
                 awarded_threshold=awarded_threshold,
                 vote_threshold=vote_threshold,
+                uni_visits_limit=uni_visits_limit,
                 check_if_badges_on_universe=check_if_badges_on_universe,
                 open_place_in_browser=open_place_in_browser,
                 use_bloxstrap=use_bloxstrap,
@@ -200,6 +226,7 @@ def deal_with_rbxinstance(an_rbxinstance: RbxInstance, user_id=None, awarded_thr
         result = deal_with_universe(
             universe_rbxinstance=an_rbxinstance,
             vote_threshold=vote_threshold,
+            uni_visits_limit=uni_visits_limit,
             check_if_badges_on_universe=check_if_badges_on_universe,
             open_place_in_browser=open_place_in_browser,
             use_bloxstrap=use_bloxstrap,
@@ -230,7 +257,7 @@ def is_universe_one_badge(an_rbxinstance: RbxInstance) -> bool:
 data_save.init()
 
 
-def handle_line(line, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, secs_reincarnation=-1, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="", check_if_badges_on_universe=True, detect_one_badge_universes=True):
+def handle_line(line, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, uni_visits_limit=-1, secs_reincarnation=-1, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="", check_if_badges_on_universe=True, detect_one_badge_universes=True):
     """
     Handles lines from text file.
     """
@@ -271,6 +298,7 @@ def handle_line(line, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, s
                     user_id=user_id,
                     awarded_threshold=awarded_threshold,
                     vote_threshold=vote_threshold,
+                    uni_visits_limit=uni_visits_limit,
                     secs_reincarnation=secs_reincarnation,
                     open_place_in_browser=open_place_in_browser,
                     use_bloxstrap=use_bloxstrap,
@@ -284,6 +312,7 @@ def handle_line(line, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, s
                                            user_id=user_id,
                                            awarded_threshold=awarded_threshold,
                                            vote_threshold=vote_threshold,
+                                           uni_visits_limit=uni_visits_limit,
                                            check_if_badges_on_universe=check_if_badges_on_universe,
                                            open_place_in_browser=open_place_in_browser,
                                            use_bloxstrap=use_bloxstrap,
@@ -311,7 +340,7 @@ def handle_line(line, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, s
     return True
 
 
-def start(lines, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, secs_reincarnation=-1, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="", check_if_badges_on_universe=True, detect_one_badge_universes=True):
+def start(lines, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, uni_visits_limit=-1, secs_reincarnation=-1, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="", check_if_badges_on_universe=True, detect_one_badge_universes=True):
     """
     'Start from lines, give what needs to be new'
     """
@@ -322,6 +351,8 @@ def start(lines, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, secs_r
         awarded_threshold = -1
     if not isinstance(vote_threshold, float):
         vote_threshold = -1.0
+    if not isinstance(uni_visits_limit, int):
+        uni_visits_limit = -1
     if not isinstance(secs_reincarnation, int):
         secs_reincarnation = -1
     if not isinstance(open_place_in_browser, bool):
@@ -350,6 +381,7 @@ def start(lines, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, secs_r
                     user_id=user_id,
                     awarded_threshold=awarded_threshold,
                     vote_threshold=vote_threshold,
+                    uni_visits_limit=uni_visits_limit,
                     secs_reincarnation=secs_reincarnation,
                     open_place_in_browser=open_place_in_browser,
                     use_bloxstrap=use_bloxstrap,
