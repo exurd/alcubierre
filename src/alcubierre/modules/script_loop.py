@@ -330,8 +330,8 @@ def start(lines, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, secs_r
         use_bloxstrap = True
     if not isinstance(use_sober, bool):
         use_sober = True
-    if not isinstance(open_place_in_browser, bool):
-        open_place_in_browser = False
+    if not isinstance(sober_opts, str):
+        sober_opts = ""
     if not isinstance(check_if_badges_on_universe, bool):
         check_if_badges_on_universe = True
     if not isinstance(detect_one_badge_universes, bool):
