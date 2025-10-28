@@ -2,7 +2,7 @@
 <img src="docs/icon.png" title="icon for alcubierre" style="image-rendering:smooth; width:25%; height:auto;"/>
 
 ###### Roblox Badge-to-Badge Place Teleporter
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 ![GitHub repo size](https://img.shields.io/github/repo-size/exurd/alcubierre)
 ![Github Created At](https://img.shields.io/github/created-at/exurd/alcubierre)
 ![GitHub commit activity week](https://img.shields.io/github/commit-activity/w/exurd/alcubierre)
@@ -13,7 +13,7 @@
 
 This program currently supports player badges, [places](https://roblox.fandom.com/wiki/Place), [universes/experiences](https://roblox.fandom.com/wiki/Experience), [users/players](https://roblox.fandom.com/wiki/User), and [groups](https://roblox.fandom.com/wiki/Group). 
 
-It can run on Python 3.8 and above. It also supports [Bloxstrap](https://bloxstraplabs.com) and [Sober](https://sober.vinegarhq.org).
+It can run on Python 3.9 and above. It also supports [Bloxstrap](https://bloxstraplabs.com) and [Sober](https://sober.vinegarhq.org).
 
 Any questions?
 
