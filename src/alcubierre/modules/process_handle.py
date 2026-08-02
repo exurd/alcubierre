@@ -151,7 +151,9 @@ def open_roblox_place(
     vPrint("Waiting 15 seconds to check if Roblox opened successfully.")
     vPrint("Please don't close the Roblox window!")
     time.sleep(15)
-    if not isinstance(roblox_process_exists(), psutil.Process):
+
+    p = roblox_process_exists()
+    if not isinstance(p, psutil.Process) or has_visible_window(p.pid) is False:
         vPrint("Presuming Roblox closed by itself, retrying...")
         return open_roblox_place(root_place_id=root_place_id,
                                 name=name,
