@@ -13,7 +13,17 @@ from alcubierre.modules.rbx_types import RbxInstance, RbxType, RbxReason
 from alcubierre.modules.verbose_print import vPrint, log_n_print
 
 
-def deal_with_badge(badge_rbxinstance: RbxInstance, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, uni_visits_limit=-1, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="") -> RbxReason:
+def deal_with_badge(
+        badge_rbxinstance: RbxInstance,
+        user_id=None,
+        awarded_threshold=-1,
+        vote_threshold=-1.0,
+        uni_visits_limit=-1,
+        open_place_in_browser=False,
+        use_bloxstrap=True,
+        use_sober=True,
+        sober_opts=""
+    ) -> RbxReason:
     """
     Deals with RbxInstances with RbxType.BADGE
     """
@@ -77,15 +87,24 @@ def deal_with_badge(badge_rbxinstance: RbxInstance, user_id=None, awarded_thresh
         process_handle.open_place_in_browser(root_place_id)
 
     process_handle.open_roblox_place(root_place_id,
-                                     name=badge_info["awardingUniverse"]["name"],
-                                     use_bloxstrap=use_bloxstrap,
-                                     use_sober=use_sober,
-                                     sober_opts=sober_opts
-                                     )
+                                    name=badge_info["awardingUniverse"]["name"],
+                                    use_bloxstrap=use_bloxstrap,
+                                    use_sober=use_sober,
+                                    sober_opts=sober_opts
+                                    )
     return RbxReason.PROCESS_OPENED
 
 
-def deal_with_place(place_rbxinstance: RbxInstance, vote_threshold=-1.0, uni_visits_limit=-1, check_if_badges_on_universe=True, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="") -> RbxReason:
+def deal_with_place(
+        place_rbxinstance: RbxInstance,
+        vote_threshold=-1.0,
+        uni_visits_limit=-1,
+        check_if_badges_on_universe=True,
+        open_place_in_browser=False,
+        use_bloxstrap=True,
+        use_sober=True,
+        sober_opts=""
+    ) -> RbxReason:
     """
     Deals with RbxInstances with RbxType.PLACE
     """
@@ -122,15 +141,24 @@ def deal_with_place(place_rbxinstance: RbxInstance, vote_threshold=-1.0, uni_vis
         process_handle.open_place_in_browser(place_rbxinstance.id)
 
     process_handle.open_roblox_place(place_rbxinstance.id,
-                                     name=place_info["name"],
-                                     use_bloxstrap=use_bloxstrap,
-                                     use_sober=use_sober,
-                                     sober_opts=sober_opts
-                                     )
+                                    name=place_info["name"],
+                                    use_bloxstrap=use_bloxstrap,
+                                    use_sober=use_sober,
+                                    sober_opts=sober_opts
+                                    )
     return RbxReason.PROCESS_OPENED
 
 
-def deal_with_universe(universe_rbxinstance: RbxInstance, vote_threshold=-1.0, uni_visits_limit=-1, check_if_badges_on_universe=True, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="") -> RbxReason:
+def deal_with_universe(
+        universe_rbxinstance: RbxInstance,
+        vote_threshold=-1.0,
+        uni_visits_limit=-1,
+        check_if_badges_on_universe=True,
+        open_place_in_browser=False,
+        use_bloxstrap=True,
+        use_sober=True,
+        sober_opts=""
+    ) -> RbxReason:
     """
     Deals with RbxInstances with RbxType.UNIVERSE
     """
@@ -168,15 +196,27 @@ def deal_with_universe(universe_rbxinstance: RbxInstance, vote_threshold=-1.0, u
         process_handle.open_place_in_browser(root_place_id)
 
     process_handle.open_roblox_place(root_place_id,
-                                     name=universe_info["name"],
-                                     use_bloxstrap=use_bloxstrap,
-                                     use_sober=use_sober,
-                                     sober_opts=sober_opts
-                                     )
+                                    name=universe_info["name"],
+                                    use_bloxstrap=use_bloxstrap,
+                                    use_sober=use_sober,
+                                    sober_opts=sober_opts
+                                    )
     return RbxReason.PROCESS_OPENED
 
 
-def deal_with_rbxinstance(an_rbxinstance: RbxInstance, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, uni_visits_limit=-1, check_if_badges_on_universe=True, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="", nested=False) -> RbxReason:
+def deal_with_rbxinstance(
+        an_rbxinstance: RbxInstance,
+        user_id=None,
+        awarded_threshold=-1,
+        vote_threshold=-1.0,
+        uni_visits_limit=-1,
+        check_if_badges_on_universe=True,
+        open_place_in_browser=False,
+        use_bloxstrap=True,
+        use_sober=True,
+        sober_opts="",
+        nested=False
+    ) -> RbxReason:
     """
     Deals with rbxInstance; should either return a new process or rbxReason
     """
@@ -254,7 +294,20 @@ def is_universe_one_badge(an_rbxinstance: RbxInstance) -> bool:
     return False
 
 
-def handle_line(line, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, uni_visits_limit=-1, secs_reincarnation=-1, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="", check_if_badges_on_universe=True, detect_one_badge_universes=True):
+def handle_line(
+        line,
+        user_id=None,
+        awarded_threshold=-1,
+        vote_threshold=-1.0,
+        uni_visits_limit=-1,
+        secs_reincarnation=-1,
+        open_place_in_browser=False,
+        use_bloxstrap=True,
+        use_sober=True,
+        sober_opts="",
+        check_if_badges_on_universe=True,
+        detect_one_badge_universes=True
+    ):
     """
     Handles lines from text file.
     """
@@ -337,7 +390,20 @@ def handle_line(line, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, u
     return True
 
 
-def start(lines, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, uni_visits_limit=-1, secs_reincarnation=-1, open_place_in_browser=False, use_bloxstrap=True, use_sober=True, sober_opts="", check_if_badges_on_universe=True, detect_one_badge_universes=True):
+def start(
+        lines,
+        user_id=None,
+        awarded_threshold=-1,
+        vote_threshold=-1.0,
+        uni_visits_limit=-1,
+        secs_reincarnation=-1,
+        open_place_in_browser=False,
+        use_bloxstrap=True,
+        use_sober=True,
+        sober_opts="",
+        check_if_badges_on_universe=True,
+        detect_one_badge_universes=True
+    ):
     """
     'Start from lines, give what needs to be new'
     """
@@ -366,7 +432,6 @@ def start(lines, user_id=None, awarded_threshold=-1, vote_threshold=-1.0, uni_vi
         detect_one_badge_universes = True
 
     for line_number, line in enumerate(lines, start=1):
-        # print(line)
         stripped_line = line.strip()
         log_n_print(f"Line {line_number}: {stripped_line}")
 
