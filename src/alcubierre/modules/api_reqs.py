@@ -13,6 +13,7 @@ import time
 
 from alcubierre.modules import data_save
 from alcubierre.modules.verbose_print import vPrint, vvPrint, log_n_print, error_n_print
+from alcubierre.modules.load_env import save_current_env_file
 
 RESPONSE_CACHE = {}
 USING_PERM_CACHE = False
@@ -102,16 +103,29 @@ def get_request_url(
         try:
             response = request_session.get(url)
             vPrint(f"Response Status Code: {response.status_code}")
-            sc = response.status_code
-            if sc in (200, 302):
+            stat_c = response.status_code
+            if stat_c in (200, 302):
                 return save_to_perm_cache(url, response, cache_results)  # OK, Found
-            if accept_forbidden and sc == 403:
+            if accept_forbidden and stat_c == 403:
                 return save_to_perm_cache(url, response, cache_results)  # Forbidden (if acceptForbidden)
-            if accept_not_found and sc == 404:
+            if accept_not_found and stat_c == 404:
                 return save_to_perm_cache(url, response, cache_results)  # Not Found (if acceptNotFound)
-            if sc == 410:
+            if stat_c == 410:
                 return save_to_perm_cache(url, response, cache_results)  # Gone
             response.raise_for_status()
+
+            # check if cookie has been replaced
+            set_cook = response.headers["Set-Cookie"]
+            if set_cook:
+                vPrint(f"Set-Cookie was sent by server! Checking if .ROBLOSECURITY was changed...")
+                if ".ROBLOSECURITY" in response.cookies:
+                    vPrint(f".ROBLOSECURITY changed! Updating .env file...")
+                    log_n_print("Updating .env file with new .ROBLOSECURITY token from response...")
+                    save_current_env_file(
+                        request_session.cookies[".ROBLOSECURITY"],
+                        request_session.headers["User-Agent"]
+                    )
+
         except requests.exceptions.Timeout as e:
             vPrint("Timed out!")
             vPrint(f"Request failed: {e}")
@@ -120,12 +134,12 @@ def get_request_url(
             vPrint(f"Request failed: {e}")
             return False
         except requests.exceptions.HTTPError:
-            if sc == 403 or sc == 419:  # Forbidden (Roblox sends 403 for some requests that need a CSRF token), Page Expired
+            if stat_c == 403 or stat_c == 419:  # Forbidden (Roblox sends 403 for some requests that need a CSRF token), Page Expired
                 vPrint("Token Validation Failed. Re-validating...")
                 validate_csrf()
-            elif sc == 400:
+            elif stat_c == 400:
                 return False  # Bad Request
-            elif sc == 429:  # Too Many Requests
+            elif stat_c == 429:  # Too Many Requests
                 vPrint("Too many requests!")
         except requests.exceptions.RequestException as e:
             vPrint(f"Request failed: {e}")

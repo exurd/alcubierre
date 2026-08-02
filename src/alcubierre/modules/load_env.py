@@ -11,6 +11,8 @@ import argparse
 import os
 from dotenv import load_dotenv
 
+CURRENT_ENV_FILE = None
+
 
 def create_env_template(parser: argparse.ArgumentParser, env_file):
     """
@@ -30,15 +32,14 @@ def create_env_template(parser: argparse.ArgumentParser, env_file):
                 f.write(f"{env_var_name}={default_value}\n\n")
 
 
-def save_env_file(
-        filename,
+def save_current_env_file(
         rbx_token:str,
         user_agent:str
     ):
     """
-    Saves data to an .env file. Useful for when the .ROBLOSECURITY cookie is refreshed.
+    Saves data to the current .env file. Useful for when the .ROBLOSECURITY cookie is refreshed.
     """
-    with open(filename, "w", encoding="utf-8") as f:
+    with open(CURRENT_ENV_FILE, "w", encoding="utf-8") as f:
         f.write(f"RBX_TOKEN=\"{rbx_token}\"\n\n")
         f.write(f"USER_AGENT=\"{user_agent}\"\n\n")
 
@@ -55,6 +56,7 @@ def load_env_file(filename) -> dict:
             env_data["RBX_TOKEN"] = str(os.getenv("RBX_TOKEN"))
         if os.getenv("USER_AGENT"):
             env_data["USER_AGENT"] = str(os.getenv("USER_AGENT"))
+        CURRENT_ENV_FILE = filename
         return env_data
     return {}
 
