@@ -25,6 +25,11 @@ FLATPAK_SOBER_OPTS = "run --branch=master --arch=x86_64 --command=sober --file-f
 SYSTEM = platform.system()
 vPrint(f"System: {SYSTEM}")
 
+if SYSTEM == "Windows":
+    # for has_visible_window
+    import win32gui
+    import win32process
+
 ROBLOX_PROCESS_NAME = ""
 if SYSTEM == "Windows":
     ROBLOX_PROCESS_NAME = "RobloxPlayerBeta.exe"
@@ -46,6 +51,26 @@ def roblox_process_exists() -> psutil.Process:
         except psutil.NoSuchProcess:
             pass
     return None
+
+
+def has_visible_window(pid):
+    """
+    WINDOWS ONLY.
+    Detects if the PID has a visible window or not.
+    Needed to detecting background processes.
+    """
+    if SYSTEM == "Windows":
+        found = False
+
+        def callback(hwnd, _):
+            nonlocal found
+            if win32gui.IsWindowVisible(hwnd):
+                _, window_pid = win32process.GetWindowThreadProcessId(hwnd)
+                if window_pid == pid:
+                    found = True
+
+        win32gui.EnumWindows(callback, None)
+        return found
 
 
 def kill_roblox_process():
@@ -86,17 +111,19 @@ def open_roblox_place(
 
     roblox_uri = f"roblox://experiences/start?placeId={str(root_place_id)}"
 
-    # if bloxstrap exists and on windows, use it (unless ignored by args)
+    use_fallback = False
     if SYSTEM == "Windows" and use_bloxstrap:
-        bs_path = f"{os.getenv('LOCALAPPDATA')}\\Bloxstrap"
-        if os.path.exists(bs_path):
+        bs_exe = f"{os.getenv('LOCALAPPDATA')}\\Bloxstrap\\Bloxstrap.exe"
+        if os.path.exists(bs_exe):
             # https://stackoverflow.com/questions/14797236/python-howto-launch-a-full-process-not-a-child-process-and-retrieve-the-pid
             # otherwise, quitting script also closes roblox
             process = subprocess.Popen(
-                [f"{bs_path}\\Bloxstrap.exe", "-player", roblox_uri],
+                [f"{bs_exe}", "-player", roblox_uri],
                 creationflags=DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP)
             vPrint(process)
             # return good or bad(...?)
+        else:
+            use_fallback = True
     elif SYSTEM == "Linux" and use_sober:
         sober_path = os.path.join(os.path.expanduser("~"), ".var/app/org.vinegarhq.Sober")
         if os.path.exists(sober_path):
@@ -111,16 +138,15 @@ def open_roblox_place(
                                        stderr=subprocess.STDOUT
                                     )
             vPrint(process)
-    else:  # fallback that might or might not work *shrug*
-        # TODO: test if this part of the script works after all these years
+        else:
+            use_fallback = True
+    else:
+        use_fallback = True
 
-        # if not process_exists("RobloxPlayerBeta.exe"):
-        #     print("Roblox is closed; re-opening it")
-        #     webbrowser.open("roblox://")
-        #     #time.sleep(10)
-
+    if use_fallback:
+        vPrint(f"Opening with Roblox URI: [{roblox_uri}]")
         webbrowser.open(roblox_uri)
-    
+
     # check if process opened correctly and try again if it closed by itself
     vPrint("Waiting 15 seconds to check if Roblox opened successfully.")
     vPrint("Please don't close the Roblox window!")
@@ -157,14 +183,18 @@ def wait_for_process_or_badge_collect(
         print("Exit the game when you have finished.")
         while True:
             time.sleep(3)
-            if not isinstance(roblox_process_exists(), psutil.Process):
+            p = roblox_process_exists()
+            if not isinstance(p, psutil.Process):
+                return RbxReason.PROCESS_CLOSED
+            if has_visible_window(p.pid) is False:
+                # roblox is in the background, act if process was closed
                 return RbxReason.PROCESS_CLOSED
             if a_rbx_instance.type == RbxType.BADGE and user_id != 0:
                 if single_badge:
                     user_badge_check = api_reqs.check_user_inv_for_badge(user_id, a_rbx_instance.id)
                     if user_badge_check:
                         return RbxReason.BADGE_COLLECTED
-                    time.sleep(7)  # 10 secs to avoid rate limiting
+                    time.sleep(7)  # 7 secs to avoid rate limiting
     else:
         print("You got " + str(secs_reincarnation) + " seconds")
         time.sleep(secs_reincarnation)

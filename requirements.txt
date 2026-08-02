@@ -2,3 +2,4 @@ playsound3==3.2.8
 psutil==7.2.2
 python-dotenv==1.2.2
 requests==2.34.2
+pywin32==312; platform_system == "Windows"
