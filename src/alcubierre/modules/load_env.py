@@ -30,6 +30,19 @@ def create_env_template(parser: argparse.ArgumentParser, env_file):
                 f.write(f"{env_var_name}={default_value}\n\n")
 
 
+def save_env_file(
+        filename,
+        rbx_token:str,
+        user_agent:str
+    ):
+    """
+    Saves data to an .env file. Useful for when the .ROBLOSECURITY cookie is refreshed.
+    """
+    with open(filename, "w", encoding="utf-8") as f:
+        f.write(f"RBX_TOKEN=\"{rbx_token}\"\n\n")
+        f.write(f"USER_AGENT=\"{user_agent}\"\n\n")
+
+
 def load_env_file(filename) -> dict:
     """
     Loads env file from a filename and puts data found into dict.
