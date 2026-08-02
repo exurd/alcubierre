@@ -32,7 +32,11 @@ def get_perm_cache():
     RESPONSE_CACHE = perm_response_cache
 
 
-def save_to_perm_cache(url, response, cache_results=True) -> requests.Response:
+def save_to_perm_cache(
+        url,
+        response,
+        cache_results=True
+    ) -> requests.Response:
     """
     Saves response to pickled file.
     """
@@ -72,7 +76,14 @@ def is_token_cookie_there() -> bool:
     return ".ROBLOSECURITY" in request_session.cookies
 
 
-def get_request_url(url, retry_amount=8, accept_forbidden=False, accept_not_found=True, initial_wait_time=None, cache_results=True) -> requests.Response:
+def get_request_url(
+        url,
+        retry_amount=8,
+        accept_forbidden=False,
+        accept_not_found=True,
+        initial_wait_time=None,
+        cache_results=True
+    ) -> requests.Response:
     """
     Internal function to request urls.
     """
