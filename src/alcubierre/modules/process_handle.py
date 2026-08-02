@@ -62,7 +62,13 @@ def kill_roblox_process():
         vPrint(f"Killed process with PID {proc.pid}")
 
 
-def open_roblox_place(root_place_id, name=None, use_bloxstrap=True, use_sober=True, sober_opts=""):
+def open_roblox_place(
+        root_place_id,
+        name=None,
+        use_bloxstrap=True,
+        use_sober=True,
+        sober_opts=""
+    ):
     """
     Opens a Roblox place.
     `name` prints alongside the 'going to' message.
@@ -102,7 +108,8 @@ def open_roblox_place(root_place_id, name=None, use_bloxstrap=True, use_sober=Tr
             vPrint(f"sober_command: [{sober_command}]")
             process = subprocess.Popen(sober_command,
                                        stdout=subprocess.DEVNULL,
-                                       stderr=subprocess.STDOUT)
+                                       stderr=subprocess.STDOUT
+                                    )
             vPrint(process)
     else:  # fallback that might or might not work *shrug*
         # TODO: test if this part of the script works after all these years
@@ -121,11 +128,11 @@ def open_roblox_place(root_place_id, name=None, use_bloxstrap=True, use_sober=Tr
     if not isinstance(roblox_process_exists(), psutil.Process):
         vPrint("Presuming Roblox closed by itself, retrying...")
         return open_roblox_place(root_place_id=root_place_id,
-                                 name=name,
-                                 use_bloxstrap=use_bloxstrap,
-                                 use_sober=use_sober,
-                                 sober_opts=sober_opts
-                                 )
+                                name=name,
+                                use_bloxstrap=use_bloxstrap,
+                                use_sober=use_sober,
+                                sober_opts=sober_opts
+                                )
 
 
 def open_place_in_browser(place_id):
@@ -137,7 +144,12 @@ def open_place_in_browser(place_id):
     webbrowser.open(url)
 
 
-def wait_for_process_or_badge_collect(a_rbx_instance: RbxInstance, user_id=0, secs_reincarnation=-1, single_badge=True) -> RbxReason:
+def wait_for_process_or_badge_collect(
+        a_rbx_instance: RbxInstance,
+        user_id=0,
+        secs_reincarnation=-1,
+        single_badge=True
+    ) -> RbxReason:
     """
     Wait for Roblox process to close or badge to be collected.
     """
