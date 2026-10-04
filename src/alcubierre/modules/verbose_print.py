@@ -43,25 +43,25 @@ def toggle_very_verbose_print():
 def log_n_print(message):
     """
     Logs and prints the message (debug level).
-
-    It inspects the stack to get the module name
-    and line number that called this function.
     """
     print(message)
-    frm = inspect.stack()[1]
-    log(message, frm)
+    frame = inspect.currentframe()
+    try:
+        log(message, frame.f_back)
+    finally:
+        del frame
 
 
 def error_n_print(message):
     """
     Logs and prints the message (error level).
-
-    It inspects the stack to get the module name
-    and line number that called this function.
     """
     print(message)
-    frm = inspect.stack()[1]
-    log(message, frm, level=logging.ERROR)
+    frame = inspect.currentframe()
+    try:
+        log(message, frame.f_back, level=logging.ERROR)
+    finally:
+        del frame
 
 
 def log(message, frm=None, level=logging.DEBUG):
@@ -72,10 +72,10 @@ def log(message, frm=None, level=logging.DEBUG):
     and line number that called this function.
     """
     if frm is None:
-        frm = inspect.stack()[1]
+        frm = inspect.currentframe().f_back
 
-    mod = inspect.getmodule(frm[0])
-    message = f"{mod.__name__}:{frm.lineno} - {message}"
+    mod = frm.f_globals.get("__name__", "<unknown>")
+    message = f"{mod}:{frm.f_lineno} - {message}"
     logger.log(level, message)
 
 
